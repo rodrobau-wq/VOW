@@ -213,7 +213,7 @@ app.get('/api/app/contexto', async (req, res, next) => {
     const redes = await Promise.all(req.redesPermitidas.map((id) => store.porId('rede', id)))
     res.json({
       usuario: { nome: req.usuario.nome, email: req.usuario.email, papel: req.usuario.papel },
-      redes: redes.filter(Boolean).map((r) => ({ id: r.id, razao: r.razao, cnpj: r.cnpj, porte: r.porte, plano: r.plano })),
+      redes: redes.filter(Boolean).map((r) => ({ id: r.id, razao: r.razao, cnpj: r.cnpj, porte: r.porte, plano: r.plano, interna: r.interna === true })),
       redeAtual: req.rede ? { id: req.rede.id, razao: req.rede.razao } : null,
     })
   } catch (e) { next(e) }

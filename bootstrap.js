@@ -13,6 +13,7 @@
 import crypto from 'node:crypto'
 import * as store from './store.js'
 import { hashSenha } from './auth.js'
+import { PREMISSAS } from './motor.js'
 
 export async function primeiroAcesso() {
   const usuarios = await store.listar('usuario')
@@ -44,4 +45,39 @@ export async function primeiroAcesso() {
   console.log('─'.repeat(64))
 
   return { criado: true, email, sorteada }
+}
+
+/**
+ * Cria o registro da própria VOW.
+ *
+ * A VOW é uma consultoria, mas também é uma empresa: tem fornecedores,
+ * contratos e itens como qualquer cliente, e a seção 5.2 do brief de
+ * Indiretos observa que ela mesma é uma linha na carteira dos clientes dela.
+ * Tê-la cadastrada faz a plataforma abrir com algo dentro em vez de uma tela
+ * de escolher rede sem rede nenhuma.
+ *
+ * Roda quando NÃO existe rede alguma — inclusive numa instalação que já tem
+ * usuário, que é o caso de quem instalou antes desta versão. Depois da
+ * primeira rede, nunca mais age.
+ */
+export async function garantirRedeVow() {
+  const redes = await store.listar('rede')
+  if (redes.length) return { criada: false, motivo: `já existem ${redes.length} rede(s)` }
+
+  const rede = await store.inserir('rede', {
+    razao: process.env.VOW_RAZAO || 'Grupo VOW',
+    cnpj: process.env.VOW_CNPJ || '',
+    porte: 'Consultoria',
+    plano: 'interno',
+    // Distingue a casa dos clientes: relatório de carteira não deve somar a
+    // própria VOW junto com as redes atendidas.
+    interna: true,
+    programaConformidade: false,
+    premissas: {
+      aliquota: PREMISSAS.aliquota,
+      parcelaCestaBasica: PREMISSAS.indiretos.parcelaCestaBasicaPadrao,
+    },
+  })
+  console.log(`Rede da casa criada: ${rede.razao}`)
+  return { criada: true, id: rede.id, razao: rede.razao }
 }

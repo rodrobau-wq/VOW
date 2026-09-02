@@ -42,3 +42,23 @@ test('com usuário existente vira no-op — não troca senha nem cria segundo ac
   // A senha do admin original continua valendo.
   assert.ok(conferirSenha('senha-do-piloto', todos[0].senhaHash))
 })
+
+test('a rede da própria VOW é criada quando não há nenhuma', async () => {
+  const { garantirRedeVow } = await import('../bootstrap.js')
+  const r = await garantirRedeVow()
+  assert.equal(r.criada, true)
+
+  const [rede] = await store.listar('rede')
+  assert.equal(rede.razao, 'Grupo VOW')
+  // `interna` separa a casa dos clientes atendidos: relatório de carteira
+  // não pode somar a própria VOW junto com as redes.
+  assert.equal(rede.interna, true)
+  assert.ok(rede.premissas.aliquota > 0)
+})
+
+test('com rede existente vira no-op — não duplica a casa a cada deploy', async () => {
+  const { garantirRedeVow } = await import('../bootstrap.js')
+  const r = await garantirRedeVow()
+  assert.equal(r.criada, false)
+  assert.equal((await store.listar('rede')).length, 1)
+})

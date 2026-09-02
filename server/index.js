@@ -28,7 +28,7 @@ import { app as rotasApp } from './app.js'
 import { lerLeads, gravarLead, caminhoDb } from '../leads-db.js'
 import * as store from '../store.js'
 import { temPostgres } from '../db.js'
-import { primeiroAcesso } from '../bootstrap.js'
+import { primeiroAcesso, garantirRedeVow } from '../bootstrap.js'
 import { protegido } from '../basic-auth.js'
 import { migrarDoDisco, ultimaMigracao } from '../migrar.js'
 
@@ -321,6 +321,8 @@ app.listen(port, async () => {
     if (!m.migrou) console.log(`Migração: ${m.motivo}`)
     const r = await primeiroAcesso()
     if (!r.criado) console.log(`Plataforma: ${r.motivo}`)
+    const v = await garantirRedeVow()
+    if (!v.criada) console.log(`Rede da casa: ${v.motivo}`)
   } catch (e) {
     console.error('Falha ao criar o primeiro acesso:', e.message)
   }
