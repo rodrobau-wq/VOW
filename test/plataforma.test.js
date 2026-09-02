@@ -96,3 +96,18 @@ test('painel: contrato vencido não conta como cobertura', () => {
   })
   assert.equal(p.numeros.coberturaContratual.valor, 0)
 })
+
+test('URL pública: host sem domínio é descartado em vez de virar link quebrado', async () => {
+  const { _normalizar } = await import('../lib-url.js')
+  // O que o Render devolvia por `fromService property: host`.
+  assert.equal(_normalizar('vow-abras'), null)
+  assert.equal(_normalizar(''), null)
+  // O que RENDER_EXTERNAL_URL devolve.
+  assert.equal(_normalizar('https://vow-abras.onrender.com'), 'https://vow-abras.onrender.com')
+  // Sem esquema, assume https.
+  assert.equal(_normalizar('vow-abras.onrender.com'), 'https://vow-abras.onrender.com')
+  // Barra sobrando não duplica no path.
+  assert.equal(_normalizar('https://vow.com.br/'), 'https://vow.com.br')
+  // Dev continua valendo.
+  assert.equal(_normalizar('http://localhost:3000'), 'http://localhost:3000')
+})

@@ -35,11 +35,10 @@ services:
         generateValue: true
       - key: NODE_ENV
         value: production
-      - key: PUBLIC_BASE_URL
-        fromService:
-          type: web
-          name: vow-abras
-          property: host
+      # PUBLIC_BASE_URL fica de fora de propósito. `fromService property: host`
+      # devolve o hostname INTERNO ("vow-abras", sem domínio) e quebrava o QR
+      # do totem. O Render injeta RENDER_EXTERNAL_URL sozinho, e é dela que
+      # lib-url.js parte. Só defina PUBLIC_BASE_URL ao ligar domínio próprio.
       # Definir no dashboard do Render (marcados como sync:false = não versionados)
       - key: RESEND_API_KEY
         sync: false
