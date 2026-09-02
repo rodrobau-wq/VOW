@@ -26,6 +26,8 @@ import { diagnosticar, PREMISSAS, PORTES } from '../motor.js'
 import { enviarDiagnostico, montarHtml } from '../email.js'
 import { app as rotasApp } from './app.js'
 import { lerLeads, gravarLead, caminhoDb } from '../leads-db.js'
+import * as store from '../store.js'
+import { temPostgres } from '../db.js'
 import { primeiroAcesso } from '../bootstrap.js'
 import { migrarDoDisco } from '../migrar.js'
 
@@ -93,7 +95,20 @@ function lerEntrada(body) {
 }
 
 /* -------------------------------------------------------------------- API */
-app.get('/healthz', (_req, res) => res.json({ ok: true, uptime: process.uptime() }))
+/**
+ * Health check e estado de instalação.
+ *
+ * `inicializada` diz apenas SE existe algum acesso — nunca quem. Sem isso não
+ * há como saber de fora se a plataforma está pronta ou se o primeiro acesso
+ * nunca foi criado, e as duas situações se parecem: o login recusa igual.
+ */
+app.get('/healthz', async (_req, res) => {
+  let plataforma = { inicializada: null, persistencia: temPostgres() ? 'postgres' : 'espelho em disco' }
+  try {
+    plataforma.inicializada = (await store.listar('usuario')).length > 0
+  } catch { /* banco indisponível não pode derrubar o health check */ }
+  res.json({ ok: true, uptime: process.uptime(), plataforma })
+})
 
 app.get('/api/premissas', (_req, res) => res.json({ premissas: PREMISSAS, portes: PORTES }))
 
