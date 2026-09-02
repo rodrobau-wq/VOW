@@ -50,3 +50,9 @@ services:
         sync: false
       - key: LEADS_PASSWORD
         sync: false
+      # Primeiro acesso à plataforma. Só tem efeito enquanto não existir
+      # nenhum usuário — depois do primeiro login, é ignorado para sempre.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_SENHA
+        sync: false

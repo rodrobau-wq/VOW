@@ -26,6 +26,7 @@ import { diagnosticar, PREMISSAS, PORTES } from '../motor.js'
 import { enviarDiagnostico, montarHtml } from '../email.js'
 import { app as rotasApp } from './app.js'
 import { lerLeads, gravarLead, caminhoDb } from '../leads-db.js'
+import { primeiroAcesso } from '../bootstrap.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const RAIZ = path.join(__dirname, '..')
@@ -300,4 +301,14 @@ app.use((err, _req, res, _next) => {
 })
 
 const port = process.env.PORT || 3000
-app.listen(port, () => console.log(`VOW ABRAS na porta ${port} · leads em ${caminhoDb()}`))
+app.listen(port, async () => {
+  console.log(`VOW ABRAS na porta ${port} · leads em ${caminhoDb()}`)
+  // Cria o acesso inicial se o banco estiver vazio. Falhar aqui não pode
+  // derrubar o site público: o totem da feira não depende da plataforma.
+  try {
+    const r = await primeiroAcesso()
+    if (!r.criado) console.log(`Plataforma: ${r.motivo}`)
+  } catch (e) {
+    console.error('Falha ao criar o primeiro acesso:', e.message)
+  }
+})
