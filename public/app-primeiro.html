@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Primeiro acesso · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  body{min-height:100dvh;display:grid;place-items:center;padding:24px}
+  .caixa{width:100%;max-width:440px}
+  .topo{display:flex;align-items:center;gap:12px;margin-bottom:30px}
+  .caduceu{width:38px;height:38px;border:1px solid var(--gold-edge);border-radius:var(--r-sm);
+           display:grid;place-items:center;color:var(--gold);font-family:var(--serif);font-size:19px}
+  h1{font-size:34px;margin-bottom:10px}
+  h1 em{font-style:italic;color:var(--gold)}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:26px;line-height:1.55}
+  label{display:block;font-size:13px;color:var(--muted);margin:0 0 8px}
+  .campo{margin-bottom:16px}
+  input{height:52px;width:100%;border-radius:var(--r-sm);border:1px solid var(--line-2);
+        background:var(--surface);color:var(--ink);padding:0 16px;font:400 16px/1 var(--sans)}
+  input:focus{border-color:var(--gold);outline:none}
+  input::placeholder{color:var(--faint)}
+  .regra{font-size:13px;color:var(--faint);margin:-6px 0 20px;display:flex;gap:8px}
+  .regra.ok{color:var(--ok)}
+  .btn{width:100%}
+  .msg{font-size:14px;margin-top:14px;min-height:20px;color:var(--risk)}
+  .msg.ok{color:var(--ok)}
+  .nota{font-size:12.5px;color:var(--faint);line-height:1.6;margin-top:22px;
+        border-top:1px solid var(--line);padding-top:18px}
+</style>
+</head>
+<body>
+  <div class="caixa">
+    <div class="topo">
+      <div class="caduceu">V</div>
+      <div><span class="logo" style="font-size:21px">VOW</span>
+        <div class="eyebrow" style="font-size:10px">Plataforma</div></div>
+    </div>
+
+    <h1>Criar o <em>primeiro acesso</em></h1>
+    <p class="sub">A plataforma ainda não tem nenhum usuário. Este cadastro cria o
+    administrador e entra direto.</p>
+
+    <form id="f">
+      <div class="campo"><label for="nome">Seu nome</label>
+        <input id="nome" autocomplete="name" placeholder="Rodrigo Bauer"></div>
+      <div class="campo"><label for="email">E-mail</label>
+        <input id="email" type="email" autocomplete="username" placeholder="voce@grupovow.com.br" required></div>
+      <div class="campo"><label for="senha">Senha</label>
+        <span class="senha-campo">
+          <input id="senha" type="password" autocomplete="new-password" placeholder="••••••••••" required>
+          <button type="button" class="olho" id="olho" aria-pressed="false"
+                  aria-label="Mostrar a senha" aria-controls="senha"></button>
+        </span></div>
+      <div class="regra" id="regra"><span id="marca">○</span><span id="texto"></span></div>
+      <button class="btn lg" id="btn" type="submit" disabled>Criar e entrar</button>
+    </form>
+
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+    <p class="nota">Esta tela só existe enquanto não houver nenhum usuário. Depois do
+    primeiro cadastro ela some, e novos acessos passam a ser criados de dentro da
+    plataforma.</p>
+  </div>
+
+<script type="module">
+const $ = (id) => document.getElementById(id)
+const MINIMO = 10
+
+const OLHO = {
+  fechado: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>',
+  aberto: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/><path d="M3.5 3.5l17 17"/></svg>',
+}
+function ligarOlho(botao, campo) {
+  const pintar = () => {
+    const visivel = campo.type === 'text'
+    botao.innerHTML = visivel ? OLHO.aberto : OLHO.fechado
+    botao.setAttribute('aria-pressed', String(visivel))
+    botao.setAttribute('aria-label', visivel ? 'Ocultar a senha' : 'Mostrar a senha')
+  }
+  botao.addEventListener('click', () => {
+    campo.type = campo.type === 'password' ? 'text' : 'password'
+    pintar(); campo.focus()
+  })
+  pintar()
+}
+ligarOlho($('olho'), $('senha'))
+
+function conferir() {
+  const n = $('senha').value.length
+  const ok = n >= MINIMO && $('email').value.includes('@')
+  $('regra').className = 'regra' + (n >= MINIMO ? ' ok' : '')
+  $('marca').textContent = n >= MINIMO ? '✓' : '○'
+  $('texto').textContent = n >= MINIMO
+    ? 'Tamanho suficiente.' : `Ao menos ${MINIMO} caracteres — faltam ${Math.max(0, MINIMO - n)}.`
+  $('btn').disabled = !ok
+}
+for (const id of ['senha', 'email']) $(id).addEventListener('input', conferir)
+conferir()
+
+$('f').addEventListener('submit', async (e) => {
+  e.preventDefault()
+  $('btn').disabled = true
+  $('msg').className = 'msg'; $('msg').textContent = ''
+  try {
+    const r = await fetch('/api/app/primeiro-acesso', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ nome: $('nome').value.trim(), email: $('email').value.trim(), senha: $('senha').value }),
+    })
+    const j = await r.json()
+    if (!r.ok) throw new Error(j.erro || 'não foi possível criar')
+    $('msg').className = 'msg ok'; $('msg').textContent = 'Acesso criado. Entrando…'
+    location.href = j.destino
+  } catch (err) {
+    $('msg').textContent = err.message
+    $('btn').disabled = false
+  }
+})
+</script>
+</body>
+</html>

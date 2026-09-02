@@ -59,3 +59,23 @@ test('a senha nova continua conferindo depois da troca', () => {
   assert.ok(!conferirSenha('uma-senha-bem-long', h))
   assert.ok(SENHA_MINIMA >= 8)
 })
+
+test('Basic Auth compara em tempo constante e recusa credencial errada', async () => {
+  const { protegido } = await import('../basic-auth.js')
+  process.env.LEADS_USER = 'vow'
+  process.env.LEADS_PASSWORD = 'segredo-do-piloto'
+
+  const chamar = (cabecalho) => new Promise((ok) => {
+    const req = { headers: cabecalho ? { authorization: cabecalho } : {} }
+    const res = { set() { return this }, status(c) { this.codigo = c; return this }, send() { ok(this.codigo) } }
+    protegido(req, res, () => ok(200))
+  })
+  const base64 = (s) => Buffer.from(s).toString('base64')
+
+  assert.equal(await chamar(null), 401)
+  assert.equal(await chamar('Basic ' + base64('vow:errada')), 401)
+  assert.equal(await chamar('Basic ' + base64('outro:segredo-do-piloto')), 401)
+  // Usuário e senha de tamanhos diferentes não podem quebrar o timingSafeEqual.
+  assert.equal(await chamar('Basic ' + base64('u:p')), 401)
+  assert.equal(await chamar('Basic ' + base64('vow:segredo-do-piloto')), 200)
+})

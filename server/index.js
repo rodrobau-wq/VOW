@@ -29,6 +29,7 @@ import { lerLeads, gravarLead, caminhoDb } from '../leads-db.js'
 import * as store from '../store.js'
 import { temPostgres } from '../db.js'
 import { primeiroAcesso } from '../bootstrap.js'
+import { protegido } from '../basic-auth.js'
 import { migrarDoDisco, ultimaMigracao } from '../migrar.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -37,22 +38,6 @@ const RAIZ = path.join(__dirname, '..')
 const app = express()
 app.use(express.json({ limit: '256kb' }))
 app.disable('x-powered-by')
-
-/* ------------------------------------------------------------------- auth */
-function protegido(req, res, next) {
-  const user = process.env.LEADS_USER
-  const pass = process.env.LEADS_PASSWORD
-  if (!user || !pass) return next() // sem credenciais configuradas, fica aberto
-
-  const [tipo, b64] = (req.headers.authorization || '').split(' ')
-  if (tipo === 'Basic' && b64) {
-    const [u, p] = Buffer.from(b64, 'base64').toString().split(':')
-    // timingSafeEqual exige buffers do mesmo tamanho — hash antes de comparar.
-    const h = (s) => crypto.createHash('sha256').update(String(s)).digest()
-    if (crypto.timingSafeEqual(h(u), h(user)) && crypto.timingSafeEqual(h(p), h(pass))) return next()
-  }
-  res.set('WWW-Authenticate', 'Basic realm="VOW Leads"').status(401).send('Acesso restrito')
-}
 
 /* --------------------------------------------------------------- validação */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/

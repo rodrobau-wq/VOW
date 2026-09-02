@@ -96,6 +96,16 @@ if (new URLSearchParams(location.search).get('erro') === 'link') {
   msg('Esse link expirou ou já foi usado. Peça outro.')
 }
 
+// Plataforma recém-publicada não tem usuário nenhum, e aí o login recusa
+// qualquer senha. Sem este aviso, a pessoa fica tentando adivinhar a dela.
+try {
+  const h = await (await fetch('/healthz')).json()
+  if (h.plataforma && h.plataforma.inicializada === false) {
+    msg('Esta plataforma ainda não tem nenhum acesso criado. '
+      + '<a href="/app/primeiro-acesso">Criar o primeiro acesso</a>', true)
+  }
+} catch { /* health check indisponível não pode travar o login */ }
+
 $('f').addEventListener('submit', async (e) => {
   e.preventDefault()
   $('btn').disabled = true

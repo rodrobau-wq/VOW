@@ -13,6 +13,7 @@ import crypto from 'node:crypto'
 import { baseUrl } from '../lib-url.js'
 import { lerLeads, atualizarLead, gravarLead, porCapturaId } from '../leads-db.js'
 import { temPostgres } from '../db.js'
+import { protegido } from '../basic-auth.js'
 import { diagnosticar } from '../motor.js'
 import { enviarEmail, emailAcesso } from '../email.js'
 import {
@@ -100,6 +101,48 @@ app.get('/app/entrar/:token', async (req, res, next) => {
       : usuario.redes || []
     abrirSessao(res, { usuarioId: usuario.id, redeId: redes.length === 1 ? redes[0] : null })
     res.redirect(redes.length === 1 ? '/app' : '/app/redes')
+  } catch (e) { next(e) }
+})
+
+/* ------------------------------------------------- primeiro acesso */
+
+/**
+ * Cria o primeiro usuário pela própria plataforma, sem depender de shell nem
+ * de variável de ambiente. Duas travas:
+ *
+ * 1. Só funciona enquanto NÃO existe nenhum usuário. Depois do primeiro, a
+ *    rota recusa para sempre — não serve para criar um segundo acesso.
+ * 2. Exige as credenciais de LEADS_USER/LEADS_PASSWORD. Sem isso, uma
+ *    plataforma recém-publicada ficaria com a conta de administrador
+ *    disponível para quem descobrisse o endereço primeiro.
+ */
+app.get('/app/primeiro-acesso', protegido, async (_req, res, next) => {
+  try {
+    if ((await store.listar('usuario')).length) return res.redirect('/app/entrar')
+    res.sendFile(path.join(RAIZ, 'public', 'app-primeiro.html'))
+  } catch (e) { next(e) }
+})
+
+app.post('/api/app/primeiro-acesso', protegido, async (req, res, next) => {
+  try {
+    if ((await store.listar('usuario')).length) {
+      return res.status(409).json({ erro: 'A plataforma já tem acesso criado. Use "esqueci minha senha".' })
+    }
+    const email = String(req.body?.email || '').trim().toLowerCase()
+    const senha = String(req.body?.senha || '')
+    const nome = String(req.body?.nome || '').trim().slice(0, 120)
+
+    if (!EMAIL_RE_CRM.test(email)) return res.status(400).json({ erro: 'E-mail inválido.' })
+    if (senha.length < SENHA_MINIMA) {
+      return res.status(400).json({ erro: `A senha precisa de ao menos ${SENHA_MINIMA} caracteres.` })
+    }
+
+    const u = await store.inserir('usuario', {
+      nome: nome || 'Administrador VOW', email, papel: 'vow',
+      senhaHash: hashSenha(senha), redes: [],
+    })
+    abrirSessao(res, { usuarioId: u.id, redeId: null })
+    res.json({ ok: true, destino: '/app' })
   } catch (e) { next(e) }
 })
 
