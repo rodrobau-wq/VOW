@@ -13,10 +13,24 @@
 import pg from 'pg'
 
 const URL = process.env.DATABASE_URL || ''
-export const temPostgres = Boolean(URL)
 
 let pool = null
-if (temPostgres) {
+let pronto = null
+/**
+ * Cliente injetado pelos testes: o PGlite é o Postgres de verdade compilado
+ * para WASM, então o SQL exercitado é exatamente o que roda em produção.
+ * Existe uma costura só aqui, e nada no resto do projeto sabe dela.
+ */
+let injetado = null
+
+export const temPostgres = () => Boolean(pool || injetado)
+
+export function usarCliente(cliente) {
+  injetado = cliente
+  pronto = null
+}
+
+if (URL) {
   pool = new pg.Pool({
     connectionString: URL,
     // O Postgres gerenciado do Render exige TLS e usa certificado próprio.
@@ -37,7 +51,7 @@ if (temPostgres) {
 // suficiente para os testes rodarem sem depender de rede.
 const memoria = { leads: new Map(), registros: new Map() }
 
-export const emMemoria = () => !temPostgres
+export const emMemoria = () => !temPostgres()
 export function limparMemoria() {
   memoria.leads.clear()
   memoria.registros.clear()
@@ -45,35 +59,44 @@ export function limparMemoria() {
 export const tabelaMemoria = (nome) => memoria[nome]
 
 export async function consulta(texto, valores = []) {
-  if (!pool) throw new Error('sem Postgres: use as funções de memória')
-  return pool.query(texto, valores)
+  const cliente = injetado || pool
+  if (!cliente) throw new Error('sem Postgres: use as funções de memória')
+  return cliente.query(texto, valores)
 }
 
-const ESQUEMA = `
-create table if not exists leads (
-  id          text primary key,
-  captura_id  text unique,
-  criado_em   timestamptz not null,
-  origem      text,
-  dados       jsonb not null
-);
-create index if not exists leads_criado_em on leads (criado_em desc);
+/**
+ * Um comando por chamada, de propósito.
+ *
+ * `consulta()` sempre passa o array de valores, e isso faz o driver usar o
+ * protocolo estendido — que recusa múltiplos comandos numa mesma instrução
+ * ("cannot insert multiple commands into a prepared statement"). Juntar o
+ * esquema num texto só quebrava a criação das tabelas na primeira subida.
+ */
+const ESQUEMA = [
+  `create table if not exists leads (
+     id          text primary key,
+     captura_id  text unique,
+     criado_em   timestamptz not null,
+     origem      text,
+     dados       jsonb not null
+   )`,
+  `create index if not exists leads_criado_em on leads (criado_em desc)`,
+  `create table if not exists registros (
+     id         text primary key,
+     colecao    text not null,
+     rede_id    text,
+     criado_em  timestamptz not null,
+     dados      jsonb not null
+   )`,
+  `create index if not exists registros_colecao on registros (colecao, rede_id)`,
+]
 
-create table if not exists registros (
-  id         text primary key,
-  colecao    text not null,
-  rede_id    text,
-  criado_em  timestamptz not null,
-  dados      jsonb not null
-);
-create index if not exists registros_colecao on registros (colecao, rede_id);
-`
-
-let pronto = null
 /** Cria as tabelas na primeira necessidade. Idempotente. */
 export function preparar() {
-  if (!temPostgres) return Promise.resolve()
-  pronto ||= consulta(ESQUEMA).catch((e) => {
+  if (!temPostgres()) return Promise.resolve()
+  pronto ||= (async () => {
+    for (const comando of ESQUEMA) await consulta(comando)
+  })().catch((e) => {
     pronto = null                    // deixa tentar de novo no próximo pedido
     throw e
   })

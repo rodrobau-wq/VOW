@@ -26,7 +26,7 @@ async function lerJson(caminho) {
 }
 
 export async function migrarDoDisco() {
-  if (!temPostgres) return { migrou: false, motivo: 'sem Postgres' }
+  if (!temPostgres()) return { migrou: false, motivo: 'sem Postgres' }
   await preparar()
 
   const jaTem = await consulta('select (select count(*) from leads) as l, (select count(*) from registros) as r')

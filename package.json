@@ -18,5 +18,8 @@
     "pg": "^8.23.0",
     "qrcode": "^1.5.4",
     "resend": "^4.0.1"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8"
   }
 }

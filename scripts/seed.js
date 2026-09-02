@@ -15,7 +15,7 @@ import { consulta, temPostgres } from '../db.js'
 const SENHA = process.env.SEED_PASSWORD || 'vow-piloto'
 
 if (process.argv.includes('--forcar')) {
-  if (!temPostgres) {
+  if (!temPostgres()) {
     console.error('Sem DATABASE_URL não há o que apagar: os dados vivem na memória do processo.')
     process.exit(1)
   }

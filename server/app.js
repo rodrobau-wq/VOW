@@ -499,10 +499,10 @@ app.get('/api/app/dados', soVow, async (_req, res, next) => {
       }
     }
     res.json({
-      tipo: temPostgres ? 'Postgres' : 'memória do processo',
+      tipo: temPostgres() ? 'Postgres' : 'memória do processo',
       // Sem banco, a plataforma perde tudo no próximo deploy. Isso precisa
       // gritar na tela, não ficar escondido num log.
-      persistente: temPostgres,
+      persistente: temPostgres(),
       leads: {
         total: leads.length,
         porOrigem: { abras: leads.filter((l) => l.origem === 'abras').length,
