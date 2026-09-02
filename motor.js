@@ -5,7 +5,17 @@
  *   revenda   — verbas recebidas da indústria. Quanto passa a ser tributado.
  *   indiretos — gasto com serviços. Quanto de cada real pago volta como crédito.
  *
- * Fontes: docs/ABRAS - Contrato de Revenda.md e docs/ABRAS - Contrato de Indiretos.md
+ * Fontes:
+ *   docs/ABRAS - Verbas Comerciais.md    → diagnosticoRevenda()
+ *   docs/ABRAS - Contrato de Indiretos.md → diagnosticoIndiretos()
+ *
+ * CUIDADO COM O NOME `revenda`. Ele calcula VERBAS, não aquisição de
+ * mercadoria. Quando o motor nasceu os dois assuntos viviam no mesmo
+ * documento; depois `ABRAS - Contrato de Revenda.md` passou a tratar só da
+ * mercadoria que entra, e as verbas foram para `ABRAS - Verbas Comerciais.md`.
+ * A chave ficou como está de propósito: ela é contrato público da API
+ * (`POST /api/simular {tipo:"revenda"}`) e está gravada nos leads já
+ * capturados. Renomear exige migração — não é conserto de cabeçalho.
  *
  * ATENÇÃO — toda premissa numérica está em PREMISSAS, isolada de propósito.
  * A pendência nº 5 dos dois briefs é exatamente "confirmar a aritmética antes

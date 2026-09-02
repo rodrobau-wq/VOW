@@ -1,7 +1,8 @@
 /**
  * VOW · ABRAS — API do totem e da plataforma de leads.
  *
- *   GET  /                 totem (kiosk da feira)
+ *   GET  /                 landing pública com os diagnósticos gratuitos
+ *   GET  /totem            totem (kiosk da feira)
  *   GET  /leads            plataforma de leads (protegida por Basic Auth)
  *   POST /api/simular      roda o motor, sem gravar nada
  *   POST /api/lead         grava o lead, dispara o e-mail, devolve o QR
@@ -208,13 +209,17 @@ app.get('/d/:id', async (req, res, next) => {
 })
 
 /* ------------------------------------------------------------------ telas */
+// `/` é a landing pública (topo de funil). O totem da feira fica em /totem,
+// e o index.html deixa de ser servido pelo static para não disputar a raiz.
+app.get('/', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'landing.html')))
+app.get('/totem', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'index.html')))
 app.get('/leads', protegido, (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'leads.html')))
 
 // O motor vive na raiz e é importado pelas duas telas — mesma aritmética no
 // browser e no servidor, sem build step nem cópia que possa divergir.
 app.get('/motor.js', (_req, res) =>
   res.type('application/javascript').sendFile(path.join(RAIZ, 'motor.js')))
-app.use(express.static(path.join(RAIZ, 'public')))
+app.use(express.static(path.join(RAIZ, 'public'), { index: false }))
 
 app.use((err, _req, res, _next) => {
   const status = err.status || 500

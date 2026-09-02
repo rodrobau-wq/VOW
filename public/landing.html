@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VOW · Reforma tributária no varejo</title>
+<meta name="description" content="Dois diagnósticos gratuitos: quanto da sua verba com a indústria passa a ser tributada e quanto do seu gasto com serviços volta como crédito.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  /* cores, tipografia e primitivas vem de /tokens.css */
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:40;background:rgba(14,27,20,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav .row{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px}
+  nav .sp{flex:1}
+  nav a.lnk{font-size:14px;color:var(--dim)}
+  nav a.lnk:hover{color:var(--ink)}
+  @media(max-width:760px){nav a.lnk{display:none}}
+
+  /* hero */
+  header.hero{padding:76px 0 64px;border-bottom:1px solid var(--line)}
+  header.hero h1{font-size:clamp(38px,6.4vw,76px);margin:22px 0 26px}
+  header.hero h1 em{font-style:italic;color:var(--gold)}
+  header.hero p.lead{font-size:clamp(17px,2.1vw,22px);color:var(--dim);max-width:62ch;margin-bottom:32px}
+  .hero-cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .hero-note{font-size:14px;color:var(--faint)}
+
+  /* faixas */
+  section{padding:72px 0}
+  .band{background:var(--bg-deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  h2.sec{font-size:clamp(28px,4vw,44px);margin-bottom:14px}
+  .sub{color:var(--muted);max-width:66ch;font-size:17px}
+
+  .grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:36px}
+  .card .n{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+  .card h3{font-size:24px;margin-bottom:10px}
+  .card p{color:var(--dim);font-size:15px;margin:0}
+
+  /* diagnóstico */
+  #diag{scroll-margin-top:70px}
+  .tabs{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line-2);border-radius:30px;margin:28px 0 24px}
+  .tab{height:46px;padding:0 22px;border-radius:24px;border:none;background:transparent;color:var(--dim);font:500 15px/1 'IBM Plex Sans',sans-serif;cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--gold);color:var(--bg)}
+  .dgrid{display:grid;grid-template-columns:1fr;gap:20px}
+  @media(min-width:940px){.dgrid{grid-template-columns:420px 1fr;align-items:start}}
+  .fld{margin-bottom:26px}
+  .fld:last-child{margin-bottom:0}
+  .fld .top{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-bottom:12px}
+  .fld label{font-size:14px;color:var(--muted)}
+  .fld .val{font-family:'Instrument Serif',serif;font-size:40px;line-height:1;color:var(--gold)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:4px;background:#243B2E;outline:none;margin:0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--gold);border:4px solid var(--bg);box-shadow:0 0 0 1.5px var(--gold);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--gold);border:4px solid var(--bg);cursor:pointer}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+
+  .out{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:32px;animation:up .3s ease both}
+  .hero-num{font-family:'Instrument Serif',serif;font-size:clamp(48px,8vw,84px);line-height:.95;letter-spacing:-.02em}
+  .hero-lbl{font-size:15px;color:var(--dim);margin-bottom:8px}
+  .hero-sub{font-size:16px;color:var(--dim);margin:16px 0 0;max-width:56ch}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:28px 0 0}
+  .tile{background:var(--raised);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .tile .l{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;line-height:1.3}
+  .tile .v{font-family:'Instrument Serif',serif;font-size:28px;line-height:1}
+  .tile .n{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
+  .rows{margin-top:26px;border-top:1px solid var(--line)}
+  .row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line)}
+  .row .nm{font-size:15px;font-weight:500}
+  .row .nt{font-size:13px;color:var(--muted);line-height:1.35;margin-top:3px;max-width:60ch}
+  .row .vv{font-family:'Instrument Serif',serif;font-size:22px;color:var(--ok);white-space:nowrap}
+  .rule{margin-top:26px}
+  .fine{margin:22px 0 0}
+
+  /* form */
+  .capture{margin-top:20px;background:var(--raised);border:1px solid rgba(224,196,140,.30);border-radius:24px;padding:28px}
+  .capture h3{font-size:26px;margin-bottom:8px}
+  .capture p.s{color:var(--dim);font-size:15px}
+  .ff{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 16px}
+  @media(max-width:640px){.ff{grid-template-columns:1fr}}
+  .ff input{height:52px;border-radius:12px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);padding:0 16px;font:400 16px/1 'IBM Plex Sans',sans-serif;width:100%}
+  .ff input::placeholder{color:var(--faint)}
+  .ff .full{grid-column:1/-1}
+  .msg{font-size:14px;margin-top:12px;min-height:20px}
+  .done{display:none;text-align:center;padding:12px 0}
+  .done img{width:170px;height:170px;border-radius:12px;background:#fff;padding:8px;margin:18px auto 0;display:block}
+
+  /* produtos */
+  .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:36px}
+  .prod{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:20px;padding:28px;display:flex;flex-direction:column}
+  .prod .n{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+  .prod h3{font-size:25px;margin-bottom:10px}
+  .prod .q{color:var(--dim);font-size:15px;margin-bottom:16px}
+  .prod ul{margin:0 0 18px;padding-left:18px;color:var(--muted);font-size:14px}
+  .prod li{margin:6px 0}
+  .prod li::marker{color:var(--gold)}
+  .prod .foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:36px}
+  .step{background:var(--surface);padding:26px 24px}
+  .step .k{font-family:'Instrument Serif',serif;font-size:30px;color:var(--gold);line-height:1;margin-bottom:12px}
+  .step h4{font-size:16px;margin:0 0 6px;font-weight:600}
+  .step p{font-size:14px;color:var(--muted);margin:0}
+
+  footer{border-top:1px solid var(--line);padding:40px 0 56px;color:var(--muted);font-size:13.5px}
+  footer .r{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="row">
+    <span class="logo">VOW</span>
+    <span style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Reforma tributária no varejo</span>
+    <span class="sp"></span>
+    <a class="lnk" href="#diag">Diagnósticos</a>
+    <a class="lnk" href="#produtos">Plataforma</a>
+    <a class="lnk" href="#como">Como funciona</a>
+    <a class="btn" href="#diag">Diagnóstico grátis</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">JBP 2027 · IBS/CBS · LC 214/2025</div>
+    <h1>Já fez o seu JBP? <em>Planejou com as novas regras tributárias?</em></h1>
+    <p class="lead">A reforma já está no seu contrato com a indústria e nos seus contratos de serviço. Em três minutos você vê o que muda, quanto custa e o que levar para a mesa.</p>
+    <div class="hero-cta">
+      <a class="btn lg" href="#diag">Fazer o diagnóstico gratuito</a>
+      <a class="btn lg ghost" href="#produtos">Conhecer a plataforma</a>
+    </div>
+    <p class="hero-note" style="margin-top:20px">Sem cadastro para simular. O e-mail só é pedido se você quiser o diagnóstico completo.</p>
+  </div>
+</header>
+
+<section class="band">
+  <div class="wrap">
+    <h2 class="sec">A operação física não muda. Muda de quem depende o imposto que você recupera.</h2>
+    <p class="sub">O pedido, o recebimento e a gôndola continuam iguais. Três documentos que ninguém olhava passam a definir margem.</p>
+    <div class="grid3">
+      <div class="card"><div class="n">01 · Cadastro do item</div><h3>A classificação define a alíquota</h3><p>Cesta básica a zero, alimentos com redução, bebida com Imposto Seletivo. NCM errado é imposto a mais em cada cupom.</p></div>
+      <div class="card"><div class="n">02 · Cadastro do fornecedor</div><h3>Seu crédito depende dele</h3><p>O crédito de IBS/CBS só existe depois que o fornecedor paga o imposto dele. Fornecedor irregular é crédito travado no seu balanço.</p></div>
+      <div class="card"><div class="n">03 · Contrato</div><h3>O acordo comercial virou operação tributada</h3><p>Bonificação, verba, gôndola, serviço: tudo precisa de nota e de contrato. Sem isso, o crédito não se sustenta.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="diag">
+  <div class="wrap">
+    <div class="eyebrow">Gratuito · sem cadastro</div>
+    <h2 class="sec" style="margin-top:12px">Dois diagnósticos, dois números</h2>
+    <p class="sub">Escolha o lado do seu negócio. Dois números bastam, e podem ser aproximados.</p>
+
+    <div class="tabs" role="tablist" aria-label="Escolha o diagnóstico">
+      <button class="tab" role="tab" id="tab-revenda" aria-selected="true" aria-controls="pane" data-tipo="revenda">Verbas com a indústria</button>
+      <button class="tab" role="tab" id="tab-indiretos" aria-selected="false" aria-controls="pane" data-tipo="indiretos">Serviços e indiretos</button>
+    </div>
+
+    <div class="dgrid" id="pane">
+      <div class="panel">
+        <div class="fld">
+          <div class="top"><label for="fat">Faturamento anual da rede</label><span class="val tnum" id="fatOut">R$ 300 mi</span></div>
+          <input type="range" id="fat" min="0" max="1000" step="1" value="448" aria-describedby="fatChips">
+          <div class="chips" id="fatChips"></div>
+        </div>
+        <div class="fld">
+          <div class="top"><label for="pct" id="pctLabel">Verba recebida da indústria</label><span class="val tnum" id="pctOut">3,0%</span></div>
+          <input type="range" id="pct" min="5" max="120" step="1" value="30">
+          <div class="chips" id="pctChips"></div>
+          <p style="font-size:13px;color:var(--faint);margin:14px 0 0" id="pctHint">Percentual do faturamento que a rede recebe em verba.</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="out" id="out" aria-live="polite"><p style="color:var(--muted);margin:0">Calculando…</p></div>
+
+        <div class="capture" id="capture">
+          <div id="capForm">
+            <h3>Receba o diagnóstico completo</h3>
+            <p class="s">Linha a linha, com as etapas para ficar em conformidade e a base legal de cada ponto. Chega no seu e-mail em segundos.</p>
+            <div class="ff">
+              <input id="cNome" type="text" placeholder="Nome e sobrenome" autocomplete="name">
+              <input id="cEmpresa" type="text" placeholder="Rede / empresa" autocomplete="organization">
+              <input id="cEmail" type="email" placeholder="voce@suarede.com.br" autocomplete="email">
+              <input id="cTel" type="tel" placeholder="(11) 99999-9999" autocomplete="tel">
+              <label class="full" style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--muted);cursor:pointer">
+                <input type="checkbox" id="cAmbos" style="width:18px;height:18px;margin-top:2px;accent-color:var(--gold)">
+                <span>Quero os dois diagnósticos — verbas e indiretos — com os mesmos números.</span>
+              </label>
+            </div>
+            <button class="btn lg" id="enviar" style="width:100%">Receber por e-mail</button>
+            <div class="msg" id="msg"></div>
+            <p style="font-size:12.5px;color:var(--faint);margin:10px 0 0">Usamos seus dados só para enviar este diagnóstico e falar com você sobre ele.</p>
+          </div>
+          <div class="done" id="capDone">
+            <h3 style="color:var(--gold)">Enviado.</h3>
+            <p class="s" id="doneTxt">Confira sua caixa de entrada.</p>
+            <img id="doneQr" alt="QR code para abrir o diagnóstico no celular" hidden>
+            <p style="font-size:13px;color:var(--muted);margin-top:14px">Aponte a câmera para abrir no celular.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="fine">Estimativa com as premissas do estudo VOW × ABRAS: alíquota de referência 26,5%, mix padrão do varejo por família e margem líquida de 2%. Os valores da sua rede dependem do inventário. Aritmética a validar com o time fiscal da VOW.</p>
+  </div>
+</section>
+
+<section id="produtos" class="band">
+  <div class="wrap">
+    <div class="eyebrow">A plataforma</div>
+    <h2 class="sec" style="margin-top:12px">Três sistemas que se alimentam</h2>
+    <p class="sub">O diagnóstico mostra o tamanho. A plataforma é o que resolve, e continua rodando depois que o projeto acaba.</p>
+    <div class="pgrid">
+      <div class="prod">
+        <div class="n">Sistema 1</div>
+        <h3>Fornecedores</h3>
+        <div class="q">Este CNPJ está regular, e quanto do imposto que eu pago a ele volta como crédito?</div>
+        <ul><li>Todo CNPJ do ERP verificado todo dia</li><li>Semáforo dentro do pedido, com alçada</li><li>Alerta de ruptura antes de faltar na gôndola</li><li>Aviso ao fornecedor antes do bloqueio</li></ul>
+        <div class="foot">Assinatura por carteira monitorada</div>
+      </div>
+      <div class="prod">
+        <div class="n">Sistema 2</div>
+        <h3>Contratos</h3>
+        <div class="q">Meus contratos sustentam o crédito que estou tomando?</div>
+        <ul><li>Revenda, verbas comerciais e indiretos</li><li>Minutas por tipo e por regime</li><li>Score de risco e wizard de adequação</li><li>Nenhum título pago sem contrato vinculado</li></ul>
+        <div class="foot">Assinatura por contrato ativo</div>
+      </div>
+      <div class="prod">
+        <div class="n">Sistema 3</div>
+        <h3>Itens</h3>
+        <div class="q">Qual a alíquota certa de cada produto que eu vendo?</div>
+        <ul><li>Classificação com embasamento por SKU</li><li>Ganho da correção sobre a venda histórica</li><li>Recuperação retroativa de até cinco anos</li><li>Base mestre que melhora a cada cliente</li></ul>
+        <div class="foot">Projeto mais success fee</div>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:28px"><strong style="color:var(--ink);font-weight:500">A ordem importa:</strong> o Sistema 3 define a alíquota de cada item, e é ela que diz quanto crédito está em risco em cada fornecedor e quanto vale cada contrato. Alíquota cheia sobre tudo produz número falso.</p>
+  </div>
+</section>
+
+<section id="como">
+  <div class="wrap">
+    <div class="eyebrow">Como funciona</div>
+    <h2 class="sec" style="margin-top:12px">Do diagnóstico à operação</h2>
+    <div class="steps">
+      <div class="step"><div class="k">01</div><h4>Diagnóstico</h4><p>Gratuito, na sua base. Mostra o tamanho do que muda, sem promessa de número.</p></div>
+      <div class="step"><div class="k">02</div><h4>Inventário</h4><p>Extrato de fornecedores e doze meses de notas. Qualquer ERP exporta.</p></div>
+      <div class="step"><div class="k">03</div><h4>Classificação</h4><p>A inteligência da VOW aplicada à sua carteira, com curadoria humana.</p></div>
+      <div class="step"><div class="k">04</div><h4>Operação</h4><p>Integrado ao ERP, nos seis momentos em que a decisão acontece.</p></div>
+    </div>
+    <div style="margin-top:40px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <a class="btn lg" href="#diag">Começar pelo diagnóstico</a>
+      <span style="font-size:14px;color:var(--muted)">ou fale com a gente: <a href="mailto:contato@grupovow.com.br">contato@grupovow.com.br</a></span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap r">
+    <span>Grupo VOW · Consultoria para o varejo · Porto Alegre · São Paulo · Brasília</span>
+    <span>Estimativas sobre premissas declaradas. Não constituem apuração fiscal.</span>
+  </div>
+</footer>
+
+<script type="module">
+const $ = (id) => document.getElementById(id)
+const brl = (v) => v.toLocaleString('pt-BR', { style:'currency', currency:'BRL', maximumFractionDigits:0 })
+const curto = (v) => {
+  const a = Math.abs(v), s = v < 0 ? '−' : ''
+  if (a >= 1e9) return `${s}R$ ${(a/1e9).toLocaleString('pt-BR',{maximumFractionDigits:1})} bi`
+  if (a >= 1e6) return `${s}R$ ${(a/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})} mi`
+  if (a >= 1e3) return `${s}R$ ${Math.round(a/1e3).toLocaleString('pt-BR')} mil`
+  return s + brl(a)
+}
+const pctFmt = (v, d=1) => (v*100).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d}) + '%'
+
+// Escala logarítmica: R$ 5 mi a R$ 150 bi. O ranking ABRAS chega a R$ 120 bi;
+// um slider linear tornaria a faixa dos regionais inalcançável.
+const FAT_MIN = 5e6, FAT_MULT = 3e4
+const toFat = (v) => { const raw = FAT_MIN * Math.pow(FAT_MULT, v/1000); const mag = Math.pow(10, Math.floor(Math.log10(raw))-1); return Math.round(raw/mag)*mag }
+const toSlider = (f) => Math.round(Math.log(f/FAT_MIN)/Math.log(FAT_MULT)*1000)
+
+const CFG = {
+  revenda:  { pctLabel:'Verba recebida da indústria', hint:'Percentual do faturamento que a rede recebe em verba da indústria.', chips:[1.5,2,3,4,6], min:5, max:120, def:30 },
+  indiretos:{ pctLabel:'Gasto com serviços e indiretos', hint:'Percentual do faturamento gasto com serviços — exclui mercadoria para revenda.', chips:[8,10,14,18,25], min:20, max:400, def:140 },
+}
+let tipo = 'revenda'
+let ultimo = null
+let timer = null
+
+const FAT_CHIPS = [[1e8,'R$ 100 mi'],[5e8,'R$ 500 mi'],[2e9,'R$ 2 bi'],[1e10,'R$ 10 bi'],[5e10,'R$ 50 bi'],[1.2e11,'R$ 120 bi']]
+
+function montarChips(el, itens, ativo, onPick){
+  el.innerHTML = ''
+  for (const [valor, rotulo] of itens) {
+    const b = document.createElement('button')
+    b.type = 'button'; b.className = 'chip'; b.textContent = rotulo
+    b.setAttribute('aria-pressed', String(ativo(valor)))
+    b.addEventListener('click', () => onPick(valor))
+    el.appendChild(b)
+  }
+}
+
+function sincronizar(){
+  const c = CFG[tipo]
+  $('pctLabel').textContent = c.pctLabel
+  $('pctHint').textContent = c.hint
+  $('pct').min = c.min; $('pct').max = c.max
+  const fat = toFat(+$('fat').value)
+  const pct = +$('pct').value / 10
+  $('fatOut').textContent = curto(fat)
+  $('pctOut').textContent = pct.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '%'
+  montarChips($('fatChips'), FAT_CHIPS, v => Math.abs(toFat(+$('fat').value) - v) < v*0.02, v => { $('fat').value = toSlider(v); sincronizar(); agendar() })
+  montarChips($('pctChips'), c.chips.map(v => [v, v.toLocaleString('pt-BR') + '%']), v => Math.abs(pct - v) < .05, v => { $('pct').value = Math.round(v*10); sincronizar(); agendar() })
+}
+
+function agendar(){ clearTimeout(timer); timer = setTimeout(calcular, 220) }
+
+async function calcular(){
+  const faturamento = toFat(+$('fat').value)
+  const pct = (+$('pct').value / 10) / 100
+  const corpo = { tipo, faturamento }
+  if (tipo === 'revenda') corpo.percentualVerba = pct; else corpo.percentualBase = pct
+  try {
+    const r = await fetch('/api/simular', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(corpo) })
+    if (!r.ok) throw new Error('falha')
+    ultimo = await r.json(); ultimo.faturamento = faturamento; ultimo.pct = pct
+    render(ultimo)
+  } catch {
+    $('out').innerHTML = '<p style="color:var(--risk);margin:0">Não consegui calcular agora. Tente de novo em instantes.</p>'
+  }
+}
+
+function render(d){
+  const o = $('out')
+  if (d.tipo === 'revenda') {
+    o.innerHTML = `
+      <div class="hero-lbl">Perda anual se a verba não for recomposta</div>
+      <div class="hero-num" style="color:var(--risk)">${curto(d.perda)}</div>
+      <p class="hero-sub">${pctFmt(d.perdaSobreLucro,0)} do lucro anual estimado. ${pctFmt(d.parcelaTributavel)} da verba passa a ser tributada — e a recomposição não custa nada à indústria, que credita o imposto que paga.</p>
+      <div class="tiles">
+        <div class="tile"><div class="l">Verba no ano</div><div class="v">${curto(d.verbaTotal)}</div></div>
+        <div class="tile"><div class="l">Passa a tributar</div><div class="v">${curto(d.tributavel)}</div><div class="n">${pctFmt(d.parcelaTributavel)} da verba</div></div>
+        <div class="tile"><div class="l">Recomposição a negociar</div><div class="v" style="color:var(--ok)">${curto(d.recomposicao)}</div><div class="n">Neutra para a indústria</div></div>
+        <div class="tile"><div class="l">Lucro anual estimado</div><div class="v">${curto(d.lucroAnual)}</div><div class="n">Margem de 2%</div></div>
+      </div>
+      <div class="rule"><p><strong>Acabou o acerto retroativo.</strong> A bonificação que depende de evento posterior — sell-out, meta, fechamento de trimestre — passa a ser operação tributada. Só continua limpa a que consta da própria nota.</p></div>`
+  } else {
+    const linhas = d.familias.slice().sort((a,b) => b.ganho - a.ganho).map(f => `
+      <div class="row">
+        <div><div class="nm">${f.nome}</div><div class="nt">${f.nota}</div></div>
+        <div class="vv">+${curto(f.ganho)}</div>
+      </div>`).join('')
+    o.innerHTML = `
+      <div class="hero-lbl">Crédito que passa a voltar por ano</div>
+      <div class="hero-num" style="color:var(--ok)">${curto(d.ganhoTotal)}</div>
+      <p class="hero-sub">Sobre ${curto(d.base)} de gasto com serviços, hoje tratado como custo puro. Quanto volta de fato depende do regime de cada prestador.</p>
+      <div class="tiles">
+        <div class="tile"><div class="l">Crédito novo</div><div class="v" style="color:var(--ok)">${curto(d.ganhoCredito)}</div></div>
+        <div class="tile"><div class="l">Se os prestadores migrarem de regime</div><div class="v" style="color:var(--ok)">+${curto(d.ganhoMigracaoRegime)}</div></div>
+        <div class="tile"><div class="l">Saldo credor gerado</div><div class="v">${curto(d.saldoCredorAnual)}</div><div class="n">Vender a zero e comprar tributado</div></div>
+        <div class="tile"><div class="l">Ganho de estar em conformidade</div><div class="v" style="color:var(--gold)">${curto(d.ganhoConformidade)}</div><div class="n">Ressarcimento em 30 dias em vez de 180</div></div>
+      </div>
+      <div class="rows">${linhas}</div>
+      <div class="rule"><p><strong>Duas propostas com o mesmo preço deixaram de ser a mesma proposta.</strong> O critério de compra passa a ser custo líquido de crédito. A diferença é de poucos pontos, não de vinte — estreita demais para decidir de cabeça.</p></div>`
+  }
+}
+
+for (const t of document.querySelectorAll('.tab')) {
+  t.addEventListener('click', () => {
+    tipo = t.dataset.tipo
+    for (const x of document.querySelectorAll('.tab')) x.setAttribute('aria-selected', String(x === t))
+    $('pct').value = CFG[tipo].def
+    sincronizar(); calcular()
+  })
+}
+$('fat').addEventListener('input', () => { sincronizar(); agendar() })
+$('pct').addEventListener('input', () => { sincronizar(); agendar() })
+
+$('enviar').addEventListener('click', async () => {
+  const nome = $('cNome').value.trim(), empresa = $('cEmpresa').value.trim()
+  const email = $('cEmail').value.trim(), telefone = $('cTel').value.trim()
+  const m = $('msg')
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { m.style.color = 'var(--risk)'; m.textContent = 'Informe um e-mail válido.'; return }
+  if (!ultimo) { m.style.color = 'var(--risk)'; m.textContent = 'Ajuste os números antes de enviar.'; return }
+  const tipos = $('cAmbos').checked ? ['revenda','indiretos'] : [tipo]
+  const corpo = { nome, empresa, email, telefone, tipos, faturamento: ultimo.faturamento }
+  if (tipos.includes('revenda')) corpo.percentualVerba = tipo === 'revenda' ? ultimo.pct : undefined
+  if (tipos.includes('indiretos')) corpo.percentualBase = tipo === 'indiretos' ? ultimo.pct : undefined
+  $('enviar').disabled = true; m.style.color = 'var(--muted)'; m.textContent = 'Enviando…'
+  try {
+    const r = await fetch('/api/lead', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(corpo) })
+    const j = await r.json()
+    if (!r.ok) throw new Error(j.erro || 'falha')
+    $('capForm').style.display = 'none'
+    $('capDone').style.display = 'block'
+    $('doneTxt').textContent = j.emailEnviado
+      ? `O diagnóstico completo foi para ${email}.`
+      : 'Diagnóstico gerado. O envio por e-mail está em configuração — use o QR abaixo.'
+    if (j.qr) { $('doneQr').src = j.qr; $('doneQr').hidden = false }
+  } catch (e) {
+    m.style.color = 'var(--risk)'; m.textContent = 'Não consegui enviar agora. Tente de novo em instantes.'
+    $('enviar').disabled = false
+  }
+})
+
+sincronizar(); calcular()
+</script>
+</body>
+</html>

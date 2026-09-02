@@ -3,7 +3,8 @@
 ### Contratos de serviços e indiretos — hoje, o que muda, impacto e governança
 
 **Data:** 02/09/2026 · Grupo VOW × Rodrigo Bauer
-**Par deste documento:** `ABRAS - Contrato de Revenda.md`, que cobre os acordos com a indústria.
+**Domínio:** o **serviço que o varejo contrata**. A pergunta é quanto de cada real pago volta como crédito.
+**Família:** `ABRAS - Contrato de Revenda.md` (a mercadoria que entra) · `ABRAS - Verbas Comerciais.md` (o dinheiro que entra da indústria)
 
 ---
 
