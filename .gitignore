@@ -4,3 +4,6 @@ node_modules/
 .DS_Store
 data/leads.json
 *.log
+
+# base da plataforma (gerada pelo seed)
+data/db.json

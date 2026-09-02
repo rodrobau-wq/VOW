@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Começar · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  h1{font-size:42px;margin-bottom:8px}
+  h1 em{font-style:italic;color:var(--gold)}
+  .sub{color:var(--muted);max-width:64ch;margin-bottom:34px}
+  .passos{display:grid;gap:14px;max-width:860px}
+  .passo{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+         padding:26px;display:grid;grid-template-columns:44px 1fr auto;gap:20px;align-items:start}
+  .passo .n{width:44px;height:44px;border-radius:50%;border:1px solid var(--gold-edge);
+            display:grid;place-items:center;font-family:var(--serif);font-size:20px;color:var(--gold)}
+  .passo h2{font-size:23px;margin-bottom:6px}
+  .passo p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.6}
+  .passo .acao{align-self:center}
+  .opcoes{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .feito{color:var(--ok);font-size:13px;font-weight:500;white-space:nowrap}
+  .poronde{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+  .sist{border:1px solid var(--line-2);border-radius:var(--r-md);padding:18px;text-align:left;
+        background:transparent;cursor:pointer;color:var(--ink)}
+  .sist:hover{border-color:var(--gold-edge)}
+  .sist b{display:block;font-family:var(--serif);font-size:19px;font-weight:400;margin-bottom:5px}
+  .sist span{font-size:13px;color:var(--muted);line-height:1.5}
+  .rule{margin-top:30px;max-width:860px}
+</style>
+</head>
+<body class="paper">
+  <div class="appbar">
+    <div class="marca"><div class="caduceu">V</div>
+      <div><span class="nome">VOW</span><span class="sob">Plataforma</span></div></div>
+    <button class="rede" id="rede"></button>
+    <div class="sp"></div>
+    <div class="quem" id="quem"></div>
+    <button class="sair" id="sair">Sair</button>
+  </div>
+
+  <main class="app-main">
+    <h1>Vamos <em>começar</em></h1>
+    <p class="sub">Três passos. O primeiro é o único que depende de você — os outros dois a
+    plataforma faz sozinha assim que os dados entrarem.</p>
+
+    <div class="passos">
+      <div class="passo">
+        <div class="n">1</div>
+        <div>
+          <h2>Trazer a base</h2>
+          <p>Contas a pagar dos últimos 12 meses e o cadastro de produtos. Pela API do ERP,
+          ou por arquivo — o que for mais rápido de conseguir.</p>
+          <div class="opcoes">
+            <button class="chip" aria-pressed="false">Bluesoft</button>
+            <button class="chip" aria-pressed="false">Consinco</button>
+            <button class="chip" aria-pressed="false">VR</button>
+            <button class="chip" aria-pressed="false">CSV / Excel</button>
+          </div>
+        </div>
+        <div class="acao"><span class="feito" id="s1"></span></div>
+      </div>
+
+      <div class="passo">
+        <div class="n">2</div>
+        <div>
+          <h2>Confirmar o CNPJ e as premissas</h2>
+          <p>Razão social, regime e estados de operação. A alíquota de referência e o mix da
+          cesta básica ficam gravados na sua rede — não usamos o padrão do setor sem você ver.</p>
+        </div>
+        <div class="acao"><span class="feito" id="s2"></span></div>
+      </div>
+
+      <div class="passo">
+        <div class="n">3</div>
+        <div>
+          <h2>Escolher por onde começar</h2>
+          <p>Os três sistemas se alimentam, mas a ordem é sua. Quem tem pressa de caixa começa
+          pelos itens; quem tem medo de fiscalização começa pelos fornecedores.</p>
+          <div class="poronde">
+            <button class="sist"><b>Fornecedores</b><span>Este CNPJ está regular, e quanto do imposto volta como crédito?</span></button>
+            <button class="sist"><b>Contratos</b><span>Meus contratos sustentam o crédito que estou tomando?</span></button>
+            <button class="sist"><b>Itens</b><span>Qual a alíquota certa de cada produto que eu vendo?</span></button>
+          </div>
+        </div>
+        <div class="acao"></div>
+      </div>
+    </div>
+
+    <div class="rule">
+      <p><strong>Uma dependência que vale saber antes.</strong> É o saneamento dos itens que
+      define a alíquota efetiva de cada família, e é ela que diz quanto crédito está de fato em
+      risco em cada fornecedor. Enquanto essa base não roda, o painel mostra o que já sabe e
+      marca o que ainda falta — em vez de estimar por cima.</p>
+    </div>
+  </main>
+
+<script type="module">
+const $ = (id) => document.getElementById(id)
+const ctx = await (await fetch('/api/app/contexto')).json()
+$('quem').innerHTML = `<b>${ctx.usuario.nome}</b>${ctx.usuario.papel}`
+$('rede').textContent = ctx.redeAtual?.razao ?? 'Escolher rede'
+$('rede').onclick = () => (location.href = '/app/redes')
+if (ctx.redes.length < 2) $('rede').style.cursor = 'default'
+$('sair').addEventListener('click', async () => {
+  await fetch('/api/app/sair', { method: 'POST' })
+  location.href = '/app/entrar'
+})
+
+// Os chips do passo 1 são exclusivos entre si: uma origem por vez.
+for (const c of document.querySelectorAll('.opcoes .chip')) {
+  c.addEventListener('click', () => {
+    for (const o of document.querySelectorAll('.opcoes .chip')) o.setAttribute('aria-pressed', 'false')
+    c.setAttribute('aria-pressed', 'true')
+    $('s1').textContent = 'origem escolhida'
+  })
+}
+</script>
+</body>
+</html>

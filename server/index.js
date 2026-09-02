@@ -3,6 +3,7 @@
  *
  *   GET  /                 landing pública com os diagnósticos gratuitos
  *   GET  /totem            totem (kiosk da feira)
+ *   GET  /app/*            plataforma SaaS (ver server/app.js)
  *   GET  /leads            plataforma de leads (protegida por Basic Auth)
  *   POST /api/simular      roda o motor, sem gravar nada
  *   POST /api/lead         grava o lead, dispara o e-mail, devolve o QR
@@ -20,6 +21,7 @@ import QRCode from 'qrcode'
 
 import { diagnosticar, PREMISSAS, PORTES } from '../motor.js'
 import { enviarDiagnostico, montarHtml } from '../email.js'
+import { app as rotasApp } from './app.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const RAIZ = path.join(__dirname, '..')
@@ -214,6 +216,10 @@ app.get('/d/:id', async (req, res, next) => {
 app.get('/', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'landing.html')))
 app.get('/totem', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'index.html')))
 app.get('/leads', protegido, (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'leads.html')))
+
+// A camada SaaS tem auth própria (sessão, tenant, papéis) e monta as suas
+// rotas antes do static, para /app/... nunca cair num arquivo solto.
+app.use(rotasApp)
 
 // O motor vive na raiz e é importado pelas duas telas — mesma aritmética no
 // browser e no servidor, sem build step nem cópia que possa divergir.

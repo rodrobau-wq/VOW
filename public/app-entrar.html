@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Entrar · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  /* O login é a última tela escura: a porta entre a vitrine e a ferramenta. */
+  body{min-height:100dvh;display:grid;place-items:center;padding:24px}
+  .caixa{width:100%;max-width:420px}
+  .topo{display:flex;align-items:center;gap:12px;margin-bottom:34px}
+  .caduceu{width:38px;height:38px;border:1px solid var(--gold-edge);border-radius:var(--r-sm);
+           display:grid;place-items:center;color:var(--gold);font-family:var(--serif);font-size:19px}
+  h1{font-size:38px;margin-bottom:8px}
+  h1 em{font-style:italic;color:var(--gold)}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:28px}
+  label{display:block;font-size:13px;color:var(--muted);margin:0 0 8px}
+  input{height:52px;width:100%;border-radius:var(--r-sm);border:1px solid var(--line-2);
+        background:var(--surface);color:var(--ink);padding:0 16px;font:400 16px/1 var(--sans);margin-bottom:18px}
+  input:focus{border-color:var(--gold);outline:none}
+  input::placeholder{color:var(--faint)}
+  .btn{width:100%}
+  .alt{margin-top:22px;padding-top:22px;border-top:1px solid var(--line);text-align:center}
+  .alt button{background:none;border:0;color:var(--gold);font:400 14px/1 var(--sans);cursor:pointer}
+  .alt button:hover{color:var(--ink)}
+  .msg{font-size:14px;margin:14px 0 0;min-height:20px;color:var(--risk)}
+  .msg.ok{color:var(--ok)}
+  .msg a{display:block;margin-top:8px;word-break:break-all;font-size:12.5px}
+  .volta{margin-top:26px;text-align:center;font-size:13px}
+  .volta a{color:var(--muted)}
+</style>
+</head>
+<body>
+  <div class="caixa">
+    <div class="topo">
+      <div class="caduceu">V</div>
+      <div><span class="logo" style="font-size:21px">VOW</span>
+        <div class="eyebrow" style="font-size:10px">Plataforma</div></div>
+    </div>
+
+    <h1>Entrar na <em>plataforma</em></h1>
+    <p class="sub">Fornecedores, contratos e itens da sua rede.</p>
+
+    <form id="f">
+      <label for="email">E-mail</label>
+      <input id="email" type="email" autocomplete="username" placeholder="voce@suarede.com.br" required>
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      <button class="btn lg" id="btn" type="submit">Entrar</button>
+    </form>
+
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+
+    <div class="alt">
+      <button type="button" id="magico">Entrar por link no e-mail</button>
+    </div>
+    <div class="volta"><a href="/">← Voltar ao site</a></div>
+  </div>
+
+<script type="module">
+const $ = (id) => document.getElementById(id)
+const msg = (texto, ok = false) => { $('msg').innerHTML = texto; $('msg').className = 'msg' + (ok ? ' ok' : '') }
+
+if (new URLSearchParams(location.search).get('erro') === 'link') {
+  msg('Esse link expirou ou já foi usado. Peça outro.')
+}
+
+$('f').addEventListener('submit', async (e) => {
+  e.preventDefault()
+  $('btn').disabled = true
+  msg('')
+  try {
+    const r = await fetch('/api/app/entrar', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: $('email').value.trim(), senha: $('senha').value }),
+    })
+    const j = await r.json()
+    if (!r.ok) throw new Error(j.erro || 'não foi possível entrar')
+    location.href = j.destino
+  } catch (err) {
+    msg(err.message)
+    $('btn').disabled = false
+  }
+})
+
+$('magico').addEventListener('click', async () => {
+  const email = $('email').value.trim()
+  if (!email) return msg('Informe o e-mail primeiro.')
+  const r = await fetch('/api/app/link-magico', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+  const j = await r.json()
+  // Sem Resend configurado o link volta na resposta, para o piloto não travar.
+  msg(j.mensagem + (j.link ? `<a href="${j.link}">${j.link}</a>` : ''), true)
+})
+</script>
+</body>
+</html>

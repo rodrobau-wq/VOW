@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  .cab{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+       flex-wrap:wrap;margin-bottom:24px}
+  h1{font-size:38px;margin-bottom:4px}
+  h1 em{font-style:italic;color:var(--gold)}
+  .cab .sub{color:var(--muted);font-size:15px;margin:0}
+  .movimento{font-size:13.5px;color:var(--muted);text-align:right;line-height:1.6}
+  .movimento b{color:var(--ink);font-weight:500}
+
+  .quatro{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:16px}
+  .num{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;
+       display:flex;flex-direction:column}
+  .num .rot{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .num .v{font-family:var(--serif);font-size:44px;line-height:1;margin:12px 0 0;
+          font-variant-numeric:tabular-nums}
+  .num .v.risco{color:var(--risk)}
+  .num .v.bom{color:var(--ok)}
+  .num .pe{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5;flex:1}
+  /* "Ainda não sabemos isto" é informação, não defeito: aparece no card. */
+  .num .falta{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line-2);
+              font-size:12px;color:var(--faint);line-height:1.5}
+
+  .colunas{display:grid;grid-template-columns:1.35fr .65fr;gap:16px;align-items:start}
+  @media(max-width:960px){.colunas{grid-template-columns:1fr}}
+  .bloco{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+  .bloco .topo{display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+               padding:20px 24px;border-bottom:1px solid var(--line)}
+  .bloco h2{font-size:24px}
+  .bloco .conta{font-size:13px;color:var(--muted)}
+
+  .exc{padding:18px 24px;border-bottom:1px solid var(--line)}
+  .exc:last-child{border-bottom:0}
+  .exc .fato{font-weight:500;color:var(--ink);font-size:14.5px;line-height:1.45}
+  .exc .cca{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.55}
+  .exc .cca b{color:var(--dim);font-weight:500}
+  .exc .pe{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;font-size:12px}
+  .tag{padding:3px 10px;border-radius:var(--r-pill);background:var(--bg-deep);color:var(--muted)}
+  .tag.venceu{background:rgba(162,74,44,.10);color:var(--risk)}
+
+  .comp{padding:20px 24px}
+  .comp .linha{display:flex;justify-content:space-between;gap:14px;padding:11px 0;
+               border-bottom:1px solid var(--line);font-size:14px;color:var(--dim)}
+  .comp .linha:last-child{border-bottom:0}
+  .comp .linha b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+  .carregando{padding:60px;text-align:center;color:var(--faint)}
+</style>
+</head>
+<body class="paper">
+  <div class="appbar">
+    <div class="marca"><div class="caduceu">V</div>
+      <div><span class="nome">VOW</span><span class="sob">Plataforma</span></div></div>
+    <button class="rede" id="rede"></button>
+    <div class="sp"></div>
+    <div class="quem" id="quem"></div>
+    <button class="sair" id="sair">Sair</button>
+  </div>
+
+  <main class="app-main">
+    <div id="tudo" class="carregando">Carregando o painel…</div>
+  </main>
+
+<script type="module">
+import { brl, brlCurto } from '/motor.js'
+
+const $ = (id) => document.getElementById(id)
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]))
+const hoje = new Date().toISOString().slice(0, 10)
+const dataBr = (d) => d ? d.split('-').reverse().slice(0, 2).join('/') : '—'
+
+const [ctx, p] = await Promise.all([
+  fetch('/api/app/contexto').then((r) => r.json()),
+  fetch('/api/app/painel').then((r) => r.json()),
+])
+
+$('quem').innerHTML = `<b>${esc(ctx.usuario.nome)}</b>${esc(ctx.usuario.papel)}`
+$('rede').textContent = ctx.redeAtual?.razao ?? 'Escolher rede'
+$('rede').onclick = () => (location.href = '/app/redes')
+if (ctx.redes.length < 2) $('rede').style.cursor = 'default'
+$('sair').addEventListener('click', async () => {
+  await fetch('/api/app/sair', { method: 'POST' })
+  location.href = '/app/entrar'
+})
+
+const n = p.numeros
+const d = p.desdeOntem
+
+const cards = [
+  {
+    rot: 'Crédito em risco',
+    v: brlCurto(n.creditoEmRisco.valor),
+    classe: 'risco',
+    pe: `${n.creditoEmRisco.fornecedores} fornecedores sem a extinção do débito garantida, de ${brlCurto(n.creditoEmRisco.de)} de crédito esperado no ano.`,
+    // Sem esta linha o card venderia urgência que a lei ainda não cobra.
+    falta: `Passa a valer em ${n.creditoEmRisco.vigenteA_partir_de}. ${esc(n.creditoEmRisco.nota)}` +
+      (n.creditoEmRisco.incompleto
+        ? `<br><br>Número parcial: ${n.creditoEmRisco.semAliquota} fornecedores ainda sem alíquota efetiva calculada.`
+        : ''),
+  },
+  {
+    rot: 'Cobertura contratual',
+    v: `${n.coberturaContratual.valor.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}%`,
+    classe: n.coberturaContratual.valor >= 100 ? 'bom' : '',
+    pe: `${n.coberturaContratual.semContrato} de ${n.coberturaContratual.pagos} CNPJs pagos estão sem contrato vigente.`,
+    falta: `${brlCurto(n.coberturaContratual.exposicaoSemContrato)} pagos em 12 meses sem contrato que os ampare.`,
+  },
+  {
+    rot: 'Itens saneados',
+    v: `${n.itensSaneados.valor.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}%`,
+    classe: '',
+    pe: `${n.itensSaneados.saneados.toLocaleString('pt-BR')} de ${n.itensSaneados.total.toLocaleString('pt-BR')} itens conferem com a base mestre.`,
+    falta: `${brl(n.itensSaneados.ganhoIdentificadoMes)}/mês identificados nos itens que ainda divergem.`,
+  },
+  {
+    rot: 'Saldo credor na fila',
+    v: brlCurto(n.saldoCredorNaFila.valor),
+    classe: '',
+    pe: `Preso por ${n.saldoCredorNaFila.dias} dias — ${n.saldoCredorNaFila.emConformidade ? 'a rede está em programa de conformidade' : 'a rede não está em programa de conformidade'}.`,
+    falta: n.saldoCredorNaFila.emConformidade
+      ? 'No prazo curto. Manter o enquadramento é o que segura os 30 dias.'
+      : `Entrar no programa devolveria o saldo em 30 dias e valeria ${brl(n.saldoCredorNaFila.custoForaDoPrograma)}/ano em custo de capital.`,
+  },
+]
+
+$('tudo').className = ''
+$('tudo').innerHTML = `
+  <div class="cab">
+    <div>
+      <h1>${esc(p.rede.razao)}</h1>
+      <p class="sub">O que precisa da sua atenção hoje.</p>
+    </div>
+    <div class="movimento">
+      Desde ontem: <b>${d.excecoesNovas}</b> ${d.excecoesNovas === 1 ? 'exceção nova' : 'exceções novas'},
+      <b>${d.excecoesFechadas}</b> ${d.excecoesFechadas === 1 ? 'fechada' : 'fechadas'}.<br>
+      ${p.vencidas > 0 ? `<b style="color:var(--risk)">${p.vencidas} fora do prazo.</b>` : 'Nenhuma fora do prazo.'}
+    </div>
+  </div>
+
+  <div class="quatro">
+    ${cards.map((c) => `
+      <div class="num">
+        <div class="rot">${esc(c.rot)}</div>
+        <div class="v ${c.classe}">${c.v}</div>
+        <div class="pe">${esc(c.pe)}</div>
+        <div class="falta">${c.falta}</div>
+      </div>`).join('')}
+  </div>
+
+  <div class="colunas">
+    <div class="bloco">
+      <div class="topo">
+        <h2>Fila de exceções</h2>
+        <span class="conta">${p.filaTotal} abertas · fato, causa, ação</span>
+      </div>
+      ${p.fila.map((e) => `
+        <div class="exc">
+          <div class="fato">${esc(e.fato)}</div>
+          <div class="cca"><b>Causa:</b> ${esc(e.causa)}<br><b>Ação:</b> ${esc(e.acao)}</div>
+          <div class="pe">
+            <span class="tag">${esc(e.origem)}</span>
+            <span class="tag">${esc(e.responsavel)}</span>
+            <span class="tag ${e.prazo && e.prazo < hoje ? 'venceu' : ''}">
+              ${e.prazo && e.prazo < hoje ? 'venceu ' : 'prazo '}${dataBr(e.prazo)}
+            </span>
+          </div>
+        </div>`).join('') || '<div class="comp">Nenhuma exceção aberta.</div>'}
+    </div>
+
+    <div class="bloco">
+      <div class="topo"><h2>O que ainda falta</h2></div>
+      <div class="comp">
+        <div class="linha"><span>Fornecedores sem alíquota efetiva</span><b>${p.completude.fornecedoresSemAliquota}</b></div>
+        <div class="linha"><span>Fornecedores sem regime declarado</span><b>${p.completude.fornecedoresSemRegime}</b></div>
+        <div class="linha"><span>Fornecedores pagos sem contrato</span><b>${p.completude.fornecedoresSemContrato}</b></div>
+      </div>
+      <div style="padding:0 24px 22px">
+        <div class="rule"><p>A plataforma mostra o que já sabe e marca o que falta.
+        Número estimado por cima não sustenta conversa com a indústria nem defesa em fiscalização.</p></div>
+      </div>
+    </div>
+  </div>`
+</script>
+</body>
+</html>
