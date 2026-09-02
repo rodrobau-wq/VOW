@@ -5,6 +5,7 @@
  * inline que os tokens divergiram em três paletas antes — não repete de novo.
  */
 const ABAS = [
+  { href: '/app/feira',     rotulo: 'Feira' },
   { href: '/app',           rotulo: 'Painel' },
   { href: '/app/hoje',      rotulo: 'Hoje' },
   { href: '/app/capturar',  rotulo: 'Capturar' },
@@ -39,6 +40,45 @@ export async function montarNav(atual) {
 }
 
 export { esc }
+
+/**
+ * Registra o service worker. Só isso torna o app instalável — e é o que faz
+ * a casca abrir sem rede no pavilhão. Falhar aqui não pode quebrar a tela:
+ * num navegador sem suporte o app continua funcionando online.
+ */
+export function ligarApp() {
+  if (!('serviceWorker' in navigator)) return
+  addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {})
+  })
+}
+
+/** Faixa de estado da rede e da fila, no topo da tela. */
+export function faixaRede() {
+  const el = document.createElement('div')
+  el.className = 'faixa-rede'
+  el.hidden = true
+  document.body.prepend(el)
+  return (estado) => {
+    if (estado.presos === -1 || !navigator.onLine) {
+      el.hidden = false; el.className = 'faixa-rede off'
+      el.textContent = 'Sem conexão. O que você capturar fica guardado no aparelho.'
+      return
+    }
+    if (estado.presos > 0) {
+      el.hidden = false; el.className = 'faixa-rede esperando'
+      el.textContent = `${estado.presos} captura(s) esperando para subir.`
+      return
+    }
+    if (estado.enviados > 0) {
+      el.hidden = false; el.className = 'faixa-rede ok'
+      el.textContent = `${estado.enviados} captura(s) sincronizada(s).`
+      setTimeout(() => { el.hidden = true }, 4000)
+      return
+    }
+    el.hidden = true
+  }
+}
 
 /* ---------------------------------------------------------- formatadores */
 export const brl = (v) => 'R$ ' + Math.round(v || 0).toLocaleString('pt-BR')

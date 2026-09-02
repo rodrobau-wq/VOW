@@ -1,0 +1,20 @@
+{
+  "name": "VOW · Campo",
+  "short_name": "VOW Campo",
+  "description": "Captura e acompanhamento de leads no estande da ABRAS, com fila offline.",
+  "start_url": "/app/feira",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E1B14",
+  "theme_color": "#0E1B14",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Capturar lead", "url": "/app/capturar" },
+    { "name": "Hoje", "url": "/app/hoje" }
+  ]
+}

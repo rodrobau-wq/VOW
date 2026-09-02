@@ -195,8 +195,26 @@ body.paper .chip[aria-pressed="true"]{color:var(--surface)}
 .app-main{padding:28px;max-width:1240px;margin:0 auto}
 
 /* Abas da plataforma — moram aqui pela mesma razão que a .appbar. */
-.appbar .abas{display:flex;gap:2px;flex-wrap:wrap}
+/* No celular as abas rolam na horizontal em vez de quebrar em duas linhas:
+   o app de campo é usado de pé, e cada linha a mais empurra o conteúdo. */
+.appbar .abas{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+              scrollbar-width:none;max-width:100%}
+.appbar .abas::-webkit-scrollbar{display:none}
+.appbar .abas a{white-space:nowrap}
 .appbar .abas a{padding:7px 14px;border-radius:var(--r-pill);font-size:13.5px;
                 color:var(--muted);text-decoration:none}
 .appbar .abas a:hover{color:var(--ink);background:var(--bg-deep)}
 .appbar .abas a.on{background:var(--ink);color:var(--surface);font-weight:500}
+
+/* Estado da rede no app de campo. A cor não decide sozinha: a frase diz. */
+.faixa-rede{padding:10px 18px;font-size:13.5px;text-align:center;font-weight:500}
+.faixa-rede.off{background:var(--risk);color:#fff}
+.faixa-rede.esperando{background:var(--gold);color:var(--bg)}
+.faixa-rede.ok{background:var(--ok);color:#fff}
+
+@media(max-width:640px){
+  .appbar{padding:10px 14px;gap:10px}
+  .appbar .marca .sob{display:none}
+  .appbar .quem{display:none}
+  .appbar .abas{order:3;flex-basis:100%}
+}

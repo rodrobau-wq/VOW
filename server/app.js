@@ -217,59 +217,91 @@ app.get('/api/app/crm/leads', async (req, res, next) => {
  * e-mail ou telefone. Exigir o que não se tem faz o consultor inventar
  * endereço, e aí o lead nasce sujo.
  */
+/** Erro de validação: reenviar não conserta, então a fila offline descarta. */
+function recusa(mensagem) {
+  return Object.assign(new Error(mensagem), { definitivo: true })
+}
+
+/**
+ * Cria um lead capturado à mão. Usada pela rota e pela sincronização da fila
+ * offline — as duas precisam das mesmas regras, e duplicar isso seria a
+ * forma mais fácil de o app de campo e o navegador discordarem.
+ *
+ * Mais permissiva que /api/lead de propósito: ali a pessoa simulou e o
+ * e-mail é o que faz o diagnóstico chegar. Aqui basta um jeito de retornar.
+ * Exigir o que não se tem faz o consultor inventar endereço.
+ */
+export async function capturar(b, usuario) {
+  const nome = String(b.nome || '').trim().slice(0, 120)
+  const empresa = String(b.empresa || '').trim().slice(0, 160)
+  const email = String(b.email || '').trim().slice(0, 200)
+  const telefone = String(b.telefone || '').trim().slice(0, 40)
+
+  if (!nome && !empresa) throw recusa('Informe ao menos o nome ou a rede.')
+  if (!email && !telefone) throw recusa('Informe e-mail ou telefone — sem isso não há como retornar.')
+  if (email && !EMAIL_RE_CRM.test(email)) throw recusa('E-mail inválido.')
+
+  /**
+   * `capturaId` é gerado no aparelho antes de existir rede. Quando a fila
+   * offline reenvia — e ela reenvia, é para isso que existe — o mesmo id
+   * chega de novo e devolvemos o lead que já foi criado. Sem isto, um
+   * consultor com sinal ruim cadastra a mesma pessoa quatro vezes.
+   */
+  const capturaId = String(b.capturaId || '').slice(0, 64)
+  if (capturaId) {
+    const jaExiste = (await lerLeads()).find((l) => l.capturaId === capturaId)
+    if (jaExiste) return { ...comCrm(jaExiste), duplicado: true }
+  }
+
+  // O diagnóstico é opcional: quem só deixou o cartão entra sem número, e o
+  // valor em jogo aparece como zero até alguém simular por ele.
+  let diagnosticos = []
+  const faturamento = Number(b.faturamento)
+  if (Number.isFinite(faturamento) && faturamento > 0) {
+    const tipos = Array.isArray(b.tipos) && b.tipos.length ? b.tipos : ['revenda']
+    if (tipos.some((t) => t !== 'revenda' && t !== 'indiretos')) throw recusa('Tipo de diagnóstico inválido.')
+    diagnosticos = tipos.map((t) => {
+      const d = diagnosticar(t, { faturamento })
+      return { tipo: d.tipo, destaque: d.destaque, entrada: d.entrada }
+    })
+  }
+
+  const id = crypto.randomUUID()
+  const agora = new Date().toISOString()
+  // Vale o instante em que o consultor capturou, não o em que a rede voltou.
+  const capturadoEm = b.capturadoEm && !Number.isNaN(Date.parse(b.capturadoEm)) ? b.capturadoEm : agora
+
+  const lead = {
+    id, capturaId: capturaId || null, criadoEm: capturadoEm, sincronizadoEm: agora,
+    nome, empresa, email, telefone,
+    cnpj: String(b.cnpj || '').slice(0, 20),
+    origem: b.origem === 'site' ? 'site' : 'abras',
+    faturamento: Number.isFinite(faturamento) && faturamento > 0 ? faturamento : 0,
+    fezOsDois: diagnosticos.length > 1,
+    diagnosticos,
+    agendar: b.agendar === true,
+    email_enviado: false,
+    // Capturado por alguém da VOW é, por definição, contato feito.
+    primeiroContatoEm: capturadoEm,
+    estagio: 'capturado', estagioDesde: capturadoEm,
+    responsavel: String(b.responsavel || usuario.nome).slice(0, 120),
+    capturadoPor: usuario.nome,
+  }
+  await gravarLead(lead)
+
+  const nota = String(b.nota || '').trim()
+  if (nota) await registrar(id, usuario.nome, nota.slice(0, 2000), 'nota')
+  await registrar(id, usuario.nome, `Capturado no ${lead.origem === 'abras' ? 'estande' : 'site'} por ${usuario.nome}`)
+  return comCrm(lead)
+}
+
 app.post('/api/app/crm/leads', async (req, res, next) => {
   try {
-    const b = req.body || {}
-    const nome = String(b.nome || '').trim().slice(0, 120)
-    const empresa = String(b.empresa || '').trim().slice(0, 160)
-    const email = String(b.email || '').trim().slice(0, 200)
-    const telefone = String(b.telefone || '').trim().slice(0, 40)
-
-    if (!nome && !empresa) return res.status(400).json({ erro: 'Informe ao menos o nome ou a rede.' })
-    if (!email && !telefone) return res.status(400).json({ erro: 'Informe e-mail ou telefone — sem isso não há como retornar.' })
-    if (email && !EMAIL_RE_CRM.test(email)) return res.status(400).json({ erro: 'E-mail inválido.' })
-
-    // O diagnóstico é opcional: quem só deixou o cartão entra sem número, e
-    // o valor em jogo aparece como zero até alguém simular por ele.
-    let diagnosticos = []
-    const faturamento = Number(b.faturamento)
-    if (Number.isFinite(faturamento) && faturamento > 0) {
-      const tipos = Array.isArray(b.tipos) && b.tipos.length ? b.tipos : ['revenda']
-      if (tipos.some((t) => t !== 'revenda' && t !== 'indiretos')) {
-        return res.status(400).json({ erro: 'tipo de diagnóstico inválido' })
-      }
-      diagnosticos = tipos.map((t) => {
-        const d = diagnosticar(t, { faturamento })
-        return { tipo: d.tipo, destaque: d.destaque, entrada: d.entrada }
-      })
-    }
-
-    const id = crypto.randomUUID()
-    const agora = new Date().toISOString()
-    const lead = {
-      id, criadoEm: agora,
-      nome, empresa, email, telefone,
-      cnpj: String(b.cnpj || '').slice(0, 20),
-      origem: b.origem === 'site' ? 'site' : 'abras',
-      faturamento: Number.isFinite(faturamento) && faturamento > 0 ? faturamento : 0,
-      fezOsDois: diagnosticos.length > 1,
-      diagnosticos,
-      agendar: b.agendar === true,
-      email_enviado: false,
-      // Capturado por alguém da VOW é, por definição, contato feito.
-      primeiroContatoEm: agora,
-      estagio: 'capturado', estagioDesde: agora,
-      responsavel: String(b.responsavel || req.usuario.nome).slice(0, 120),
-      capturadoPor: req.usuario.nome,
-    }
-    await gravarLead(lead)
-
-    const nota = String(b.nota || '').trim()
-    if (nota) await registrar(id, req.usuario.nome, nota.slice(0, 2000), 'nota')
-    await registrar(id, req.usuario.nome, `Capturado no ${lead.origem === 'abras' ? 'estande' : 'site'} por ${req.usuario.nome}`)
-
-    res.json(comCrm(lead))
-  } catch (e) { next(e) }
+    res.json(await capturar(req.body || {}, req.usuario))
+  } catch (e) {
+    if (e.definitivo) return res.status(400).json({ erro: e.message })
+    next(e)
+  }
 })
 
 app.get('/api/app/crm/leads/:id', async (req, res, next) => {
@@ -388,8 +420,59 @@ app.post('/api/app/crm/leads/:id/interacoes', async (req, res, next) => {
   } catch (e) { next(e) }
 })
 
+/**
+ * Sincroniza a fila offline. Cada item é tratado isoladamente: um que falha
+ * não derruba os outros, e o aparelho só apaga da fila o que voltou com `ok`.
+ */
+app.post('/api/app/crm/sync', async (req, res, next) => {
+  try {
+    const fila = Array.isArray(req.body?.fila) ? req.body.fila.slice(0, 200) : []
+    const resultados = []
+    for (const item of fila) {
+      try {
+        const r = await capturar(item, req.usuario)
+        resultados.push({ capturaId: item.capturaId, ok: true, id: r.id, duplicado: r.duplicado === true })
+      } catch (e) {
+        // Erro de validação é definitivo: reenviar não conserta. O aparelho
+        // tira da fila e mostra para o consultor corrigir.
+        resultados.push({ capturaId: item.capturaId, ok: false, erro: e.message, definitivo: e.definitivo === true })
+      }
+    }
+    res.json({ resultados })
+  } catch (e) { next(e) }
+})
+
+/** Painel do estande: quem acabou de simular no totem, para abordar na hora. */
+app.get('/api/app/crm/feira', async (req, res, next) => {
+  try {
+    const minutos = Math.min(Number(req.query.minutos) || 120, 1440)
+    const corte = Date.now() - minutos * 60e3
+    const todos = await lerLeads()
+    const recentes = todos
+      .filter((l) => new Date(l.criadoEm).getTime() >= corte)
+      .map(comCrm)
+      .sort((a, b) => b.criadoEm.localeCompare(a.criadoEm))
+
+    const hoje = new Date().toISOString().slice(0, 10)
+    const doDia = todos.filter((l) => l.criadoEm.slice(0, 10) === hoje)
+    res.json({
+      recentes,
+      // Quem veio do totem e ninguém tocou ainda é o que o consultor precisa
+      // ver: a pessoa ainda está no pavilhão.
+      naoAbordados: recentes.filter((l) => l.origem === 'abras' && !l.primeiroContatoEm).length,
+      hoje: {
+        total: doDia.length,
+        totem: doDia.filter((l) => l.origem === 'abras').length,
+        pediramConversa: doDia.filter((l) => l.agendar).length,
+        valorEmJogo: doDia.reduce((s, l) => s + (l.diagnosticos || []).reduce((a, d) => a + (d.destaque || 0), 0), 0),
+      },
+    })
+  } catch (e) { next(e) }
+})
+
 /* ------------------------------------------------------------ telas CRM */
 app.get('/app/capturar', tela('capturar'))
+app.get('/app/feira', tela('feira'))
 app.get('/app/pipeline', tela('pipeline'))
 app.get('/app/hoje', tela('hoje'))
 app.get('/app/resultado', tela('resultado'))
