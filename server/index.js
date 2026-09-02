@@ -18,6 +18,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import QRCode from 'qrcode'
+import { baseUrl } from '../lib-url.js'
 
 import { diagnosticar, PREMISSAS, PORTES } from '../motor.js'
 import { enviarDiagnostico, montarHtml } from '../email.js'
@@ -150,7 +151,7 @@ app.post('/api/lead', async (req, res, next) => {
     await gravarLead(lead)
 
     // QR só é montado quando o lead existe — aponta para a página do resultado.
-    const base = (process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '')
+    const base = baseUrl(req)
     const url = `${base}/d/${id}`
     const qr = await QRCode.toDataURL(url, { margin: 1, width: 320, color: { dark: '#14120F', light: '#FFFFFF' } })
 

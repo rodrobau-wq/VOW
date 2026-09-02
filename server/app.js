@@ -9,6 +9,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import * as store from '../store.js'
+import { baseUrl } from '../lib-url.js'
 import { montarPainel, CLASSES_CREDITO, RISCOS, CALENDARIO } from '../painel.js'
 import {
   abrirSessao, fecharSessao, carregaContexto, conferirSenha,
@@ -62,7 +63,7 @@ app.post('/api/app/link-magico', async (req, res, next) => {
     if (!usuario) return res.json(resposta)
 
     const token = gerarLinkMagico(usuario.id)
-    const base = (process.env.PUBLIC_BASE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '')
+    const base = baseUrl(req)
     const link = `${base}/app/entrar/${token}`
 
     if (!process.env.RESEND_API_KEY) resposta.link = link

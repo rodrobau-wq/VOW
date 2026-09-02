@@ -42,7 +42,7 @@ const vale = await store.inserir('rede', {
 
 /* ------------------------------------------------------------ usuários */
 await store.inserir('usuario', {
-  nome: 'Rodrigo Bauer', email: 'rodrigo@grupovow.com.br', papel: 'vow',
+  nome: 'Rodrigo Bauer', email: process.env.ADMIN_EMAIL || 'rodrobau@gmail.com', papel: 'vow',
   senhaHash: hashSenha(SENHA), redes: [],   // papel vow enxerga todas
 })
 await store.inserir('usuario', {
@@ -160,7 +160,7 @@ console.log(`  itens:        320`)
 console.log(`  exceções:     ${EXC.length}`)
 console.log('')
 console.log('  Entrar em /app/entrar:')
-console.log('    rodrigo@grupovow.com.br   (consultor VOW · vê as duas redes)')
+console.log(`    ${process.env.ADMIN_EMAIL || 'rodrobau@gmail.com'}      (admin VOW · vê as duas redes)`)
 console.log('    marina@bompreco.com.br    (fiscal · só a Bom Preço)')
 console.log('    caio@vale.com.br          (suprimentos · atende as duas)')
 console.log(`    senha: ${SENHA}`)

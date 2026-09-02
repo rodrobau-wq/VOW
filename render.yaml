@@ -25,6 +25,16 @@ services:
         value: "20"
       - key: LEADS_DB
         value: /var/data/leads.json
+      # A base da plataforma (redes, usuários, fornecedores) mora no disco.
+      # Sem isto ela nasceria no filesystem efêmero e sumiria a cada deploy.
+      - key: APP_DB
+        value: /var/data/db.json
+      # Assina o cookie de sessão. Gerado uma vez pelo Render e mantido entre
+      # deploys — se mudar, todo mundo é deslogado.
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
       - key: PUBLIC_BASE_URL
         fromService:
           type: web
