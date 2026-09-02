@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diagnóstico gratuito · VOW</title>
+<meta name="description" content="Simulador AS IS → TO BE: quanto da sua verba com a indústria passa a ser tributada e quanto do seu gasto com serviços volta como crédito.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  /* Camada pública: escala escura, a mesma da landing e do totem. */
+  nav{position:sticky;top:0;z-index:40;background:rgba(14,27,20,.92);backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line)}
+  nav .row{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:16px}
+  nav .sp{flex:1}
+  .passos{display:flex;gap:6px;align-items:center}
+  .pino{height:8px;width:14px;border-radius:4px;background:rgba(243,238,226,.18);transition:width .3s,background .3s}
+  .pino.on{width:34px;background:var(--gold)}
+  .recomecar{background:none;border:1px solid var(--line-2);color:var(--dim);border-radius:var(--r-pill);
+             padding:8px 16px;font:400 13px/1 var(--sans);cursor:pointer}
+  .recomecar:hover{color:var(--ink);border-color:var(--gold-edge)}
+
+  main{max-width:1120px;margin:0 auto;padding:44px 24px 80px}
+  .tela{display:none;animation:up .4s ease both}
+  .tela.on{display:block}
+  h1{font-size:clamp(34px,5.2vw,64px);margin-bottom:16px}
+  h1 em{font-style:italic;color:var(--gold)}
+  .lead{font-size:clamp(16px,1.9vw,20px);color:var(--dim);max-width:64ch;margin-bottom:34px}
+  h2.sec{font-size:clamp(24px,3.2vw,38px);margin-bottom:8px}
+  .legenda{color:var(--muted);font-size:15px;margin-bottom:22px;max-width:70ch}
+
+  /* 1 · escolha */
+  .escolha{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .prod{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-2xl);padding:32px;
+        text-align:left;cursor:pointer;color:var(--ink);transition:border-color .2s,transform .2s}
+  .prod:hover{border-color:var(--gold-edge);transform:translateY(-3px)}
+  .prod h3{font-size:38px;margin:10px 0 12px}
+  .prod p{color:var(--dim);font-size:15px;margin:0 0 22px;line-height:1.6}
+  .prod .ir{display:flex;align-items:center;justify-content:space-between;gap:14px;
+            border-top:1px solid var(--line);padding-top:18px}
+  .prod .ir b{color:var(--gold);font-weight:500;font-size:14px}
+  .prod .seta{width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--bg);
+              display:grid;place-items:center;font-size:19px}
+  .prod .feito{color:var(--ok);font-size:13px;font-weight:500}
+
+  /* 2 · simulação */
+  .simul{display:grid;grid-template-columns:1fr;gap:16px;max-width:760px}
+  .campo .top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}
+  .campo label{font-size:15px;color:var(--muted)}
+  .campo .val{font-family:var(--serif);font-size:44px;line-height:1;color:var(--gold)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:5px;
+                    background:var(--track);outline:none;margin:0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:34px;height:34px;border-radius:50%;
+    background:var(--gold);border:6px solid var(--bg);box-shadow:0 0 0 2px var(--gold);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--gold);
+    border:5px solid var(--bg);cursor:pointer}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .resumo{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;
+          padding:20px 0 0;border-top:1px solid var(--line);margin-top:6px}
+  .resumo .r{font-size:14px;color:var(--muted)}
+  .resumo .v{font-family:var(--serif);font-size:34px;color:var(--ink)}
+
+  /* 3 · resultado */
+  .heroi{margin-bottom:38px}
+  .heroi .rot{font-size:15px;color:var(--dim);margin-bottom:8px}
+  .heroi .num{font-family:var(--serif);font-size:clamp(56px,10vw,124px);line-height:.95;letter-spacing:-.02em}
+  .heroi .num.perda{color:var(--risk)}
+  .heroi .num.ganho{color:var(--ok)}
+  .heroi .sub{font-size:16px;color:var(--dim);margin-top:12px;max-width:60ch}
+
+  .cenarios{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+  .cen{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);padding:24px;
+       position:relative;overflow:hidden}
+  .cen::before{content:'';position:absolute;inset:0 0 auto;height:5px}
+  .cen.c1{background:#122019}.cen.c1::before{background:var(--faint)}
+  .cen.c2::before{background:var(--risk)}
+  .cen.c3::before{background:var(--gold)}
+  .cen .t{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+  .cen .ln{display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px;
+           color:var(--dim);border-bottom:1px solid var(--line)}
+  .cen .ln b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+  .cen .fim{margin-top:16px}
+  .cen .fim .l{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .cen .fim .v{font-family:var(--serif);font-size:38px;line-height:1;margin-top:6px}
+  .cen .fim .n{font-size:12.5px;color:var(--faint);margin-top:6px;line-height:1.45}
+
+  /* caixa */
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+  .tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:20px}
+  .tile.ouro{background:var(--raised);border-color:var(--gold-edge)}
+  .tile .l{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .tile .v{font-family:var(--serif);font-size:34px;line-height:1;margin-top:8px}
+  .tile .n{font-size:12.5px;color:var(--faint);margin-top:6px;line-height:1.45}
+
+  /* linha a linha */
+  .faixa{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;
+         font-size:13.5px;color:var(--muted);margin:14px 0 16px}
+  .fam{border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:10px;
+       cursor:pointer;transition:border-color .15s,opacity .15s;background:var(--surface)}
+  .fam.off{opacity:.45;background:transparent}
+  .fam .cab{display:flex;align-items:flex-start;gap:14px}
+  .cx{width:26px;height:26px;border-radius:8px;border:2px solid var(--line-2);flex:0 0 auto;
+      display:grid;place-items:center;font-size:14px;color:var(--bg);margin-top:2px}
+  .fam:not(.off) .cx{background:var(--gold);border-color:var(--gold)}
+  .fam .id{flex:1;min-width:0}
+  .fam .nm{font-size:17px;font-weight:500}
+  .fam .tag{font-size:12px;margin-top:5px;display:inline-block}
+  .fam .dir{text-align:right;flex:0 0 auto}
+  .fam .vl{font-family:var(--serif);font-size:26px;line-height:1}
+  .pm{display:flex;gap:6px;justify-content:flex-end;margin-top:8px;align-items:center}
+  .pm button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line-2);background:transparent;
+             color:var(--ink);font:400 17px/1 var(--sans);cursor:pointer}
+  .pm button:hover{border-color:var(--gold);color:var(--gold)}
+  .pm span{font-size:12px;color:var(--faint);min-width:104px;text-align:right}
+  .barra{height:10px;border-radius:5px;background:#2A3D33;margin-top:14px;overflow:hidden}
+  .barra i{display:block;height:100%;border-radius:5px}
+  .fam .mud{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5}
+  .fam .mud b{color:var(--dim);font-weight:500}
+
+  /* etapas */
+  .etapas{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+  .et{border-top:1px solid var(--line-2);padding-top:16px}
+  .et .n{font-family:var(--serif);font-size:34px;color:var(--gold);line-height:1}
+  .et .t{font-size:17px;font-weight:500;margin:8px 0 6px}
+  .et .d{font-size:13.5px;color:var(--muted);line-height:1.55}
+
+  /* entrega */
+  .entrega{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;align-items:start}
+  .ff{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 14px}
+  .ff .full{grid-column:1/-1}
+  .ff input{height:52px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--bg);
+            color:var(--ink);padding:0 16px;font:400 16px/1 var(--sans);width:100%}
+  .ff input:focus{border-color:var(--gold);outline:none}
+  .ff input::placeholder{color:var(--faint)}
+  .ff input.ok{border-color:var(--ok)} .ff input.ruim{border-color:var(--risk)}
+  .cnpjst{font-size:13px;color:var(--muted);margin:-6px 0 12px;display:flex;gap:8px;align-items:center}
+  .cnpjst i{width:8px;height:8px;border-radius:50%;background:var(--faint);display:inline-block}
+  .toggle{width:100%;text-align:left;padding:16px 18px;border-radius:var(--r-md);border:1px solid var(--line-2);
+          background:transparent;color:var(--dim);font:400 14.5px/1.4 var(--sans);cursor:pointer;margin-top:12px}
+  .toggle[aria-pressed="true"]{border-color:var(--ok);color:var(--ok);background:rgba(123,211,137,.12)}
+  .qrw{text-align:center}
+  .qrw img{width:180px;height:180px;background:#fff;border-radius:var(--r-sm);padding:10px}
+  .msg{font-size:14px;margin-top:12px;min-height:20px;color:var(--risk)}
+
+  .bloco{margin-top:52px}
+  .acoes{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px;align-items:center}
+  @media(max-width:640px){ .ff{grid-template-columns:1fr} main{padding:28px 18px 60px} }
+</style>
+</head>
+<body>
+<nav><div class="row">
+  <a href="/" class="logo">VOW</a>
+  <div class="sp"></div>
+  <div class="passos" id="passos" aria-hidden="true"></div>
+  <button class="recomecar" id="recomecar" hidden>Recomeçar</button>
+</div></nav>
+
+<main>
+  <!-- 1 ................................................. escolha -->
+  <section class="tela on" id="t-escolha">
+    <div class="eyebrow">JBP 2027 · IBS/CBS · LC 214/2025</div>
+    <h1>Escolha um <em>diagnóstico</em></h1>
+    <p class="lead">São os dois lados da mesma conta. Em três minutos você vê o que muda, quanto
+    custa e o que levar para a mesa do JBP. Sem cadastro para simular — o e-mail só é pedido
+    se você quiser receber o diagnóstico completo.</p>
+    <div class="escolha" id="escolha"></div>
+  </section>
+
+  <!-- 2 ................................................. simulação -->
+  <section class="tela" id="t-simular">
+    <h1>Dois números <em>bastam</em></h1>
+    <p class="lead">Pode ser aproximado. Na tela seguinte você marca quais contratos tem de
+    verdade e ajusta linha a linha.</p>
+
+    <div class="simul">
+      <div class="panel campo">
+        <div class="top"><label for="s-fat">Faturamento anual da rede</label>
+          <span class="val" id="v-fat"></span></div>
+        <input type="range" id="s-fat" min="0" max="1000" step="1">
+        <div class="chips" id="chips-fat"></div>
+      </div>
+
+      <div class="panel campo">
+        <div class="top"><label for="s-pct" id="l-pct"></label>
+          <span class="val" id="v-pct"></span></div>
+        <input type="range" id="s-pct">
+        <div class="chips" id="chips-pct"></div>
+      </div>
+
+      <div class="resumo">
+        <span class="r" id="r-rot"></span>
+        <span class="v" id="r-val"></span>
+      </div>
+    </div>
+
+    <div class="acoes">
+      <button class="btn lg" id="ver">Ver o diagnóstico</button>
+      <button class="btn ghost" onclick="ir('escolha')">Voltar</button>
+    </div>
+  </section>
+
+  <!-- 3 ................................................. resultado -->
+  <section class="tela" id="t-resultado">
+    <div class="eyebrow" id="r-eyebrow"></div>
+    <div class="heroi">
+      <div class="rot" id="h-rot"></div>
+      <div class="num" id="h-num"></div>
+      <div class="sub" id="h-sub"></div>
+    </div>
+
+    <div class="bloco">
+      <h2 class="sec">O antes e o <em>depois</em></h2>
+      <p class="legenda">Três cenários sobre os mesmos números.</p>
+      <div class="cenarios" id="cenarios"></div>
+      <div class="rule" style="margin-top:20px" id="callout"></div>
+    </div>
+
+    <div class="bloco">
+      <h2 class="sec">O que muda no <em>caixa</em></h2>
+      <p class="legenda" id="caixa-leg"></p>
+      <div class="chips" id="chips-caixa" style="margin:0 0 16px"></div>
+      <div class="tiles" id="tiles"></div>
+    </div>
+
+    <div class="bloco">
+      <h2 class="sec">Linha a <em>linha</em></h2>
+      <p class="legenda">Toque nas linhas que <b>você não tem</b> para tirá-las da conta, e use
+      <b>− +</b> para calibrar cada uma. Cada linha é independente: ajustar uma não mexe nas outras.</p>
+      <div class="faixa">
+        <span id="f-conta"></span>
+        <span id="f-ref"></span>
+      </div>
+      <div id="familias"></div>
+      <p class="fine" id="nota-fin" hidden>Serviços financeiros têm regime específico na LC 214 e
+      ficam fora deste cálculo — entram na análise da consultoria.</p>
+    </div>
+
+    <div class="bloco">
+      <h2 class="sec">Como ficar em <em>conformidade</em></h2>
+      <p class="legenda" id="ordem"></p>
+      <div class="etapas" id="etapas"></div>
+      <div class="chips" id="mecanismos" style="margin-top:22px"></div>
+    </div>
+
+    <div class="bloco">
+      <h2 class="sec">Leve o diagnóstico <em>com você</em></h2>
+      <p class="legenda">Chega por e-mail já com as linhas que você marcou.</p>
+      <div class="entrega">
+        <div class="panel">
+          <div class="ff">
+            <input class="full" type="text"  id="f-nome"  placeholder="Seu nome" autocomplete="name">
+            <input class="full" type="text"  id="f-cnpj"  placeholder="CNPJ da rede (opcional)" inputmode="numeric">
+            <input type="email" id="f-email" placeholder="E-mail" autocomplete="email" inputmode="email">
+            <input type="tel"   id="f-fone"  placeholder="Telefone (opcional)" inputmode="tel">
+          </div>
+          <div class="cnpjst" id="cnpjst" hidden><i></i><span></span></div>
+          <button class="toggle" id="agendar" aria-pressed="false">
+            Quero conversar com a VOW sobre este diagnóstico</button>
+          <div class="msg" id="msg" role="status" aria-live="polite"></div>
+          <button class="btn lg" id="enviar" style="width:100%;margin-top:14px">Receber por e-mail</button>
+        </div>
+        <div class="panel qrw" id="qrw" hidden>
+          <div class="eyebrow">Leve no celular</div>
+          <img id="qr" alt="QR code do seu diagnóstico">
+          <p class="fine" style="margin-top:12px">Aponte a câmera para abrir este diagnóstico no celular.</p>
+        </div>
+      </div>
+      <p class="fine" id="disclaimer" style="margin-top:22px"></p>
+    </div>
+
+    <div class="acoes">
+      <button class="btn ghost" id="voltar-ajustar">← Voltar e ajustar os números</button>
+    </div>
+  </section>
+
+  <!-- 4 ................................................. fim -->
+  <section class="tela" id="t-fim">
+    <div class="eyebrow" id="fim-eyebrow"></div>
+    <h1 id="fim-tit"></h1>
+    <p class="lead" id="fim-sub"></p>
+    <div class="panel" id="fim-metade" hidden style="max-width:640px">
+      <div class="eyebrow">Falta a outra metade</div>
+      <h3 style="font-family:var(--serif);font-size:32px;font-weight:400;margin:10px 0 10px" id="m-nome"></h3>
+      <p style="color:var(--dim);font-size:15px;margin-bottom:18px" id="m-txt"></p>
+      <button class="btn" id="m-btn"></button>
+    </div>
+    <div class="acoes">
+      <a class="btn ghost" href="/">Voltar ao site</a>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+import {
+  PRODUTOS, simular, caixaRevenda, caixaIndiretos,
+  fmtBRL, fmtBRLc, fmtPct, fmtCNPJ, fmtFone, soDigitos, emailOk, buscarCNPJ, ALIQUOTA,
+} from '/motor.js'
+
+const $ = (id) => document.getElementById(id)
+// ?e=abras marca quem veio do estande — o comercial responde esse primeiro.
+// ?d=revenda|indiretos pula a escolha e abre direto o diagnóstico do card.
+const PARAMS = new URLSearchParams(location.search)
+const ORIGEM = (PARAMS.get('e') || PARAMS.get('origem')) === 'abras' ? 'abras' : 'site'
+const PRE = PARAMS.get('d')
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]))
+
+/* Slider de faturamento em escala logarítmica: R$ 5 mi a R$ 50 bi. Linear
+   deixaria 90% do curso em valores que nenhuma rede tem. */
+const fatDe = (v) => {
+  const bruto = 5e6 * Math.pow(10000, v / 1000)
+  const mag = Math.pow(10, Math.floor(Math.log10(bruto)) - 1)
+  return Math.round(bruto / mag) * mag
+}
+const fatPara = (f) => Math.round(1000 * Math.log(f / 5e6) / Math.log(10000))
+
+const CHIPS_FAT = [50e6, 300e6, 1e9, 5e9, 20e9]
+const CHIPS_PCT = { revenda: [1.5, 2, 3, 4, 6], indiretos: [4, 6, 8, 10, 12] }
+
+const est = {
+  produto: null, fat: 300e6, pct: 3,
+  ativas: null, pesos: {},
+  dReceb: 45, prazo: 60,
+  agendar: false, empresa: null,
+  feitos: {}, lead: null,
+}
+
+/* ------------------------------------------------------------ navegação */
+const ORDEM = ['escolha', 'simular', 'resultado', 'fim']
+window.ir = (tela) => {
+  document.querySelectorAll('.tela').forEach((s) => s.classList.remove('on'))
+  $('t-' + tela).classList.add('on')
+  est.tela = tela
+  const i = ORDEM.indexOf(tela)
+  $('passos').innerHTML = ORDEM.slice(0, 3).map((_, k) => `<span class="pino ${k <= i ? 'on' : ''}"></span>`).join('')
+  $('recomecar').hidden = tela === 'escolha'
+  scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+$('recomecar').onclick = () => {
+  Object.assign(est, { produto: null, fat: 300e6, pct: 3, ativas: null, pesos: {}, agendar: false, feitos: {}, lead: null })
+  for (const id of ['f-nome', 'f-cnpj', 'f-email', 'f-fone']) $(id).value = ''
+  $('qrw').hidden = true; $('msg').textContent = ''
+  pintarEscolha(); ir('escolha')
+}
+
+/* -------------------------------------------------------------- escolha */
+function pintarEscolha() {
+  $('escolha').innerHTML = Object.values(PRODUTOS).map((p, i) => `
+    <button class="prod" data-p="${p.id}">
+      <div class="eyebrow">Diagnóstico 0${i + 1}/02</div>
+      <h3>${esc(p.sub)}</h3>
+      <p>${esc(p.pergunta)}</p>
+      <div class="ir">
+        <b>${est.feitos[p.id] ? '' : esc(p.curto)}</b>
+        ${est.feitos[p.id] ? '<span class="feito">✓ já feito</span>' : '<span class="seta">→</span>'}
+      </div>
+    </button>`).join('')
+}
+$('escolha').addEventListener('click', (e) => {
+  const b = e.target.closest('.prod'); if (!b) return
+  est.produto = b.dataset.p
+  const p = PRODUTOS[est.produto]
+  est.pct = p.pctDefault; est.ativas = null; est.pesos = {}
+  prepararSimulacao(); ir('simular')
+})
+
+/* ------------------------------------------------------------ simulação */
+function prepararSimulacao() {
+  const p = PRODUTOS[est.produto]
+  $('l-pct').textContent = p.campoPct
+  const s = $('s-pct')
+  s.min = p.pctMin; s.max = p.pctMax; s.step = p.pctStep; s.value = est.pct
+  $('s-fat').value = fatPara(est.fat)
+  $('chips-fat').innerHTML = CHIPS_FAT.map((v) => `<button class="chip" data-f="${v}">${fmtBRLc(v)}</button>`).join('')
+  $('chips-pct').innerHTML = CHIPS_PCT[est.produto].map((v) => `<button class="chip" data-pc="${v}">${fmtPct(v / 100)}</button>`).join('')
+  pintarSimulacao()
+}
+function pintarSimulacao() {
+  $('v-fat').textContent = fmtBRLc(est.fat)
+  $('v-pct').textContent = fmtPct(est.pct / 100)
+  const p = PRODUTOS[est.produto]
+  $('r-rot').textContent = est.produto === 'revenda'
+    ? 'Verba estimada no ano' : 'Gasto estimado com indiretos no ano'
+  $('r-val').textContent = fmtBRL(est.fat * est.pct / 100)
+  for (const c of $('chips-fat').children) c.setAttribute('aria-pressed', String(+c.dataset.f === est.fat))
+  for (const c of $('chips-pct').children) c.setAttribute('aria-pressed', String(+c.dataset.pc === est.pct))
+  void p
+}
+$('s-fat').addEventListener('input', (e) => { est.fat = fatDe(+e.target.value); pintarSimulacao() })
+$('s-pct').addEventListener('input', (e) => { est.pct = +e.target.value; pintarSimulacao() })
+$('chips-fat').addEventListener('click', (e) => {
+  const b = e.target.closest('.chip'); if (!b) return
+  est.fat = +b.dataset.f; $('s-fat').value = fatPara(est.fat); pintarSimulacao()
+})
+$('chips-pct').addEventListener('click', (e) => {
+  const b = e.target.closest('.chip'); if (!b) return
+  est.pct = +b.dataset.pc; $('s-pct').value = est.pct; pintarSimulacao()
+})
+$('ver').onclick = () => { pintarResultado(); ir('resultado') }
+$('voltar-ajustar').onclick = () => ir('simular')
+
+/* ------------------------------------------------------------ resultado */
+function calcular() {
+  return simular(est.produto, est.fat, est.pct, est.ativas, est.pesos)
+}
+
+function pintarResultado() {
+  const p = PRODUTOS[est.produto]
+  const r = calcular()
+  est.feitos[est.produto] = r
+  const rev = est.produto === 'revenda'
+
+  $('r-eyebrow').textContent = p.sub
+  $('h-rot').textContent = rev
+    ? 'Perda anual se a verba não for recomposta'
+    : 'Crédito que passa a voltar por ano'
+  $('h-num').className = 'num ' + (rev ? 'perda' : 'ganho')
+  $('h-num').textContent = fmtBRLc(rev ? r.perda : r.ganho)
+  $('h-sub').textContent = rev
+    ? `${fmtPct(r.pctLucro)} do lucro anual · ${fmtPct(r.pctTributavel)} da verba passa a ser tributada.`
+    : `Sobre um gasto de ${fmtBRL(r.base)} por ano em serviços e indiretos.`
+
+  /* três cenários */
+  const cen = rev ? [
+    { c: 'c1', t: 'Hoje', ln: [['Verba negociada', fmtBRL(r.base)], ['Tributo sobre a verba', fmtBRL(0)], ['Custo para a indústria', fmtBRL(r.base)]],
+      l: 'Fica com o varejo', v: fmtBRL(r.base), n: 'A verba entra como abatimento, sem tributo próprio.' },
+    { c: 'c2', t: 'Depois, sem mexer no acordo', ln: [['Verba negociada', fmtBRL(r.base)], ['Tributo sobre a verba', fmtBRL(r.perda)], ['Custo para a indústria', fmtBRL(r.base)]],
+      l: 'Fica com o varejo', v: fmtBRL(r.base - r.perda), n: 'O tributo sai do bolso do varejo. A indústria paga o mesmo.' },
+    { c: 'c3', t: 'Depois, com a verba recomposta', ln: [['Verba negociada', fmtBRL(r.base + r.recomposicao)], ['Tributo sobre a verba', fmtBRL(r.recomposicao)], ['Custo para a indústria', fmtBRL(r.base)]],
+      l: 'Fica com o varejo', v: fmtBRL(r.base), n: 'A indústria credita integralmente o imposto — o custo líquido dela não muda.' },
+  ] : [
+    { c: 'c1', t: 'Hoje', ln: [['Gasto com indiretos', fmtBRL(r.base)], ['Crédito recuperado', fmtBRL(r.creditoHoje)], ['Critério de compra', 'Preço']],
+      l: 'Custo líquido', v: fmtBRL(r.base - r.creditoHoje), n: 'ISS não credita e PIS/Cofins vive preso ao conceito de insumo.' },
+    { c: 'c2', t: 'Depois, sem revisar a carteira', ln: [['Gasto com indiretos', fmtBRL(r.base)], ['Crédito recuperado', fmtBRL(r.creditoDepois * 0.6)], ['Critério de compra', 'Preço']],
+      l: 'Custo líquido', v: fmtBRL(r.base - r.creditoDepois * 0.6), n: 'Crédito parcial: parte da carteira está em regime que devolve pouco.' },
+    { c: 'c3', t: 'Depois, com a carteira revisada', ln: [['Gasto com indiretos', fmtBRL(r.base)], ['Crédito recuperado', fmtBRL(r.creditoDepois)], ['Critério de compra', 'Custo líquido']],
+      l: 'Custo líquido', v: fmtBRL(r.base - r.creditoDepois), n: 'Regime declarado, nota correta e contrato com gatilho de mudança.' },
+  ]
+  $('cenarios').innerHTML = cen.map((c) => `
+    <div class="cen ${c.c}">
+      <div class="t">${esc(c.t)}</div>
+      ${c.ln.map(([a, b]) => `<div class="ln"><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join('')}
+      <div class="fim"><div class="l">${esc(c.l)}</div><div class="v">${esc(c.v)}</div><div class="n">${esc(c.n)}</div></div>
+    </div>`).join('')
+
+  $('callout').innerHTML = rev
+    ? '<p>Leia a linha <b>custo para a indústria</b>: no cenário 3 a verba sobe, mas a indústria credita integralmente o imposto que paga. O custo líquido dela é o mesmo — não se está pedindo dinheiro a mais, e sim que o tributo novo não saia do bolso do varejo.</p>'
+    : '<p>Duas propostas com o mesmo preço não são mais a mesma proposta. Sobre o mesmo líquido ao prestador, o de crédito integral sai na frente por cerca de 2% — um desconto de pouco mais de 2% já empata a disputa. Estreito demais para decidir de cabeça.</p>'
+
+  pintarCaixa(r)
+  pintarFamilias(r)
+
+  /* conformidade */
+  $('ordem').textContent = rev
+    ? 'Classificar antes de renegociar. Quem senta com a indústria sem saber a natureza de cada linha negocia no escuro.'
+    : 'Classificar antes de sentar. Quem negocia sem saber o regime do prestador está negociando preço bruto, que é o número errado.'
+  $('etapas').innerHTML = p.etapas.map((e, i) => `
+    <div class="et"><div class="n">0${i + 1}</div><div class="t">${esc(e.t)}</div><div class="d">${esc(e.d)}</div></div>`).join('')
+  $('mecanismos').innerHTML = p.mecanismos.map((m) => `<span class="chip" style="cursor:default">${esc(m)}</span>`).join('')
+  $('nota-fin').hidden = rev
+
+  $('disclaimer').textContent = `Ordem de grandeza com alíquota de referência de ${fmtPct(ALIQUOTA)}, mix padrão do varejo alimentar e margem líquida de 2%. Não é parecer: as premissas ainda estão em validação pelo time fiscal da VOW, e o número da sua rede depende do seu mix e dos seus contratos.`
+}
+
+function pintarCaixa(r) {
+  const rev = est.produto === 'revenda'
+  $('caixa-leg').textContent = rev
+    ? 'A verba deixa de ser abatimento e vira nota emitida pelo varejo: surge um recebível, e um tributo que vence antes de ele entrar.'
+    : 'Crédito alto na entrada com saída a alíquota zero gera saldo credor. Ele volta, mas pela fila de ressarcimento.'
+
+  const opcoes = rev ? [30, 45, 60, 90] : [30, 60, 180]
+  const atual = rev ? est.dReceb : est.prazo
+  $('chips-caixa').innerHTML =
+    `<span class="fine" style="align-self:center;margin-right:6px">${rev ? 'Prazo para receber a verba' : 'Prazo de ressarcimento'}:</span>` +
+    opcoes.map((d) => `<button class="chip" data-d="${d}" aria-pressed="${d === atual}">${d} dias</button>`).join('')
+
+  if (rev) {
+    const c = caixaRevenda(r, { dReceb: est.dReceb })
+    $('tiles').innerHTML = [
+      ['Tributo a recolher por mês', fmtBRL(c.tribMes), 'Vence no dia 25 do mês seguinte.'],
+      ['Defasagem', `${c.gap} dias`, `Receber em ${c.dReceb} contra recolher em ${c.dTrib}.`],
+      ['Capital de giro imobilizado', fmtBRL(c.giro), 'Dinheiro parado só por causa do descasamento.'],
+      ['Custo anual do carrego', fmtBRL(c.carrego), `A ${fmtPct(c.cc, 0)} ao ano.`],
+    ].map(([l, v, n], i) => `<div class="tile ${i === 3 ? 'ouro' : ''}"><div class="l">${esc(l)}</div><div class="v">${esc(v)}</div><div class="n">${esc(n)}</div></div>`).join('')
+  } else {
+    const c = caixaIndiretos(r, { prazo: est.prazo })
+    $('tiles').innerHTML = [
+      ['Crédito acumulado por mês', fmtBRL(c.credMes), 'Entra como saldo, não como caixa.'],
+      ['Prazo de ressarcimento', `${c.prazo} dias`, 'LC 214: 30 em conformidade, 180 fora dela.'],
+      ['Saldo preso na fila', fmtBRL(c.preso), 'Seu dinheiro aguardando devolução.'],
+      ['Custo anual do carrego', fmtBRL(c.carrego), `A ${fmtPct(c.cc, 0)} ao ano.`],
+    ].map(([l, v, n], i) => `<div class="tile ${i === 3 ? 'ouro' : ''}"><div class="l">${esc(l)}</div><div class="v">${esc(v)}</div><div class="n">${esc(n)}</div></div>`).join('')
+  }
+}
+$('chips-caixa').addEventListener('click', (e) => {
+  const b = e.target.closest('.chip'); if (!b) return
+  if (est.produto === 'revenda') est.dReceb = +b.dataset.d; else est.prazo = +b.dataset.d
+  pintarCaixa(calcular())
+})
+
+function pintarFamilias(r) {
+  const rev = est.produto === 'revenda'
+  const p = PRODUTOS[est.produto]
+  const ativas = est.ativas || p.familias.map((f) => f.nome)
+  const maior = Math.max(...r.familias.map((f) => f.valor), 1)
+
+  $('f-conta').textContent = ativas.length === p.familias.length
+    ? `Todas as ${p.familias.length} famílias na conta.`
+    : `${ativas.length} de ${p.familias.length} famílias na conta.`
+  const calibrado = Math.round(r.base) !== Math.round(r.baseRef)
+  $('f-ref').innerHTML = `Referência inicial: <b>${fmtBRL(r.baseRef)}</b> · Total calibrado: <b>${fmtBRL(r.base)}</b>` +
+    (calibrado ? ' <button class="chip" id="reset" style="margin-left:8px">Voltar à referência</button>' : '')
+
+  $('familias').innerHTML = p.familias.map((f) => {
+    const on = ativas.includes(f.nome)
+    const d = r.familias.find((x) => x.nome === f.nome)
+    const peso = est.pesos[f.nome] ?? f.peso
+    const frac = rev ? f.trib : f.cred
+    const tag = rev
+      ? (f.trib === 1 ? ['Tributa', 'var(--risk)'] : f.trib === 0 ? ['Não tributa', 'var(--ok)'] : ['Depende do documento', 'var(--gold)'])
+      : (f.cred === 1 ? ['Crédito integral', 'var(--ok)'] : f.cred >= 0.8 ? ['Crédito alto', 'var(--ok)'] : ['Depende do regime', 'var(--gold)'])
+    return `
+    <div class="fam ${on ? '' : 'off'}" data-n="${esc(f.nome)}">
+      <div class="cab">
+        <div class="cx">${on ? '✓' : ''}</div>
+        <div class="id">
+          <div class="nm">${esc(f.nome)}</div>
+          <div class="tag" style="color:${on ? tag[1] : 'var(--muted)'}">${on ? esc(tag[0]) : 'Não tenho'}</div>
+        </div>
+        <div class="dir">
+          <div class="vl">${on && d ? fmtBRL(d.valor) : '—'}</div>
+          ${on ? `<div class="pm">
+            <button data-op="-" aria-label="Diminuir ${esc(f.nome)}">−</button>
+            <button data-op="+" aria-label="Aumentar ${esc(f.nome)}">+</button>
+            <span>${peso}% · ${fmtBRLc(d ? d.valor : 0)}</span></div>` : ''}
+        </div>
+      </div>
+      ${on ? `<div class="barra"><i style="width:${Math.max(2, (d.valor / maior) * 100)}%;background:linear-gradient(90deg,${tag[1]} ${frac * 100}%,#3A4F42 ${frac * 100}%)"></i></div>
+      <div class="mud"><b>Hoje:</b> ${esc(f.hoje)} <b>·  Muda:</b> ${esc(f.muda)}</div>` : ''}
+    </div>`
+  }).join('')
+}
+
+$('familias').addEventListener('click', (e) => {
+  const linha = e.target.closest('.fam'); if (!linha) return
+  const nome = linha.dataset.n
+  const p = PRODUTOS[est.produto]
+  const ativas = est.ativas || p.familias.map((f) => f.nome)
+  const botao = e.target.closest('[data-op]')
+
+  if (botao) {
+    // − / + movem 1 p.p. só naquela família. As demais não mudam.
+    const atual = est.pesos[nome] ?? p.familias.find((f) => f.nome === nome).peso
+    est.pesos[nome] = Math.max(1, Math.min(100, atual + (botao.dataset.op === '+' ? 1 : -1)))
+  } else {
+    const dentro = ativas.includes(nome)
+    // Não deixa desmarcar a última: o diagnóstico ficaria sem conta.
+    if (dentro && ativas.length === 1) return
+    est.ativas = dentro ? ativas.filter((n) => n !== nome) : [...ativas, nome]
+  }
+  atualizarTudo()
+})
+$('familias').parentElement.addEventListener('click', (e) => {
+  if (e.target.id !== 'reset') return
+  est.ativas = null; est.pesos = {}; atualizarTudo()
+})
+
+// Toda mudança de calibração redesenha o resultado inteiro. É idempotente e
+// barato — muito melhor do que sincronizar seção por seção à mão.
+function atualizarTudo() {
+  pintarResultado()
+}
+
+/* -------------------------------------------------------------- entrega */
+$('f-cnpj').addEventListener('input', async (e) => {
+  e.target.value = fmtCNPJ(e.target.value)
+  const d = soDigitos(e.target.value)
+  const st = $('cnpjst')
+  if (d.length !== 14) { st.hidden = true; e.target.classList.remove('ok', 'ruim'); est.empresa = null; return }
+  st.hidden = false; st.querySelector('span').textContent = 'Buscando dados da empresa…'
+  st.querySelector('i').style.background = 'var(--gold)'
+  try {
+    const emp = await buscarCNPJ(d)
+    est.empresa = emp
+    e.target.classList.add('ok'); e.target.classList.remove('ruim')
+    st.querySelector('i').style.background = 'var(--ok)'
+    st.querySelector('span').textContent = `${emp.razao} · ${emp.municipio}/${emp.uf}`
+  } catch {
+    est.empresa = null
+    e.target.classList.add('ruim'); e.target.classList.remove('ok')
+    st.querySelector('i').style.background = 'var(--risk)'
+    st.querySelector('span').textContent = 'CNPJ não encontrado. Pode seguir sem ele.'
+  }
+})
+$('f-fone').addEventListener('input', (e) => { e.target.value = fmtFone(e.target.value) })
+$('agendar').onclick = (e) => {
+  est.agendar = !est.agendar
+  e.currentTarget.setAttribute('aria-pressed', String(est.agendar))
+  e.currentTarget.textContent = est.agendar
+    ? '✓ Conversa com a VOW solicitada. Entramos em contato.'
+    : 'Quero conversar com a VOW sobre este diagnóstico'
+}
+
+$('enviar').onclick = async () => {
+  const email = $('f-email').value.trim()
+  if (!emailOk(email)) { $('msg').textContent = 'Confira o e-mail.'; return }
+  $('msg').textContent = ''; $('enviar').disabled = true; $('enviar').textContent = 'Enviando…'
+  try {
+    const corpo = {
+      nome: $('f-nome').value.trim(),
+      empresa: est.empresa ? (est.empresa.fantasia || est.empresa.razao) : '',
+      cnpj: $('f-cnpj').value.trim(),
+      email, telefone: $('f-fone').value.trim(),
+      origem: ORIGEM, agendar: est.agendar,
+      tipos: Object.keys(est.feitos),
+      faturamento: est.fat,
+      ativas: est.ativas || undefined,
+      pesos: Object.keys(est.pesos).length ? est.pesos : undefined,
+    }
+    if (est.produto === 'revenda') corpo.percentualVerba = est.pct / 100
+    else corpo.percentualBase = est.pct / 100
+
+    const r = await fetch('/api/lead', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corpo),
+    })
+    const j = await r.json()
+    if (!r.ok) throw new Error(j.erro || 'não foi possível enviar')
+
+    est.lead = j
+    $('qr').src = j.qr; $('qrw').hidden = false
+    mostrarFim(j, email)
+  } catch (e) {
+    $('msg').textContent = e.message
+  } finally {
+    $('enviar').disabled = false; $('enviar').textContent = 'Receber por e-mail'
+  }
+}
+
+function mostrarFim(j, email) {
+  const nome = ($('f-nome').value.trim().split(' ')[0]) || ''
+  $('fim-eyebrow').textContent = j.emailEnviado ? 'Diagnóstico enviado' : 'Diagnóstico registrado'
+  $('fim-tit').innerHTML = nome ? `Obrigado, <em>${esc(nome)}</em>.` : 'Está <em>a caminho</em>.'
+  $('fim-sub').textContent = (j.emailEnviado
+    ? `Mandamos para ${email}. Se não aparecer em alguns minutos, olhe a caixa de promoções.`
+    : 'Registramos o seu diagnóstico. O e-mail sai assim que a fila liberar.')
+    + (est.agendar ? ' A VOW entra em contato sobre a conversa que você pediu.' : '')
+
+  const falta = Object.keys(PRODUTOS).find((id) => !est.feitos[id])
+  $('fim-metade').hidden = !falta
+  if (falta) {
+    $('m-nome').textContent = PRODUTOS[falta].sub
+    $('m-txt').textContent = falta === 'revenda'
+      ? 'Você viu quanto de crédito entra. Falta ver quanto de verba sai — e essa é a metade que dói.'
+      : 'Você viu quanto de verba sai. Falta ver quanto de crédito entra — e essa é a metade que devolve.'
+    $('m-btn').textContent = 'Fazer o outro com os mesmos dados'
+    $('m-btn').onclick = () => {
+      est.produto = falta; est.pct = PRODUTOS[falta].pctDefault
+      est.ativas = null; est.pesos = {}
+      prepararSimulacao(); pintarResultado(); ir('resultado')
+    }
+  }
+  ir('fim')
+}
+
+// Chegando por um card do site, o produto já vem escolhido.
+pintarEscolha()
+if (PRE && PRODUTOS[PRE]) {
+  est.produto = PRE
+  est.pct = PRODUTOS[PRE].pctDefault
+  prepararSimulacao()
+  ir('simular')
+} else {
+  ir('escolha')
+}
+</script>
+</body>
+</html>

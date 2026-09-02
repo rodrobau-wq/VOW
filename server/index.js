@@ -2,7 +2,9 @@
  * VOW · ABRAS — API do totem e da plataforma de leads.
  *
  *   GET  /                 landing pública com os diagnósticos gratuitos
- *   GET  /totem            totem (kiosk da feira)
+ *   GET  /totem            totem da feira — protótipo de design (public/abras)
+ *   GET  /totem-v1         totem codado, com gravação de lead no servidor
+ *   GET  /diagnostico      simulador AS IS -> TO BE (diagnóstico gratuito da landing)
  *   GET  /app/*            plataforma SaaS (ver server/app.js)
  *   GET  /leads            plataforma de leads (protegida por Basic Auth)
  *   POST /api/simular      roda o motor, sem gravar nada
@@ -90,11 +92,27 @@ function lerEntrada(body) {
     }
     return n
   }
+  // Calibração do simulador: quais famílias o varejista tem e com que peso.
+  // Nomes desconhecidos são ignorados pelo motor, então basta limitar tamanho.
+  const ativas = Array.isArray(body.ativas) && body.ativas.length
+    ? body.ativas.slice(0, 40).map((n) => String(n).slice(0, 60))
+    : undefined
+  let pesos
+  if (body.pesos && typeof body.pesos === 'object') {
+    pesos = {}
+    for (const [nome, valor] of Object.entries(body.pesos).slice(0, 40)) {
+      const v = Number(valor)
+      if (Number.isFinite(v) && v >= 0 && v <= 100) pesos[String(nome).slice(0, 60)] = v
+    }
+  }
+
   return {
     faturamento,
     percentualVerba: num(body.percentualVerba, 0, 0.2),
     percentualBase: num(body.percentualBase, 0, 0.6),
     parcelaCestaBasica: num(body.parcelaCestaBasica, 0, 1),
+    ativas,
+    pesos,
   }
 }
 
@@ -117,7 +135,7 @@ app.post('/api/simular', (req, res, next) => {
 
 app.post('/api/lead', async (req, res, next) => {
   try {
-    const { nome, empresa, email, telefone, tipos, origem } = req.body || {}
+    const { nome, empresa, email, telefone, tipos, origem, cnpj, agendar } = req.body || {}
     if (!email || !EMAIL_RE.test(String(email))) {
       return res.status(400).json({ erro: 'e-mail inválido' })
     }
@@ -137,6 +155,9 @@ app.post('/api/lead', async (req, res, next) => {
       empresa: String(empresa || '').slice(0, 160),
       email: String(email).slice(0, 200),
       telefone: String(telefone || '').slice(0, 40),
+      cnpj: String(cnpj || '').slice(0, 20),
+      // Pedido de conversa é a fila comercial: vale mais que o lead cru.
+      agendar: agendar === true,
       // De onde veio: 'abras' no estande, 'site' na landing. É o corte que o
       // comercial mais usa depois da feira.
       origem: String(origem || 'site').slice(0, 40),
@@ -219,7 +240,22 @@ app.get('/d/:id', async (req, res, next) => {
 // `/` é a landing pública (topo de funil). O totem da feira fica em /totem,
 // e o index.html deixa de ser servido pelo static para não disputar a raiz.
 app.get('/', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'landing.html')))
-app.get('/totem', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'index.html')))
+// A raiz virou uma tela só (hero, vertical ou horizontal, para o painel do
+// estande). O site completo — seções de produto, como funciona, rodapé —
+// continua inteiro aqui, e é para onde a navegação aponta.
+app.get('/site', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'site.html')))
+// /totem é o protótipo de design vindo do Claude Design (public/abras/).
+// Ele traz o próprio runtime e o próprio motor, e é a tela que o cliente
+// aprovou — por isso é o destino do botão de diagnóstico.
+// O totem codado, que grava lead no servidor, fica em /totem-v1 até a
+// portabilidade do protótipo para o motor da casa.
+app.get('/totem', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'abras', 'totem.dc.html')))
+app.get('/totem-v1', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'index.html')))
+
+// O diagnóstico gratuito da landing. Mesma tela do protótipo do totem, mas
+// adaptada à web (responsiva, não 1080x1920) e ligada ao backend de verdade:
+// usa o motor da casa, grava o lead, dispara o e-mail e gera o QR no servidor.
+app.get('/diagnostico', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'diagnostico.html')))
 app.get('/leads', protegido, (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'leads.html')))
 
 // A camada SaaS tem auth própria (sessão, tenant, papéis) e monta as suas

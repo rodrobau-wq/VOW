@@ -1,31 +1,4 @@
-/**
- * Motor de diagnóstico VOW · ABRAS — fonte única da aritmética.
- *
- * O núcleo abaixo veio do handoff de design ("Simulador AS IS TO BE Abras"),
- * onde é copy aprovada: famílias, pesos, textos de "hoje → o que muda" e as
- * etapas de conformidade. Não altere pesos nem `trib`/`cred` sem falar com a
- * VOW — é o mix que produz os números publicados.
- *
- * Diferença importante para a versão anterior deste arquivo: os 70,5% de
- * parcela tributável **não são mais uma constante**. Eles caem do mix das 12
- * famílias de Revenda (Σ peso × trib = 70,5), o que torna o número calibrável
- * pelo varejista no simulador sem deixar de bater com o documento.
- *
- * Fontes:
- *   docs/ABRAS - Verbas Comerciais.md     → produto `revenda`
- *   docs/ABRAS - Contrato de Indiretos.md → produto `indiretos`
- *
- * CUIDADO COM O NOME `revenda`. Ele calcula VERBAS, não aquisição de
- * mercadoria. É contrato público da API (`POST /api/simular`) e está gravado
- * nos leads já capturados: renomear exige migração.
- *
- * ATENÇÃO — as premissas seguem pendentes de validação do time fiscal da VOW
- * (pendência nº 1 do handoff e nº 5 dos dois briefs). O que sai daqui é ordem
- * de grandeza, não parecer, e a interface precisa dizer isso.
- *
- * Isomórfico: roda no Node (servidor) e no browser (simulador), sem build.
- */
-
+// Motor de simulação ABRAS · VOW — premissas do documento (alíquota 26,5%, 70,5% tributável, margem 2%)
 export const ALIQUOTA = 0.265;
 export const MARGEM_LUCRO = 0.02;
 export const POR_DENTRO = 1 - 1 / (1 + ALIQUOTA); // 20,95%
@@ -148,6 +121,46 @@ export async function buscarCNPJ(cnpj) {
   return { razao: j.razao_social, fantasia: j.nome_fantasia || '', municipio: j.municipio, uf: j.uf, porte: j.porte || '', cnae: j.cnae_fiscal_descricao || '', abertura: j.data_inicio_atividade || '' };
 }
 
+// ---- Leads: persistência local + entrega automática à plataforma ----
+export function carregarLeads() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; } }
+export function salvarLead(lead, webhookUrl) {
+  const leads = carregarLeads();
+  const i = leads.findIndex(l => l.id === lead.id);
+  if (i >= 0) leads[i] = lead; else leads.unshift(lead);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(leads));
+  if (webhookUrl) { try { fetch(webhookUrl, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) }); } catch {} }
+  return lead;
+}
+// ---- Envio do e-mail via Resend (através de um endpoint próprio: a chave nunca fica no navegador) ----
+export const RESEND_KEY = 'vow_abras_resend';
+export function resendConfig() { try { return { endpoint: '', from: 'VOW <diagnostico@vow.com.br>', replyTo: 'contato@vow.com.br', ...JSON.parse(localStorage.getItem(RESEND_KEY) || '{}') }; } catch { return { endpoint: '', from: '', replyTo: '' }; } }
+export function salvarResendConfig(cfg) { localStorage.setItem(RESEND_KEY, JSON.stringify(cfg)); }
+export function linkDiagnostico(lead, baseUrl) {
+  const d = { id: lead.id, p: lead.produto, f: lead.faturamento, pc: lead.pct, a: lead.resultado?.ativas || null, w: lead.resultado?.pesos || null, n: lead.nome, e: lead.empresa ? (lead.empresa.fantasia || lead.empresa.razao) : '', s: Object.keys(lead.simulacoes || {}) };
+  const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(d))));
+  const base = baseUrl || new URL('Diagnóstico VOW.dc.html', location.href).href;
+  return base + '#d=' + b64;
+}
+export function decodificarDiagnostico(hash) {
+  try { const m = /d=([^&]+)/.exec(hash || ''); return m ? JSON.parse(decodeURIComponent(escape(atob(m[1])))) : null; } catch { return null; }
+}
+// Envia o diagnóstico. Sem endpoint configurado, registra como 'demo' (aparece como enviado na feira, sem disparo real).
+export async function enviarEmail(lead, opts = {}) {
+  const cfg = resendConfig();
+  const { emailHtml, emailText } = await import('./email.js');
+  const link = linkDiagnostico(lead, opts.baseUrl);
+  const payload = { to: lead.email, from: cfg.from, reply_to: cfg.replyTo, subject: assuntoEmail(lead), html: emailHtml(lead, { linkDiagnostico: link, linkContato: opts.linkContato || ('mailto:' + (cfg.replyTo || 'contato@vow.com.br')) }), text: emailText(lead), tags: [{ name: 'origem', value: 'totem_abras' }, { name: 'produto', value: lead.produto }], leadId: lead.id };
+  if (!cfg.endpoint) return { status: 'enviado', modo: 'demo', ts: Date.now() };
+  try {
+    const r = await fetch(cfg.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || j.message || ('HTTP ' + r.status));
+    return { status: 'enviado', modo: 'resend', ts: Date.now(), resendId: j.id || j.data?.id || '' };
+  } catch (e) { return { status: 'erro', modo: 'resend', ts: Date.now(), erro: String(e.message || e) }; }
+}
+
+export function novoLead(dados) { return { id: 'L' + Date.now().toString(36).toUpperCase(), ts: Date.now(), status: 'lead', entregas: {}, origem: 'Totem ABRAS', ...dados }; }
+
 export function assuntoEmail(lead) {
   if (!lead.resultado) return 'Seu diagnóstico VOW · ABRAS 2026';
   return lead.resultado.produto === 'revenda'
@@ -155,124 +168,20 @@ export function assuntoEmail(lead) {
     : `Diagnóstico VOW · ${fmtBRLc(lead.resultado.ganho)} de crédito que passa a voltar`;
 }
 
-/* ======================================================================
- * Camada de compatibilidade
- *
- * A API pública (`/api/simular`, `/api/lead`), o e-mail e o painel do SaaS
- * falam em frações (0.03) e em nomes próprios. O simulador fala em pontos
- * percentuais (3) e no vocabulário do handoff. Traduzir aqui evita a única
- * coisa que o brief proíbe de verdade: duas aritméticas no mesmo repositório.
- * ====================================================================== */
-
-/** Faixas usadas nos presets do totem, para o visitante não digitar nada. */
-export const PORTES = [
-  { id: 'ate100',   rotulo: 'Até R$ 100 mi',    faturamento: 60_000_000 },
-  { id: 'ate300',   rotulo: 'R$ 100 a 300 mi',  faturamento: 200_000_000 },
-  { id: 'ate1bi',   rotulo: 'R$ 300 mi a 1 bi', faturamento: 600_000_000 },
-  { id: 'acima1bi', rotulo: 'Acima de R$ 1 bi', faturamento: 1_500_000_000 },
-]
-
-/**
- * Premissas que o painel do SaaS consome e que não vivem no mix de famílias:
- * prazos de ressarcimento da LC 214, custo de capital e a comparação entre
- * regimes de fornecedor.
- */
-export const PREMISSAS = {
-  aliquota: ALIQUOTA,
-  porDentro: POR_DENTRO,
-  margemLucro: MARGEM_LUCRO,
-  revenda: { percentualVerbaPadrao: PRODUTOS.revenda.pctDefault / 100 },
-  indiretos: {
-    percentualBasePadrao: PRODUTOS.indiretos.pctDefault / 100,
-    /** Parcela da carteira hoje em prestadores da guia única do Simples. */
-    parcelaGuiaUnica: 0.28,
-    /**
-     * Vantagem do crédito integral sobre a guia única, no mesmo líquido ao
-     * prestador. O brief é explícito: ~2%, não vinte e tantos — um desconto
-     * de pouco mais de 2% já empata a disputa.
-     */
-    vantagemRegimeIntegral: 0.02,
-    /** Rede de bairro vende de 35% a 50% em cesta básica, a alíquota zero. */
-    parcelaCestaBasicaPadrao: 0.42,
-    /** LC 214: 30 dias em programa de conformidade, 180 fora dele. */
-    diasRessarcimento: { comConformidade: 30, semConformidade: 180 },
-    custoCapitalAnual: 0.14,
-  },
+export function seedDemo() {
+  if (carregarLeads().length) return;
+  const agora = Date.now();
+  const demos = [
+    ['revenda', 'Mariana Costa', 'mariana@superbomdia.com.br', '11987650001', '12.345.678/0001-90', 'Supermercados Bom Dia Ltda', 'Campinas', 'SP', 300e6, 3, true],
+    ['indiretos', 'Carlos Menezes', 'carlos@redeviva.com.br', '21998760002', '23.456.789/0001-01', 'Rede Viva Supermercados S.A.', 'Niterói', 'RJ', 520e6, 8, false],
+    ['revenda', 'Ana Paula Ribeiro', 'ana.ribeiro@mercadoreal.com', '31991230003', '', '', '', '', 120e6, 4, true],
+    ['indiretos', 'Roberto Lins', 'roberto@atacadolins.com.br', '81988880004', '34.567.890/0001-12', 'Atacado Lins Distribuição', 'Recife', 'PE', 900e6, 7, true],
+    ['revenda', 'Fernanda Souza', 'fernanda@souzamercados.com.br', '41999990005', '', '', '', '', 60e6, 2.5, false],
+  ];
+  demos.forEach((d, i) => {
+    const [produto, nome, email, telefone, cnpj, razao, municipio, uf, fat, pct, agendar] = d;
+    const ts = agora - (i + 1) * 23 * 60 * 1000;
+    const lead = { id: 'L' + (ts).toString(36).toUpperCase(), ts, status: 'simulado', origem: 'Totem ABRAS', demo: true, produto, nome, email, telefone, cnpj, empresa: razao ? { razao, fantasia: '', municipio, uf } : null, faturamento: fat, pct, resultado: simular(produto, fat, pct), entregas: { email: { ts: ts + 90000, status: 'enviado' }, qr: true, agendar } };
+    salvarLead(lead);
+  });
 }
-
-const round = (n) => Math.round(n * 100) / 100
-
-/** Diagnóstico de Revenda no formato da API. `percentualVerba` é fração. */
-export function diagnosticoRevenda({ faturamento, percentualVerba, ativas, pesos } = {}) {
-  const pct = (percentualVerba ?? PREMISSAS.revenda.percentualVerbaPadrao) * 100
-  const r = simular('revenda', faturamento, pct, ativas, pesos)
-  return {
-    tipo: 'revenda',
-    entrada: { faturamento, percentualVerba: pct / 100, ativas: r.ativas, pesos: r.pesos },
-    verbaTotal: round(r.base),
-    verbaReferencia: round(r.baseRef),
-    tributavel: round(r.tributavel),
-    parcelaTributavel: r.pctTributavel,
-    recomposicao: round(r.recomposicao),
-    perda: round(r.perda),
-    lucroAnual: round(r.lucro),
-    perdaSobreLucro: r.pctLucro,
-    familias: r.familias.map((f) => ({
-      nome: f.nome, valor: round(f.valor), tributavel: round(f.tributavel),
-      recomposicao: round(f.recomposicao), trib: f.trib, hoje: f.hoje, muda: f.muda,
-    })),
-    /** O número grande da tela. */
-    destaque: round(r.perda),
-  }
-}
-
-/** Diagnóstico de Indiretos no formato da API. `percentualBase` é fração. */
-export function diagnosticoIndiretos({ faturamento, percentualBase, parcelaCestaBasica, ativas, pesos } = {}) {
-  const p = PREMISSAS.indiretos
-  const pct = (percentualBase ?? p.percentualBasePadrao) * 100
-  const pctCesta = parcelaCestaBasica ?? p.parcelaCestaBasicaPadrao
-  const r = simular('indiretos', faturamento, pct, ativas, pesos)
-
-  // Ganho adicional se a carteira hoje na guia única migrar de regime.
-  const ganhoMigracaoRegime = r.base * p.parcelaGuiaUnica * p.vantagemRegimeIntegral
-
-  // Crédito alto na entrada + saída majoritariamente a alíquota zero =
-  // saldo credor estrutural. Quanto mais crédito a rede acerta, mais caixa
-  // fica preso na fila de ressarcimento.
-  const saldoCredorAnual = r.ganho * pctCesta
-  const d = p.diasRessarcimento
-  const caixaPreso180 = (saldoCredorAnual / 365) * d.semConformidade
-  const caixaPreso30 = (saldoCredorAnual / 365) * d.comConformidade
-
-  return {
-    tipo: 'indiretos',
-    entrada: { faturamento, percentualBase: pct / 100, parcelaCestaBasica: pctCesta, ativas: r.ativas, pesos: r.pesos },
-    base: round(r.base),
-    baseReferencia: round(r.baseRef),
-    creditoHoje: round(r.creditoHoje),
-    creditoDepois: round(r.creditoDepois),
-    ganhoCredito: round(r.ganho),
-    ganhoMigracaoRegime: round(ganhoMigracaoRegime),
-    ganhoTotal: round(r.ganho + ganhoMigracaoRegime),
-    saldoCredorAnual: round(saldoCredorAnual),
-    caixaPreso180: round(caixaPreso180),
-    caixaPreso30: round(caixaPreso30),
-    ganhoConformidade: round((caixaPreso180 - caixaPreso30) * p.custoCapitalAnual),
-    familias: r.familias.map((f) => ({
-      nome: f.nome, valor: round(f.valor), ganho: round(f.ganho),
-      cred: f.cred, hojeCred: f.hojeCred, hoje: f.hoje, muda: f.muda,
-    })),
-    destaque: round(r.ganho + ganhoMigracaoRegime),
-  }
-}
-
-export function diagnosticar(tipo, entrada) {
-  if (tipo === 'revenda') return diagnosticoRevenda(entrada)
-  if (tipo === 'indiretos') return diagnosticoIndiretos(entrada)
-  throw new Error(`diagnóstico desconhecido: ${tipo}`)
-}
-
-/* Nomes antigos, mantidos porque as telas já os importam. */
-export const brl = fmtBRL
-export const brlCurto = fmtBRLc
-export const pct = fmtPct
