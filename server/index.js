@@ -25,40 +25,14 @@ import { baseUrl } from '../lib-url.js'
 import { diagnosticar, PREMISSAS, PORTES } from '../motor.js'
 import { enviarDiagnostico, montarHtml } from '../email.js'
 import { app as rotasApp } from './app.js'
+import { lerLeads, gravarLead, caminhoDb } from '../leads-db.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const RAIZ = path.join(__dirname, '..')
-const DB = process.env.LEADS_DB || path.join(RAIZ, 'data', 'leads.json')
 
 const app = express()
 app.use(express.json({ limit: '256kb' }))
 app.disable('x-powered-by')
-
-/* ---------------------------------------------------------------- storage */
-// Arquivo JSON com escrita serializada. Uma feira gera centenas de leads, não
-// milhões — troca por Postgres só quando a plataforma sair do estande.
-let fila = Promise.resolve()
-
-async function lerLeads() {
-  try {
-    return JSON.parse(await fs.readFile(DB, 'utf8'))
-  } catch (e) {
-    if (e.code === 'ENOENT') return []
-    throw e
-  }
-}
-
-function gravarLead(lead) {
-  fila = fila.then(async () => {
-    const leads = await lerLeads()
-    const i = leads.findIndex((l) => l.id === lead.id)
-    if (i >= 0) leads[i] = lead
-    else leads.push(lead)
-    await fs.mkdir(path.dirname(DB), { recursive: true })
-    await fs.writeFile(DB, JSON.stringify(leads, null, 2))
-  })
-  return fila
-}
 
 /* ------------------------------------------------------------------- auth */
 function protegido(req, res, next) {
@@ -144,8 +118,11 @@ app.post('/api/lead', async (req, res, next) => {
       return res.status(400).json({ erro: 'tipo inválido' })
     }
 
-    const entrada = lerEntrada(req.body)
-    const diagnosticos = lista.map((t) => diagnosticar(t, entrada))
+    // O cadastro vem antes da simulação: sem faturamento ainda, o lead nasce
+    // sem diagnóstico. Quem abandona no slider continua sendo um lead.
+    const temNumero = Number(req.body?.faturamento) > 0
+    const entrada = temNumero ? lerEntrada(req.body) : null
+    const diagnosticos = temNumero ? lista.map((t) => diagnosticar(t, entrada)) : []
 
     const id = crypto.randomUUID()
     const lead = {
@@ -161,11 +138,18 @@ app.post('/api/lead', async (req, res, next) => {
       // De onde veio: 'abras' no estande, 'site' na landing. É o corte que o
       // comercial mais usa depois da feira.
       origem: String(origem || 'site').slice(0, 40),
-      faturamento: entrada.faturamento,
+      faturamento: entrada ? entrada.faturamento : 0,
       // "fez os dois" é o sinal comercial que a plataforma exibe.
       fezOsDois: diagnosticos.length > 1,
+      estagio: 'capturado',
+      estagioDesde: new Date().toISOString(),
       diagnosticos: diagnosticos.map((d) => ({ tipo: d.tipo, destaque: d.destaque, entrada: d.entrada })),
       email_enviado: false,
+    }
+
+    if (!diagnosticos.length) {
+      await gravarLead(lead)
+      return res.json({ id, url: null, qr: null, emailEnviado: false, diagnosticos: [] })
     }
 
     const envio = await enviarDiagnostico({ para: lead.email, nome: lead.nome, empresa: lead.empresa, diagnosticos })
@@ -183,6 +167,47 @@ app.post('/api/lead', async (req, res, next) => {
   } catch (e) {
     next(e)
   }
+})
+
+/**
+ * Anexa o diagnóstico a um lead já capturado, dispara o e-mail e devolve o QR.
+ *
+ * Existe porque o cadastro vem antes da simulação: o lead nasce no passo 1 e
+ * só ganha número no passo 3. Refazer a simulação sobrescreve — é o mesmo
+ * lead ajustando a calibração, não um lead novo.
+ */
+app.post('/api/lead/:id/diagnostico', async (req, res, next) => {
+  try {
+    const leads = await lerLeads()
+    const lead = leads.find((l) => l.id === req.params.id)
+    if (!lead) return res.status(404).json({ erro: 'lead não encontrado' })
+
+    const tipos = Array.isArray(req.body?.tipos) && req.body.tipos.length ? req.body.tipos : ['revenda']
+    if (tipos.some((t) => t !== 'revenda' && t !== 'indiretos')) {
+      return res.status(400).json({ erro: 'tipo inválido' })
+    }
+    const entrada = lerEntrada(req.body)
+    const diagnosticos = tipos.map((t) => diagnosticar(t, entrada))
+
+    Object.assign(lead, {
+      faturamento: entrada.faturamento,
+      fezOsDois: diagnosticos.length > 1,
+      diagnosticos: diagnosticos.map((d) => ({ tipo: d.tipo, destaque: d.destaque, entrada: d.entrada })),
+      agendar: req.body?.agendar === true || lead.agendar === true,
+    })
+
+    const envio = await enviarDiagnostico({
+      para: lead.email, nome: lead.nome, empresa: lead.empresa, diagnosticos,
+    })
+    lead.email_enviado = envio.enviado
+    if (!envio.enviado) lead.email_erro = envio.motivo
+    await gravarLead(lead)
+
+    const base = baseUrl(req)
+    const url = `${base}/d/${lead.id}`
+    const qr = await QRCode.toDataURL(url, { margin: 1, width: 320, color: { dark: '#0E1B14', light: '#FFFFFF' } })
+    res.json({ id: lead.id, url, qr, emailEnviado: envio.enviado, diagnosticos })
+  } catch (e) { next(e) }
 })
 
 app.get('/api/leads', protegido, async (_req, res, next) => {
@@ -275,4 +300,4 @@ app.use((err, _req, res, _next) => {
 })
 
 const port = process.env.PORT || 3000
-app.listen(port, () => console.log(`VOW ABRAS na porta ${port} · leads em ${DB}`))
+app.listen(port, () => console.log(`VOW ABRAS na porta ${port} · leads em ${caminhoDb()}`))

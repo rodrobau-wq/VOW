@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Funil · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  main{padding:24px 28px 40px}
+  .cab{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:20px}
+  h1{font-size:36px;margin:0 0 4px}
+  h1 em{font-style:italic;color:var(--gold)}
+  .cab p{color:var(--muted);font-size:15px;margin:0}
+
+  .topo-num{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:22px}
+  .n{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px}
+  .n .r{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .n .v{font-family:var(--serif);font-size:30px;line-height:1;margin-top:7px;font-variant-numeric:tabular-nums}
+  .n.alerta .v{color:var(--risk)}
+  .n .p{font-size:12.5px;color:var(--faint);margin-top:5px;line-height:1.4}
+
+  .rolagem{overflow-x:auto;margin:0 -28px;padding:0 28px 8px}
+  .colunas{display:grid;grid-template-columns:repeat(5,minmax(272px,1fr));gap:12px;min-width:1420px;align-items:start}
+  .col{background:var(--bg-deep);border:1px solid var(--line);border-radius:var(--r-md);padding:14px}
+  .col.alvo{border-color:var(--gold);background:var(--gold-wash)}
+  .col h2{font-family:var(--sans);font-size:14.5px;font-weight:600;margin:0}
+  .col .cabc{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px}
+  .col .qt{font-family:var(--serif);font-size:22px;color:var(--gold);line-height:1}
+  .col .saida{font-size:11.5px;color:var(--faint);line-height:1.45;margin:6px 0 12px;
+              padding-bottom:12px;border-bottom:1px solid var(--line)}
+  .col .soma{font-size:12px;color:var(--muted);margin-bottom:10px;font-variant-numeric:tabular-nums}
+
+  .cartao{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;
+          margin-bottom:9px;cursor:grab;display:block;text-decoration:none;color:inherit}
+  .cartao:hover{border-color:var(--gold-edge)}
+  .cartao.arrastando{opacity:.4}
+  .cartao .emp{font-weight:500;font-size:14.5px;line-height:1.35}
+  .cartao .pes{font-size:12.5px;color:var(--faint);margin-top:2px}
+  .cartao .vals{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-top:10px}
+  .cartao .jogo{font-family:var(--serif);font-size:19px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .cartao .hon{font-size:12.5px;color:var(--ok);font-weight:500;font-variant-numeric:tabular-nums}
+  .cartao .rod{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:11px}
+  .marca-t{padding:3px 8px;border-radius:999px;background:var(--bg-deep);color:var(--muted)}
+  .marca-t.atras{background:rgba(162,74,44,.12);color:var(--risk)}
+  .marca-t.sla{background:rgba(162,74,44,.16);color:var(--risk);font-weight:500}
+  .marca-t.feira{background:var(--gold-wash);color:var(--gold-deep)}
+  .vazia{font-size:12.5px;color:var(--faint);padding:14px 4px;text-align:center}
+  .dica{font-size:12.5px;color:var(--faint);margin-top:14px}
+</style>
+</head>
+<body class="paper">
+<main>
+  <div class="cab">
+    <div><h1>O <em>funil</em></h1><p>Arraste um cartão para mudar de fase.</p></div>
+  </div>
+  <div class="topo-num" id="numeros"></div>
+  <div class="rolagem"><div class="colunas" id="colunas"></div></div>
+  <p class="dica">Fechar exige honorário e perder exige motivo — as duas coisas são pedidas
+  na tela da oportunidade, não aqui.</p>
+</main>
+
+<script type="module">
+import { montarNav, esc, brl, brlCurto, parado } from '/app-nav.js'
+await montarNav('/app/pipeline')
+
+const $ = (id) => document.getElementById(id)
+let dados = null
+
+async function carregar() {
+  dados = await (await fetch('/api/app/crm/pipeline')).json()
+  pintar()
+}
+
+function pintar() {
+  $('numeros').innerHTML = `
+    <div class="n"><div class="r">Oportunidades abertas</div><div class="v">${dados.totalAbertos}</div>
+      <div class="p">nas cinco fases do funil</div></div>
+    <div class="n ${dados.foraDoSla ? 'alerta' : ''}"><div class="r">Fora do prazo de contato</div>
+      <div class="v">${dados.foraDoSla}</div>
+      <div class="p">${dados.foraDoSla ? 'capturados há mais de 48 h sem ninguém falar' : 'nenhum atrasado'}</div></div>
+    <div class="n"><div class="r">Previsão ponderada</div><div class="v">${brlCurto(dados.previsaoPonderada)}</div>
+      <div class="p">honorário × probabilidade — receita da VOW</div></div>
+    <div class="n"><div class="r">Valor em jogo</div><div class="v">${brlCurto(dados.valorEmJogoTotal)}</div>
+      <div class="p">exposição dos clientes. Prioriza, não é receita</div></div>`
+
+  $('colunas').innerHTML = dados.colunas.map((c) => `
+    <section class="col" data-e="${c.id}">
+      <div class="cabc"><h2>${esc(c.nome)}</h2><span class="qt">${c.total}</span></div>
+      <div class="saida">${esc(c.saida || '')}</div>
+      <div class="soma">${brlCurto(c.valorEmJogo)} em jogo${c.previsao ? ` · ${brlCurto(c.previsao)} previstos` : ''}</div>
+      ${c.leads.map((l) => cartao(l)).join('') || '<div class="vazia">Nada aqui</div>'}
+    </section>`).join('')
+
+  for (const el of document.querySelectorAll('.cartao')) {
+    el.draggable = true
+    el.addEventListener('dragstart', (ev) => {
+      ev.dataTransfer.setData('text/plain', el.dataset.id)
+      el.classList.add('arrastando')
+    })
+    el.addEventListener('dragend', () => el.classList.remove('arrastando'))
+  }
+  for (const col of document.querySelectorAll('.col')) {
+    col.addEventListener('dragover', (ev) => { ev.preventDefault(); col.classList.add('alvo') })
+    col.addEventListener('dragleave', () => col.classList.remove('alvo'))
+    col.addEventListener('drop', async (ev) => {
+      ev.preventDefault(); col.classList.remove('alvo')
+      await mover(ev.dataTransfer.getData('text/plain'), col.dataset.e)
+    })
+  }
+}
+
+function cartao(l) {
+  const marcas = []
+  if (l.foraDoSla) marcas.push('<span class="marca-t sla">fora do prazo</span>')
+  else if (l.atrasadoNaFase) marcas.push(`<span class="marca-t atras">parado ${parado(l.diasParado)}</span>`)
+  else marcas.push(`<span class="marca-t">${parado(l.diasParado)}</span>`)
+  if (l.origem === 'abras') marcas.push('<span class="marca-t feira">ABRAS</span>')
+  if (l.agendar) marcas.push('<span class="marca-t feira">pediu conversa</span>')
+  if (l.responsavel) marcas.push(`<span class="marca-t">${esc(l.responsavel.split(' ')[0])}</span>`)
+
+  return `<a class="cartao" href="/app/leads/${l.id}" data-id="${l.id}">
+    <div class="emp">${esc(l.empresa || l.nome || 'Sem empresa')}</div>
+    <div class="pes">${esc(l.nome || l.email)}</div>
+    <div class="vals">
+      <span class="jogo">${brlCurto(l.valorEmJogo)}</span>
+      ${l.honorario ? `<span class="hon">${brl(l.honorario)}</span>` : ''}
+    </div>
+    <div class="rod">${marcas.join('')}</div>
+  </a>`
+}
+
+async function mover(id, estagio) {
+  const r = await fetch(`/api/app/crm/leads/${id}`, {
+    method: 'PATCH', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ estagio }),
+  })
+  if (!r.ok) {
+    const j = await r.json().catch(() => ({}))
+    // Fechar sem honorário e perder sem motivo são recusados pelo servidor:
+    // a tela manda a pessoa para onde esses campos existem.
+    alert(j.erro || 'Não foi possível mover.')
+    if (/honorário|motivo/i.test(j.erro || '')) location.href = `/app/leads/${id}`
+    return
+  }
+  carregar()
+}
+
+carregar()
+</script>
+</body>
+</html>

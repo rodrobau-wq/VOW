@@ -93,6 +93,10 @@ body.paper{
 
 /* --------------------------------------------------------------- base */
 *{box-sizing:border-box}
+/* Um `display` declarado numa classe vence o `hidden` do navegador, e o
+   elemento reaparece. Já aconteceu com o status de CNPJ: o atributo estava
+   lá e a bolinha continuava na tela. */
+[hidden]{display:none!important}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -189,3 +193,10 @@ body.paper .chip[aria-pressed="true"]{color:var(--surface)}
 .appbar .sair:hover{color:var(--risk)}
 
 .app-main{padding:28px;max-width:1240px;margin:0 auto}
+
+/* Abas da plataforma — moram aqui pela mesma razão que a .appbar. */
+.appbar .abas{display:flex;gap:2px;flex-wrap:wrap}
+.appbar .abas a{padding:7px 14px;border-radius:var(--r-pill);font-size:13.5px;
+                color:var(--muted);text-decoration:none}
+.appbar .abas a:hover{color:var(--ink);background:var(--bg-deep)}
+.appbar .abas a.on{background:var(--ink);color:var(--surface);font-weight:500}

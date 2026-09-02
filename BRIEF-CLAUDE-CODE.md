@@ -12,7 +12,7 @@ Este documento é autossuficiente. Leia-o inteiro antes de escrever a primeira l
 
 O Grupo VOW é uma consultoria tributária que atende redes de supermercado. A reforma tributária brasileira — IBS e CBS, LC 214/2025 — transfere ao varejista responsabilidades que eram do governo. A VOW resolve isso hoje à mão, cliente a cliente. O projeto é embarcar essa inteligência numa plataforma SaaS.
 
-**Alvo:** Smart Market ABRAS, 12 e 13 de abril de 2027. Antes disso, piloto pago com clientes da base.
+**Alvo:** Smart Market ABRAS **2026**. Antes disso, piloto pago com clientes da base.
 
 **Três produtos**, e a ordem entre eles importa:
 

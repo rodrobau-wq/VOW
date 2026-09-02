@@ -1,0 +1,168 @@
+/**
+ * CRM — as fases do funil e as contas que as telas consomem.
+ *
+ * Regra que atravessa o arquivo inteiro: **valor em jogo e honorário são
+ * coisas diferentes.** O valor em jogo é a exposição do cliente e vem do
+ * diagnóstico que ele mesmo simulou; o honorário é a receita da VOW e só
+ * existe a partir da proposta. Somar diagnósticos e chamar de previsão infla
+ * o forecast em dezenas de vezes — ver docs/CRM-DESENHO.md.
+ *
+ * Por isso `previsaoPonderada` usa honorário, e `valorEmJogo` só ordena a
+ * fila de quem atender primeiro.
+ */
+
+/** Fase sem critério de saída não é pipeline, é lista de desejos. */
+export const ESTAGIOS = [
+  { id: 'capturado',  n: '01', nome: 'Capturado',       saida: 'Alguém da VOW falou com a pessoa.',                    metaDias: 2,  prob: 0.05 },
+  { id: 'qualificado',n: '02', nome: 'Qualificado',     saida: 'Porte acima do mínimo e acesso ao decisor.',           metaDias: 7,  prob: 0.15 },
+  { id: 'reuniao',    n: '03', nome: 'Reunião marcada', saida: 'Reunião aconteceu e autorizou o levantamento.',        metaDias: 14, prob: 0.30 },
+  { id: 'levantamento', n: '04', nome: 'Levantamento',  saida: 'Número real apurado e apresentado.',                   metaDias: 30, prob: 0.50 },
+  { id: 'proposta',   n: '05', nome: 'Proposta',        saida: 'Resposta do cliente — sim ou não, mas resposta.',      metaDias: 21, prob: 0.70 },
+  { id: 'fechado',    n: '06', nome: 'Fechado',         saida: null, metaDias: null, prob: 1, final: true },
+  { id: 'perdido',    n: '06', nome: 'Perdido',         saida: null, metaDias: null, prob: 0, final: true },
+]
+
+export const ESTAGIO_PADRAO = 'capturado'
+export const ABERTOS = ESTAGIOS.filter((e) => !e.final).map((e) => e.id)
+const PORID = Object.fromEntries(ESTAGIOS.map((e) => [e.id, e]))
+export const ehEstagio = (id) => Boolean(PORID[id])
+export const estagio = (id) => PORID[id] || PORID[ESTAGIO_PADRAO]
+
+/**
+ * Lista fixa. Campo livre vira cento e vinte redações de "não tinha verba" e
+ * nenhum relatório — o motivo é a única leitura que sobra de um negócio perdido.
+ */
+export const MOTIVOS_PERDA = [
+  { id: 'sem_orcamento',  rotulo: 'Sem orçamento para 2027',      acao: 'Retomar na virada do orçamento' },
+  { id: 'interno',        rotulo: 'Contabilidade interna assumiu', acao: 'Sinal de produto: pode virar assinatura da plataforma' },
+  { id: 'concorrente',    rotulo: 'Foi para concorrente',          acao: 'Registrar qual — é como se sabe contra quem se perde', pedeDetalhe: true },
+  { id: 'porte',          rotulo: 'Porte abaixo do mínimo',        acao: 'Não deveria ter sido qualificado; corrigir o filtro' },
+  { id: 'sem_resposta',   rotulo: 'Sem resposta',                  acao: 'Se muitos caem aqui, o problema é o prazo de contato' },
+  { id: 'momento',        rotulo: 'Momento errado',                acao: 'Volta ao pipeline na data marcada', pedeData: true },
+]
+export const ehMotivo = (id) => MOTIVOS_PERDA.some((m) => m.id === id)
+
+/** Prazo para o primeiro contato. É o número que faz alguém pegar o telefone. */
+export const SLA_PRIMEIRO_CONTATO_H = 48
+
+export const TIPOS_INTERACAO = ['nota', 'ligacao', 'email', 'reuniao', 'whatsapp']
+
+const HORA = 3600e3
+const DIA = 24 * HORA
+const agora = () => Date.now()
+const ts = (v) => (v ? new Date(v).getTime() : 0)
+const round = (n) => Math.round(n * 100) / 100
+
+/** Exposição do cliente, somada dos diagnósticos que ele simulou. */
+export function valorEmJogo(lead) {
+  return (lead.diagnosticos || []).reduce((s, d) => s + (d.destaque || 0), 0)
+}
+
+/** Enriquece o lead com o que as telas precisam e o banco não guarda. */
+export function comCrm(lead) {
+  const est = estagio(lead.estagio)
+  const desde = ts(lead.estagioDesde || lead.criadoEm)
+  const diasParado = Math.floor((agora() - desde) / DIA)
+  // Fase final manda na probabilidade: fechado é 100%, perdido é 0. Manter a
+  // estimativa que o consultor digitou na proposta deixaria negócio ganho
+  // aparecendo com 70% de chance de acontecer.
+  const prob = est.final ? est.prob : (lead.probabilidade ?? est.prob)
+
+  // Fora do prazo: capturado há mais de 48 h e ninguém falou com ele ainda.
+  const semContato = !lead.primeiroContatoEm
+  const foraDoSla = semContato && !est.final &&
+    agora() - ts(lead.criadoEm) > SLA_PRIMEIRO_CONTATO_H * HORA
+
+  const prazo = lead.proximaAcao?.quando
+  return {
+    ...lead,
+    estagio: est.id,
+    estagioNome: est.nome,
+    valorEmJogo: valorEmJogo(lead),
+    honorario: lead.honorario ?? null,
+    probabilidade: prob,
+    // Sem honorário não há previsão: o valor em jogo é do cliente, não da VOW.
+    previsao: lead.honorario ? round(lead.honorario * prob) : 0,
+    diasParado,
+    atrasadoNaFase: est.metaDias != null && diasParado > est.metaDias,
+    foraDoSla,
+    acaoVencida: Boolean(prazo && prazo < new Date().toISOString().slice(0, 10) && !est.final),
+  }
+}
+
+/** O funil: uma coluna por fase aberta, ordenada por quem espera há mais tempo. */
+export function montarPipeline(leads) {
+  const vivos = leads.map(comCrm).filter((l) => !estagio(l.estagio).final)
+  const colunas = ABERTOS.map((id) => {
+    const e = PORID[id]
+    const dentro = vivos
+      .filter((l) => l.estagio === id)
+      .sort((a, b) => b.diasParado - a.diasParado)
+    return {
+      ...e,
+      leads: dentro,
+      total: dentro.length,
+      valorEmJogo: round(dentro.reduce((s, l) => s + l.valorEmJogo, 0)),
+      previsao: round(dentro.reduce((s, l) => s + l.previsao, 0)),
+      atrasados: dentro.filter((l) => l.atrasadoNaFase).length,
+    }
+  })
+  return {
+    colunas,
+    totalAbertos: vivos.length,
+    previsaoPonderada: round(vivos.reduce((s, l) => s + l.previsao, 0)),
+    valorEmJogoTotal: round(vivos.reduce((s, l) => s + l.valorEmJogo, 0)),
+    foraDoSla: vivos.filter((l) => l.foraDoSla).length,
+    acoesVencidas: vivos.filter((l) => l.acaoVencida).length,
+  }
+}
+
+/** A tela da reunião de pipeline: o que fechou, o que caiu e por quê. */
+export function montarResultado(leads, desdeIso) {
+  const corte = desdeIso ? ts(desdeIso) : 0
+  const noPeriodo = leads.filter((l) => ts(l.fechadoEm || l.criadoEm) >= corte)
+  const fechados = noPeriodo.filter((l) => l.estagio === 'fechado')
+  const perdidos = noPeriodo.filter((l) => l.estagio === 'perdido')
+  const decididos = fechados.length + perdidos.length
+
+  const motivos = MOTIVOS_PERDA.map((m) => ({
+    ...m,
+    total: perdidos.filter((l) => l.motivoPerda === m.id).length,
+  })).sort((a, b) => b.total - a.total)
+
+  // Ciclo médio: da captura ao fechamento. Só de quem realmente fechou.
+  const ciclos = fechados.map((l) => (ts(l.fechadoEm) - ts(l.criadoEm)) / DIA).filter((d) => d >= 0)
+
+  return {
+    fechados: fechados.length,
+    perdidos: perdidos.length,
+    // Sem negócio decidido não há taxa: 0/0 é ausência de dado, não 0%.
+    taxa: decididos ? round((fechados.length / decididos) * 100) : null,
+    receitaFechada: round(fechados.reduce((s, l) => s + (l.honorario || 0), 0)),
+    perdidaEmProposta: round(perdidos.reduce((s, l) => s + (l.honorario || 0), 0)),
+    cicloMedioDias: ciclos.length ? Math.round(ciclos.reduce((s, d) => s + d, 0) / ciclos.length) : null,
+    motivos,
+    origens: ['abras', 'site'].map((o) => ({
+      origem: o,
+      fechados: fechados.filter((l) => l.origem === o).length,
+      perdidos: perdidos.filter((l) => l.origem === o).length,
+    })),
+  }
+}
+
+/** A tela que o consultor abre de manhã: só o que vence hoje e o que passou. */
+export function montarHoje(leads) {
+  const hoje = new Date().toISOString().slice(0, 10)
+  const vivos = leads.map(comCrm).filter((l) => !estagio(l.estagio).final)
+  const comPrazo = (f) => vivos.filter(f).sort((a, b) =>
+    (a.proximaAcao?.quando || '').localeCompare(b.proximaAcao?.quando || ''))
+
+  return {
+    foraDoSla: vivos.filter((l) => l.foraDoSla).sort((a, b) => b.valorEmJogo - a.valorEmJogo),
+    vencidas: comPrazo((l) => l.acaoVencida),
+    hoje: comPrazo((l) => l.proximaAcao?.quando === hoje),
+    // Oportunidade sem próxima ação está morta e ninguém percebeu.
+    semProximaAcao: vivos.filter((l) => !l.proximaAcao?.quando && !l.foraDoSla)
+      .sort((a, b) => b.diasParado - a.diasParado),
+  }
+}

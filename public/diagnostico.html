@@ -163,12 +163,37 @@
     <div class="eyebrow">JBP 2027 · IBS/CBS · LC 214/2025</div>
     <h1>Escolha um <em>diagnóstico</em></h1>
     <p class="lead">São os dois lados da mesma conta. Em três minutos você vê o que muda, quanto
-    custa e o que levar para a mesa do JBP. Sem cadastro para simular — o e-mail só é pedido
-    se você quiser receber o diagnóstico completo.</p>
+    custa e o que levar para a mesa do JBP. O diagnóstico chega no seu e-mail ao final.</p>
     <div class="escolha" id="escolha"></div>
   </section>
 
-  <!-- 2 ................................................. simulação -->
+
+  <!-- 2 ................................................. cadastro -->
+  <section class="tela" id="t-cadastro">
+    <h1>Antes de simular, <em>quem é você?</em></h1>
+    <p class="lead">O diagnóstico vai para o seu e-mail ao final. O CNPJ é opcional, mas
+    preenche o resto sozinho.</p>
+
+    <div class="panel" style="max-width:680px">
+      <div class="ff">
+        <input class="full" type="text"  id="f-nome"  placeholder="Seu nome" autocomplete="name">
+        <input class="full" type="text"  id="f-cnpj"  placeholder="CNPJ da rede (opcional)" inputmode="numeric">
+        <input type="email" id="f-email" placeholder="E-mail" autocomplete="email" inputmode="email">
+        <input type="tel"   id="f-fone"  placeholder="Telefone" autocomplete="tel" inputmode="tel">
+      </div>
+      <div class="cnpjst" id="cnpjst" hidden><i></i><span></span></div>
+      <p class="fine">Usamos seus dados só para enviar este diagnóstico e falar com você
+      sobre ele.</p>
+    </div>
+
+    <div class="msg" id="msg-cad"></div>
+    <div class="acoes">
+      <button class="btn lg" id="continuar">Continuar para a simulação</button>
+      <button class="btn ghost" onclick="ir('escolha')">Voltar</button>
+    </div>
+  </section>
+
+  <!-- 3 ................................................. simulação -->
   <section class="tela" id="t-simular">
     <h1>Dois números <em>bastam</em></h1>
     <p class="lead">Pode ser aproximado. Na tela seguinte você marca quais contratos tem de
@@ -201,7 +226,7 @@
     </div>
   </section>
 
-  <!-- 3 ................................................. resultado -->
+  <!-- 4 ................................................. resultado -->
   <section class="tela" id="t-resultado">
     <div class="eyebrow" id="r-eyebrow"></div>
     <div class="heroi">
@@ -249,17 +274,12 @@
       <p class="legenda">Chega por e-mail já com as linhas que você marcou.</p>
       <div class="entrega">
         <div class="panel">
-          <div class="ff">
-            <input class="full" type="text"  id="f-nome"  placeholder="Seu nome" autocomplete="name">
-            <input class="full" type="text"  id="f-cnpj"  placeholder="CNPJ da rede (opcional)" inputmode="numeric">
-            <input type="email" id="f-email" placeholder="E-mail" autocomplete="email" inputmode="email">
-            <input type="tel"   id="f-fone"  placeholder="Telefone (opcional)" inputmode="tel">
-          </div>
-          <div class="cnpjst" id="cnpjst" hidden><i></i><span></span></div>
+          <p style="margin:0 0 16px;color:var(--dim);font-size:15px">
+            Vai para <b id="alvo-email"></b>, já com as linhas que você marcou.</p>
           <button class="toggle" id="agendar" aria-pressed="false">
             Quero conversar com a VOW sobre este diagnóstico</button>
-          <div class="msg" id="msg" role="status" aria-live="polite"></div>
-          <button class="btn lg" id="enviar" style="width:100%;margin-top:14px">Receber por e-mail</button>
+          <div class="msg" id="msg"></div>
+          <button class="btn lg" id="enviar" style="width:100%;margin-top:14px">Enviar para o meu e-mail</button>
         </div>
         <div class="panel qrw" id="qrw" hidden>
           <div class="eyebrow">Leve no celular</div>
@@ -275,7 +295,7 @@
     </div>
   </section>
 
-  <!-- 4 ................................................. fim -->
+  <!-- 5 ................................................. fim -->
   <section class="tela" id="t-fim">
     <div class="eyebrow" id="fim-eyebrow"></div>
     <h1 id="fim-tit"></h1>
@@ -327,13 +347,13 @@ const est = {
 }
 
 /* ------------------------------------------------------------ navegação */
-const ORDEM = ['escolha', 'simular', 'resultado', 'fim']
+const ORDEM = ['escolha', 'cadastro', 'simular', 'resultado', 'fim']
 window.ir = (tela) => {
   document.querySelectorAll('.tela').forEach((s) => s.classList.remove('on'))
   $('t-' + tela).classList.add('on')
   est.tela = tela
   const i = ORDEM.indexOf(tela)
-  $('passos').innerHTML = ORDEM.slice(0, 3).map((_, k) => `<span class="pino ${k <= i ? 'on' : ''}"></span>`).join('')
+  $('passos').innerHTML = ORDEM.slice(0, 4).map((_, k) => `<span class="pino ${k <= i ? 'on' : ''}"></span>`).join('')
   $('recomecar').hidden = tela === 'escolha'
   scrollTo({ top: 0, behavior: 'smooth' })
 }
@@ -341,7 +361,8 @@ window.ir = (tela) => {
 $('recomecar').onclick = () => {
   Object.assign(est, { produto: null, fat: 300e6, pct: 3, ativas: null, pesos: {}, agendar: false, feitos: {}, lead: null })
   for (const id of ['f-nome', 'f-cnpj', 'f-email', 'f-fone']) $(id).value = ''
-  $('qrw').hidden = true; $('msg').textContent = ''
+  est.leadId = null
+  $('qrw').hidden = true; $('msg').textContent = ''; $('msg-cad').textContent = ''
   pintarEscolha(); ir('escolha')
 }
 
@@ -363,7 +384,9 @@ $('escolha').addEventListener('click', (e) => {
   est.produto = b.dataset.p
   const p = PRODUTOS[est.produto]
   est.pct = p.pctDefault; est.ativas = null; est.pesos = {}
-  prepararSimulacao(); ir('simular')
+  // Cadastro antes da simulação: o lead existe mesmo se a pessoa largar no
+  // slider, que é justamente quem a gente mais quer alcançar depois.
+  if (est.leadId) { prepararSimulacao(); ir('simular') } else ir('cadastro')
 })
 
 /* ------------------------------------------------------------ simulação */
@@ -603,38 +626,64 @@ $('agendar').onclick = (e) => {
     : 'Quero conversar com a VOW sobre este diagnóstico'
 }
 
-$('enviar').onclick = async () => {
+$('continuar').onclick = async () => {
   const email = $('f-email').value.trim()
-  if (!emailOk(email)) { $('msg').textContent = 'Confira o e-mail.'; return }
-  $('msg').textContent = ''; $('enviar').disabled = true; $('enviar').textContent = 'Enviando…'
+  const msg = $('msg-cad')
+  if (!emailOk(email)) { msg.textContent = 'Confira o e-mail — é para onde o diagnóstico vai.'; return }
+  msg.textContent = ''
+  $('continuar').disabled = true
+
+  try {
+    const r = await fetch('/api/lead', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        nome: $('f-nome').value.trim(),
+        empresa: est.empresa ? (est.empresa.fantasia || est.empresa.razao) : '',
+        cnpj: $('f-cnpj').value.trim(),
+        email, telefone: $('f-fone').value.trim(),
+        origem: ORIGEM, tipos: [est.produto],
+      }),
+    })
+    const j = await r.json()
+    if (!r.ok) throw new Error(j.erro || 'não foi possível continuar')
+    est.leadId = j.id
+    $('alvo-email').textContent = email
+    prepararSimulacao()
+    ir('simular')
+  } catch (e) {
+    msg.textContent = e.message
+  } finally {
+    $('continuar').disabled = false
+  }
+}
+
+$('enviar').onclick = async () => {
+  if (!est.leadId) { $('msg').textContent = 'Refaça o cadastro para receber o diagnóstico.'; return }
+  $('msg').textContent = ''
+  $('enviar').disabled = true; $('enviar').textContent = 'Enviando…'
   try {
     const corpo = {
-      nome: $('f-nome').value.trim(),
-      empresa: est.empresa ? (est.empresa.fantasia || est.empresa.razao) : '',
-      cnpj: $('f-cnpj').value.trim(),
-      email, telefone: $('f-fone').value.trim(),
-      origem: ORIGEM, agendar: est.agendar,
       tipos: Object.keys(est.feitos),
       faturamento: est.fat,
+      agendar: est.agendar,
       ativas: est.ativas || undefined,
       pesos: Object.keys(est.pesos).length ? est.pesos : undefined,
     }
     if (est.produto === 'revenda') corpo.percentualVerba = est.pct / 100
     else corpo.percentualBase = est.pct / 100
 
-    const r = await fetch('/api/lead', {
+    const r = await fetch(`/api/lead/${est.leadId}/diagnostico`, {
       method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corpo),
     })
     const j = await r.json()
     if (!r.ok) throw new Error(j.erro || 'não foi possível enviar')
 
-    est.lead = j
     $('qr').src = j.qr; $('qrw').hidden = false
-    mostrarFim(j, email)
+    mostrarFim(j, $('f-email').value.trim())
   } catch (e) {
     $('msg').textContent = e.message
   } finally {
-    $('enviar').disabled = false; $('enviar').textContent = 'Receber por e-mail'
+    $('enviar').disabled = false; $('enviar').textContent = 'Enviar para o meu e-mail'
   }
 }
 
@@ -658,7 +707,7 @@ function mostrarFim(j, email) {
     $('m-btn').onclick = () => {
       est.produto = falta; est.pct = PRODUTOS[falta].pctDefault
       est.ativas = null; est.pesos = {}
-      prepararSimulacao(); pintarResultado(); ir('resultado')
+      prepararSimulacao(); ir('simular')
     }
   }
   ir('fim')

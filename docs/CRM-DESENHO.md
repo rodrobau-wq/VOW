@@ -87,6 +87,5 @@ depender das decisões abaixo.
 1. **Como a VOW cobra** — % do recuperado, fixo, ou fixo + êxito? Define a fórmula da previsão.
 2. **Porte mínimo** — abaixo de que faturamento não compensa? Sem isso a qualificação é opinião.
 3. **Quem são os responsáveis** — nomes e quantidade de consultores.
-4. **A data da ABRAS** — [BRIEF-CLAUDE-CODE.md](../BRIEF-CLAUDE-CODE.md) diz 12 e 13 de abril
-   de **2027**; o handoff de design fala em **ABRAS 2026**. As duas não podem estar certas, e
-   a data governa o modo feira e os prazos.
+4. ~~A data da ABRAS~~ — **resolvido: ABRAS 2026.** O brief dizia 2027 e o handoff dizia
+   2026; o cliente confirmou 2026. Corrigir a seção 1 do BRIEF-CLAUDE-CODE.md.

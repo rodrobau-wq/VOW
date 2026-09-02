@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carteira · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  main{padding:24px 28px 60px;max-width:1320px;margin:0 auto}
+  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--gold)}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 22px}
+  .barra{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  input[type=search]{height:38px;padding:0 15px;border:1px solid var(--line-2);border-radius:var(--r-pill);
+    background:var(--surface);color:var(--ink);font:400 14px/1 var(--sans);min-width:250px;outline:0}
+  input[type=search]:focus{border-color:var(--gold)}
+  a.csv{margin-left:auto;height:38px;display:inline-flex;align-items:center;padding:0 18px;
+        border-radius:var(--r-pill);background:var(--gold);color:var(--surface);font-size:13px;font-weight:500;text-decoration:none}
+  .tab{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+  .rol{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px;min-width:900px}
+  th{background:var(--bg-deep);text-align:left;padding:12px 16px;font-size:10px;letter-spacing:.13em;
+     text-transform:uppercase;font-weight:500;color:var(--muted)}
+  th.n,td.n{text-align:right;font-variant-numeric:tabular-nums}
+  td{padding:13px 16px;border-top:1px solid var(--line);color:var(--dim)}
+  tr:hover td{background:var(--bg-deep)}
+  a.lead{color:var(--ink);font-weight:500;text-decoration:none}
+  a.lead:hover{color:var(--gold)}
+  .det{font-size:12px;color:var(--faint);margin-top:2px}
+  .selo{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:500}
+  .selo.f{background:var(--gold-wash);color:var(--gold-deep)}
+  .selo.g{background:rgba(47,122,85,.12);color:var(--ok)}
+  .selo.p{background:rgba(162,74,44,.12);color:var(--risk)}
+  .selo.n{background:var(--bg-deep);color:var(--muted)}
+  .vazio{padding:56px;text-align:center;color:var(--faint)}
+</style>
+</head>
+<body class="paper">
+<main>
+  <h1>A <em>carteira</em></h1>
+  <p class="sub">Todo lead capturado, em qualquer fase.</p>
+  <div class="barra">
+    <input type="search" id="busca" placeholder="Buscar por nome, rede ou e-mail…">
+    <button class="chip" data-f="" aria-pressed="true">Todos</button>
+    <button class="chip" data-f="abras" aria-pressed="false">ABRAS</button>
+    <button class="chip" data-f="site" aria-pressed="false">Site</button>
+    <a class="csv" href="/api/leads.csv">Exportar CSV</a>
+  </div>
+  <div class="tab"><div class="rol"><table>
+    <thead><tr><th>Lead</th><th>Rede</th><th>Fase</th><th class="n">Valor em jogo</th>
+      <th class="n">Honorário</th><th>Responsável</th><th>Parado</th></tr></thead>
+    <tbody id="corpo"></tbody>
+  </table></div><div class="vazio" id="vazio" hidden>Nenhum lead ainda.</div></div>
+</main>
+
+<script type="module">
+import { montarNav, esc, brl, brlCurto, parado } from '/app-nav.js'
+await montarNav('/app/leads')
+
+const $ = (id) => document.getElementById(id)
+let origem = '', busca = ''
+
+const SELO = { fechado: 'g', perdido: 'p', capturado: 'n' }
+
+async function carregar() {
+  const p = new URLSearchParams()
+  if (origem) p.set('origem', origem)
+  if (busca) p.set('q', busca)
+  const leads = await (await fetch('/api/app/crm/leads?' + p)).json()
+  $('vazio').hidden = leads.length > 0
+  $('corpo').innerHTML = leads.map((l) => `
+    <tr>
+      <td><a class="lead" href="/app/leads/${l.id}">${esc(l.nome || l.email)}</a>
+        <div class="det">${esc(l.email)}${l.origem === 'abras' ? ' · ABRAS' : ''}</div></td>
+      <td>${esc(l.empresa || '—')}</td>
+      <td><span class="selo ${SELO[l.estagio] || 'f'}">${esc(l.estagioNome)}</span></td>
+      <td class="n">${brlCurto(l.valorEmJogo)}</td>
+      <td class="n">${l.honorario ? brl(l.honorario) : '—'}</td>
+      <td>${esc(l.responsavel || '—')}</td>
+      <td>${l.foraDoSla ? '<span class="selo p">fora do prazo</span>' : esc(parado(l.diasParado))}</td>
+    </tr>`).join('')
+}
+
+$('busca').addEventListener('input', (e) => { busca = e.target.value; carregar() })
+for (const b of document.querySelectorAll('.barra .chip')) {
+  b.addEventListener('click', () => {
+    for (const x of document.querySelectorAll('.barra .chip')) x.setAttribute('aria-pressed', 'false')
+    b.setAttribute('aria-pressed', 'true'); origem = b.dataset.f; carregar()
+  })
+}
+carregar()
+</script>
+</body>
+</html>

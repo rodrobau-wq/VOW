@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resultado · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  main{padding:24px 28px 60px;max-width:1180px;margin:0 auto}
+  .cab{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
+  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--gold)}
+  .cab p{color:var(--muted);font-size:15px;margin:0}
+  .periodo{display:flex;gap:6px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:13px;margin-bottom:20px}
+  .k{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:19px}
+  .k .r{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .k .v{font-family:var(--serif);font-size:34px;line-height:1;margin-top:8px;font-variant-numeric:tabular-nums}
+  .k.bom .v{color:var(--ok)} .k.ruim .v{color:var(--risk)}
+  .k .p{font-size:12.5px;color:var(--faint);margin-top:6px;line-height:1.45}
+  .duas{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;align-items:start}
+  @media(max-width:920px){.duas{grid-template-columns:1fr}}
+  .bloco{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px 24px}
+  .bloco h2{font-size:22px;margin:0 0 6px}
+  .bloco .leg{font-size:13.5px;color:var(--muted);margin:0 0 16px}
+  .mot{padding:13px 0;border-bottom:1px solid var(--line)}
+  .mot:last-child{border-bottom:0}
+  .mot .l1{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .mot .nm{font-size:14.5px;font-weight:500}
+  .mot .qt{font-family:var(--serif);font-size:21px;font-variant-numeric:tabular-nums}
+  .mot .barra{height:6px;border-radius:3px;background:var(--bg-deep);margin:8px 0 7px;overflow:hidden}
+  .mot .barra i{display:block;height:100%;background:var(--risk);border-radius:3px}
+  .mot .ac{font-size:12.5px;color:var(--faint);line-height:1.5}
+  .linha{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--dim)}
+  .linha:last-child{border-bottom:0}
+  .linha b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+  .nota{font-size:12.5px;color:var(--faint);margin-top:16px;line-height:1.55}
+</style>
+</head>
+<body class="paper">
+<main>
+  <div class="cab">
+    <div><h1>O que <em>fechou</em> e o que caiu</h1><p>A tela da reunião de pipeline.</p></div>
+    <div class="periodo">
+      <button class="chip" data-d="30" aria-pressed="true">30 dias</button>
+      <button class="chip" data-d="90" aria-pressed="false">90 dias</button>
+      <button class="chip" data-d="0" aria-pressed="false">Tudo</button>
+    </div>
+  </div>
+  <div id="tudo" style="color:var(--faint)">Carregando…</div>
+</main>
+
+<script type="module">
+import { montarNav, esc, brl, brlCurto } from '/app-nav.js'
+await montarNav('/app/resultado')
+
+const $ = (id) => document.getElementById(id)
+let dias = 30
+
+async function carregar() {
+  const desde = dias ? new Date(Date.now() - dias * 864e5).toISOString() : ''
+  const d = await (await fetch('/api/app/crm/resultado?desde=' + desde)).json()
+  const maior = Math.max(...d.motivos.map((m) => m.total), 1)
+
+  $('tudo').innerHTML = `
+    <div class="kpis">
+      <div class="k bom"><div class="r">Fechados</div><div class="v">${d.fechados}</div>
+        <div class="p">${brl(d.receitaFechada)} em honorários</div></div>
+      <div class="k ruim"><div class="r">Perdidos</div><div class="v">${d.perdidos}</div>
+        <div class="p">${d.perdidaEmProposta ? brl(d.perdidaEmProposta) + ' que chegaram a ter proposta' : 'nenhum chegou a ter proposta'}</div></div>
+      <div class="k"><div class="r">Taxa de fechamento</div>
+        <div class="v">${d.taxa === null ? '—' : d.taxa + '%'}</div>
+        <div class="p">${d.taxa === null ? 'nenhum negócio decidido no período' : 'dos negócios decididos'}</div></div>
+      <div class="k"><div class="r">Ciclo médio</div>
+        <div class="v">${d.cicloMedioDias === null ? '—' : d.cicloMedioDias + 'd'}</div>
+        <div class="p">${d.cicloMedioDias === null ? 'sem fechamento no período' : 'da captura à assinatura'}</div></div>
+    </div>
+
+    <div class="duas">
+      <div class="bloco">
+        <h2>Por que se perde</h2>
+        <p class="leg">Lista fixa, escolhida no momento da perda. É a única leitura que sobra
+        de um negócio que não fechou.</p>
+        ${d.motivos.map((m) => `
+          <div class="mot">
+            <div class="l1"><span class="nm">${esc(m.rotulo)}</span><span class="qt">${m.total}</span></div>
+            <div class="barra"><i style="width:${(m.total / maior) * 100}%"></i></div>
+            <div class="ac">${esc(m.acao)}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="bloco">
+        <h2>Por origem</h2>
+        <p class="leg">Se a feira converte diferente do site, o investimento muda.</p>
+        ${d.origens.map((o) => `
+          <div class="linha"><span>${o.origem === 'abras' ? 'Totem ABRAS' : 'Site'}</span>
+            <b>${o.fechados} ganhos · ${o.perdidos} perdidos</b></div>`).join('')}
+        <p class="nota">A receita mostrada é o honorário da VOW, nunca a soma dos
+        diagnósticos. O valor em jogo é a exposição do cliente e serve para priorizar
+        atendimento — misturar os dois multiplicaria a previsão por dezenas.</p>
+      </div>
+    </div>`
+}
+
+for (const b of document.querySelectorAll('.periodo .chip')) {
+  b.addEventListener('click', () => {
+    for (const x of document.querySelectorAll('.periodo .chip')) x.setAttribute('aria-pressed', 'false')
+    b.setAttribute('aria-pressed', 'true')
+    dias = Number(b.dataset.d)
+    carregar()
+  })
+}
+carregar()
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Oportunidade · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  main{padding:24px 28px 60px;max-width:1180px;margin:0 auto}
+  .volta{font-size:13.5px;color:var(--muted);text-decoration:none}
+  .volta:hover{color:var(--ink)}
+  .cab{margin:14px 0 22px}
+  h1{font-size:38px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:15px;margin:0}
+  .sub a{color:var(--gold)}
+
+  .duas{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
+  @media(max-width:980px){.duas{grid-template-columns:1fr}}
+  .bloco{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+         padding:22px 24px;margin-bottom:16px}
+  .bloco h2{font-size:22px;margin:0 0 14px}
+  .rot{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+
+  .valores{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+  .val{border:1px solid var(--line);border-radius:var(--r-md);padding:16px;background:var(--bg-deep)}
+  .val .v{font-family:var(--serif);font-size:30px;line-height:1;margin-top:7px;font-variant-numeric:tabular-nums}
+  .val.jogo .v{color:var(--risk)} .val.hon .v{color:var(--ok)}
+  .val .p{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.45}
+
+  .fases{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+  .fase{padding:8px 14px;border-radius:999px;border:1px solid var(--line-2);background:transparent;
+        color:var(--muted);font:400 13px/1 var(--sans);cursor:pointer}
+  .fase.on{background:var(--gold);color:var(--surface);border-color:var(--gold);font-weight:500}
+  .fase.ganho.on{background:var(--ok);border-color:var(--ok)}
+  .fase.perda.on{background:var(--risk);border-color:var(--risk)}
+  .saida{font-size:12.5px;color:var(--faint);margin:10px 0 0;line-height:1.5}
+
+  label{display:block;font-size:12.5px;color:var(--muted);margin:14px 0 6px}
+  input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--line-2);
+    border-radius:var(--r-sm);background:var(--raised);color:var(--ink);
+    font:400 14.5px/1.4 var(--sans);outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+  textarea{resize:vertical;min-height:76px}
+  .dupla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .btn.pequeno{height:40px;padding:0 18px;font-size:14px;border-radius:var(--r-pill)}
+  .acoes{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+  .msg{font-size:13.5px;min-height:19px;color:var(--risk)}
+  .msg.ok{color:var(--ok)}
+
+  .linha{display:flex;justify-content:space-between;gap:14px;padding:11px 0;
+         border-bottom:1px solid var(--line);font-size:14px;color:var(--dim)}
+  .linha:last-child{border-bottom:0}
+  .linha b{color:var(--ink);font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+
+  .tempo{list-style:none;margin:0;padding:0}
+  .tempo li{padding:14px 0 14px 20px;border-left:2px solid var(--line);position:relative;margin-left:4px}
+  .tempo li::before{content:"";position:absolute;left:-5px;top:20px;width:8px;height:8px;
+                    border-radius:50%;background:var(--line-2)}
+  .tempo li.sistema::before{background:var(--gold)}
+  .tempo .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+  .tempo .tipo{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .tempo .qdo{font-size:12px;color:var(--faint)}
+  .tempo .txt{font-size:14px;color:var(--dim);line-height:1.55}
+  .tempo .aut{font-size:12px;color:var(--faint);margin-top:3px}
+  .aviso{font-size:12.5px;color:var(--faint);margin-top:12px;line-height:1.5}
+</style>
+</head>
+<body class="paper">
+<main>
+  <a class="volta" href="/app/pipeline">← Funil</a>
+  <div id="tudo" style="padding:60px 0;color:var(--faint)">Carregando…</div>
+</main>
+
+<script type="module">
+import { montarNav, esc, brl, brlCurto, dataBr, quando, parado } from '/app-nav.js'
+await montarNav('/app/leads')
+
+const $ = (id) => document.getElementById(id)
+const ID = location.pathname.split('/').pop()
+let ref = null, lead = null, interacoes = []
+
+async function carregar() {
+  const [r, d] = await Promise.all([
+    fetch('/api/app/crm/referencias').then((x) => x.json()),
+    fetch(`/api/app/crm/leads/${ID}`).then((x) => x.json()),
+  ])
+  ref = r
+  if (d.erro) { $('tudo').textContent = d.erro; return }
+  lead = d.lead; interacoes = d.interacoes
+  pintar()
+}
+
+function pintar() {
+  const l = lead
+  const est = ref.estagios.find((e) => e.id === l.estagio) || ref.estagios[0]
+  const diag = (l.diagnosticos || []).map((d) =>
+    `<div class="linha"><span>${d.tipo === 'revenda' ? 'Verbas com a indústria' : 'Serviços e indiretos'}</span>
+     <b>${brl(d.destaque)}</b></div>`).join('')
+
+  $('tudo').innerHTML = `
+  <div class="cab">
+    <h1>${esc(l.empresa || l.nome || 'Sem empresa')}</h1>
+    <p class="sub">${esc(l.nome || '')} · <a href="mailto:${esc(l.email)}">${esc(l.email)}</a>
+      ${l.telefone ? ' · ' + esc(l.telefone) : ''}${l.cnpj ? ' · ' + esc(l.cnpj) : ''}</p>
+  </div>
+
+  <div class="duas">
+    <div>
+      <div class="bloco">
+        <h2>Fase</h2>
+        <div class="fases" id="fases">
+          ${ref.estagios.map((e) => `<button class="fase ${e.id === l.estagio ? 'on' : ''}
+            ${e.id === 'fechado' ? 'ganho' : e.id === 'perdido' ? 'perda' : ''}"
+            data-e="${e.id}">${esc(e.nome)}</button>`).join('')}
+        </div>
+        <p class="saida">${est.saida ? '<b>Para avançar:</b> ' + esc(est.saida) : 'Fase final.'}
+          ${l.foraDoSla ? '<br><b style="color:var(--risk)">Fora do prazo de primeiro contato.</b>' : ''}
+          Nesta fase ${parado(l.diasParado)}.</p>
+
+        <div id="perda-campos" ${l.estagio === 'perdido' ? '' : 'hidden'}>
+          <label for="motivo">Motivo da perda</label>
+          <select id="motivo">
+            <option value="">Escolha…</option>
+            ${ref.motivos.map((m) => `<option value="${m.id}" ${m.id === l.motivoPerda ? 'selected' : ''}>${esc(m.rotulo)}</option>`).join('')}
+          </select>
+          <label for="detalhe">Detalhe (opcional)</label>
+          <input id="detalhe" value="${esc(l.motivoDetalhe || '')}" placeholder="Qual concorrente, ou a data de retomada">
+        </div>
+
+        <div class="dupla">
+          <div><label for="resp">Responsável</label>
+            <input id="resp" value="${esc(l.responsavel || '')}" placeholder="Quem atende"></div>
+          <div><label for="prob">Probabilidade</label>
+            <input id="prob" type="number" min="0" max="100" step="5" value="${Math.round((l.probabilidade ?? est.prob) * 100)}"></div>
+        </div>
+        <label for="hon">Honorário proposto — a receita da VOW</label>
+        <input id="hon" type="number" min="0" step="1000" value="${l.honorario ?? ''}" placeholder="Só a partir da proposta">
+
+        <div class="dupla">
+          <div><label for="acao">Próxima ação</label>
+            <input id="acao" value="${esc(l.proximaAcao?.texto || '')}" placeholder="Ligar para o CFO"></div>
+          <div><label for="quando">Quando</label>
+            <input id="quando" type="date" value="${esc(l.proximaAcao?.quando || '')}"></div>
+        </div>
+
+        <div class="acoes">
+          <button class="btn pequeno" id="salvar">Salvar</button>
+          <span class="msg" id="msg"></span>
+        </div>
+      </div>
+
+      <div class="bloco">
+        <h2>Histórico</h2>
+        <label for="texto">Registrar o que aconteceu</label>
+        <textarea id="texto" placeholder="Ligou, falou com o diretor comercial, pediu proposta até sexta"></textarea>
+        <div class="dupla" style="margin-top:10px">
+          <select id="tipo">
+            ${ref.tipos.map((t) => `<option value="${t}">${t}</option>`).join('')}
+          </select>
+          <button class="btn pequeno" id="registrar">Registrar</button>
+        </div>
+        <p class="aviso">O histórico não pode ser editado nem apagado. Ele existe para
+        reconstruir o que foi combinado com o cliente — e um registro editável não serve
+        para isso.</p>
+        <ul class="tempo" id="tempo" style="margin-top:18px"></ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="bloco">
+        <div class="valores">
+          <div class="val jogo"><div class="rot">Valor em jogo</div>
+            <div class="v">${brlCurto(l.valorEmJogo)}</div>
+            <div class="p">Exposição do cliente, do diagnóstico que ele simulou. Prioriza — não é receita.</div></div>
+          <div class="val hon"><div class="rot">Previsão</div>
+            <div class="v">${l.honorario ? brlCurto(l.previsao) : '—'}</div>
+            <div class="p">${l.honorario ? 'Honorário × probabilidade.' : 'Sem honorário informado ainda.'}</div></div>
+        </div>
+        ${diag}
+        <div class="linha"><span>Faturamento da rede</span><b>${brlCurto(l.faturamento)}</b></div>
+        <div class="linha"><span>Origem</span><b>${l.origem === 'abras' ? 'Totem ABRAS' : 'Site'}</b></div>
+        <div class="linha"><span>Capturado em</span><b>${quando(l.criadoEm)}</b></div>
+        <div class="linha"><span>Primeiro contato</span><b>${l.primeiroContatoEm ? quando(l.primeiroContatoEm) : 'ainda não'}</b></div>
+        <div class="linha"><span>Pediu conversa</span><b>${l.agendar ? 'sim' : 'não'}</b></div>
+        <div class="linha"><span>Diagnóstico por e-mail</span><b>${l.email_enviado ? 'enviado' : 'pendente'}</b></div>
+      </div>
+    </div>
+  </div>`
+
+  pintarTempo()
+
+  $('fases').addEventListener('click', (ev) => {
+    const b = ev.target.closest('.fase'); if (!b) return
+    for (const x of $('fases').children) x.classList.toggle('on', x === b)
+    // Perder pede motivo: o campo aparece antes de salvar, não depois do erro.
+    $('perda-campos').hidden = b.dataset.e !== 'perdido'
+  })
+  $('salvar').addEventListener('click', salvar)
+  $('registrar').addEventListener('click', registrar)
+}
+
+function pintarTempo() {
+  $('tempo').innerHTML = interacoes.map((i) => `
+    <li class="${i.tipo === 'sistema' ? 'sistema' : ''}">
+      <div class="top"><span class="tipo">${esc(i.tipo)}</span><span class="qdo">${quando(i.criadoEm)}</span></div>
+      <div class="txt">${esc(i.texto)}</div>
+      <div class="aut">${esc(i.autor || '')}</div>
+    </li>`).join('') || '<li style="border:0;padding-left:0"><div class="txt" style="color:var(--faint)">Nada registrado ainda.</div></li>'
+}
+
+async function salvar() {
+  const corpo = {
+    estagio: $('fases').querySelector('.on').dataset.e,
+    responsavel: $('resp').value.trim(),
+    probabilidade: Number($('prob').value) / 100,
+    honorario: $('hon').value === '' ? null : Number($('hon').value),
+    proximaAcao: $('acao').value.trim() ? { texto: $('acao').value.trim(), quando: $('quando').value } : null,
+  }
+  if (!$('perda-campos').hidden) {
+    corpo.motivoPerda = $('motivo').value
+    corpo.motivoDetalhe = $('detalhe').value.trim()
+  }
+  const msg = $('msg'); msg.className = 'msg'; msg.textContent = ''
+  const r = await fetch(`/api/app/crm/leads/${ID}`, {
+    method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corpo),
+  })
+  const j = await r.json()
+  if (!r.ok) { msg.textContent = j.erro; return }
+  msg.className = 'msg ok'; msg.textContent = 'Salvo.'
+  await carregar()
+}
+
+async function registrar() {
+  const texto = $('texto').value.trim()
+  if (!texto) return
+  const r = await fetch(`/api/app/crm/leads/${ID}/interacoes`, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ tipo: $('tipo').value, texto }),
+  })
+  if (r.ok) { $('texto').value = ''; await carregar() }
+}
+
+carregar()
+</script>
+</body>
+</html>
