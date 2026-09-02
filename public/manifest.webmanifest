@@ -1,8 +1,8 @@
 {
   "name": "VOW · Campo",
   "short_name": "VOW Campo",
-  "description": "Captura e acompanhamento de leads no estande da ABRAS, com fila offline.",
-  "start_url": "/app/feira",
+  "description": "Acompanhamento da jornada dos leads da VOW.",
+  "start_url": "/app/pipeline",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -14,7 +14,7 @@
     { "src": "/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Capturar lead", "url": "/app/capturar" },
-    { "name": "Hoje", "url": "/app/hoje" }
+    { "name": "Agora", "url": "/app/hoje" },
+    { "name": "Jornada", "url": "/app/pipeline" }
   ]
 }

@@ -11,13 +11,13 @@
  *    abordado. Sem rede, a API falha — e a tela diz que está offline, em vez
  *    de mentir.
  *
- * A captura não depende disto: ela grava em IndexedDB antes de tentar a rede.
- * Ver fila-offline.js.
+ * Com a captura acontecendo só na landing, não há fila offline a manter: o
+ * app é de leitura e de mover cartão, e essas duas coisas exigem rede.
  */
 const VERSAO = 'vow-campo-v1'
 const CASCA = [
-  '/app/feira', '/app/capturar', '/app/hoje', '/app/pipeline',
-  '/tokens.css', '/app-nav.js', '/fila-offline.js', '/motor.js',
+  '/app/hoje', '/app/pipeline', '/app/leads',
+  '/tokens.css', '/app-nav.js', '/motor.js',
   '/icone.svg', '/manifest.webmanifest',
 ]
 

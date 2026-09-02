@@ -85,6 +85,26 @@ export async function atualizar(colecao, id, mudancas) {
   return linha(r.rows[0])
 }
 
+/**
+ * Remove um registro.
+ *
+ * Vale inclusive para `verificacao` e `interacao`: append-only proíbe
+ * REESCREVER a história, o que é diferente de apagar um registro que a
+ * pessoa pediu para apagar. O que não pode é um UPDATE mudar o que ficou
+ * gravado — remover é uma decisão explícita de quem opera.
+ */
+export async function remover(colecao, id) {
+  checa(colecao)
+  if (emMemoria()) {
+    const tinha = tabelaMemoria('registros').delete(id)
+    if (tinha) await salvarNoDisco()
+    return tinha
+  }
+  await preparar()
+  const r = await consulta('delete from registros where id = $1 and colecao = $2', [id, colecao])
+  return r.rowCount > 0
+}
+
 export async function listar(colecao, redeId = null, filtro = null) {
   checa(colecao)
   const global = GLOBAIS.has(colecao)

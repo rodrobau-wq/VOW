@@ -80,6 +80,17 @@ export async function atualizarLead(id, mudancas) {
   return r.rowCount ? doc(r.rows[0]) : null
 }
 
+export async function removerLead(id) {
+  if (emMemoria()) {
+    const tinha = tabelaMemoria('leads').delete(id)
+    if (tinha) await salvarNoDisco()
+    return tinha
+  }
+  await preparar()
+  const r = await consulta('delete from leads where id = $1', [id])
+  return r.rowCount > 0
+}
+
 export async function contarLeads() {
   if (emMemoria()) return tabelaMemoria('leads').size
   await preparar()

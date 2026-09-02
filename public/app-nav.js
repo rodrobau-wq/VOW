@@ -8,14 +8,13 @@
  * A barra conta a jornada do lead, não uma lista de telas.
  *
  * Da esquerda para a direita é a ordem em que o trabalho acontece: o que
- * precisa de você agora, capturar quem chega, mover no quadro, a carteira
- * inteira, e o que fechou. `Base` fica separada porque não é etapa de
+ * precisa de você agora, mover no quadro, a carteira inteira, e o que fechou.
+ * A captura não é aba porque não acontece aqui: o lead entra sozinho pelo
+ * diagnóstico da landing. `Base` fica separada porque não é etapa de
  * trabalho — é onde se confere o dado.
  */
 const ABAS = [
   { href: '/app/hoje',      rotulo: 'Agora',     grupo: 'O dia' },
-  { href: '/app/feira',     rotulo: 'Feira',     grupo: 'O dia' },
-  { href: '/app/capturar',  rotulo: 'Capturar',  grupo: 'A jornada' },
   { href: '/app/pipeline',  rotulo: 'Jornada',   grupo: 'A jornada' },
   { href: '/app/leads',     rotulo: 'Carteira',  grupo: 'A jornada' },
   { href: '/app/resultado', rotulo: 'Resultado', grupo: 'O fecho' },
