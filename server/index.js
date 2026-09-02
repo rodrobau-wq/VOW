@@ -29,7 +29,7 @@ import { lerLeads, gravarLead, caminhoDb } from '../leads-db.js'
 import * as store from '../store.js'
 import { temPostgres } from '../db.js'
 import { primeiroAcesso } from '../bootstrap.js'
-import { migrarDoDisco } from '../migrar.js'
+import { migrarDoDisco, ultimaMigracao } from '../migrar.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const RAIZ = path.join(__dirname, '..')
@@ -103,7 +103,13 @@ function lerEntrada(body) {
  * nunca foi criado, e as duas situações se parecem: o login recusa igual.
  */
 app.get('/healthz', async (_req, res) => {
-  let plataforma = { inicializada: null, persistencia: temPostgres() ? 'postgres' : 'espelho em disco' }
+  let plataforma = {
+    inicializada: null,
+    persistencia: temPostgres() ? 'postgres' : 'espelho em disco',
+    // Sem acesso ao log do serviço, é aqui que se confere se a migração
+    // achou os arquivos antigos e o que ela trouxe.
+    migracao: ultimaMigracao,
+  }
   try {
     plataforma.inicializada = (await store.listar('usuario')).length > 0
   } catch { /* banco indisponível não pode derrubar o health check */ }
@@ -324,7 +330,9 @@ app.listen(port, async () => {
   try {
     // Traz o que ficou no disco antes de criar qualquer coisa nova, senão o
     // primeiro acesso ocuparia o banco e a migração se recusaria a rodar.
-    const m = await migrarDoDisco()
+    // Mescla por padrão: a inserção é `on conflict do nothing`, então nunca
+    // sobrescreve, e o arquivo é renomeado depois — roda uma vez e acabou.
+    const m = await migrarDoDisco({ mesclar: process.env.MIGRAR_DISCO !== '0' })
     if (!m.migrou) console.log(`Migração: ${m.motivo}`)
     const r = await primeiroAcesso()
     if (!r.criado) console.log(`Plataforma: ${r.motivo}`)
