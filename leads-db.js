@@ -7,7 +7,7 @@
  * quatro vezes quando o sinal do pavilhão oscila. Antes isso dependia de ler
  * antes de escrever, o que falha com dois aparelhos sincronizando juntos.
  */
-import { consulta, preparar, emMemoria, tabelaMemoria } from './db.js'
+import { consulta, preparar, emMemoria, tabelaMemoria, salvarNoDisco } from './db.js'
 
 const doc = (r) => ({ id: r.id, ...r.dados })
 
@@ -36,6 +36,7 @@ export async function gravarLead(lead) {
   const { id, ...dados } = lead
   if (emMemoria()) {
     tabelaMemoria('leads').set(id, { id, dados })
+    await salvarNoDisco()
     return lead
   }
   await preparar()
@@ -69,6 +70,7 @@ export async function atualizarLead(id, mudancas) {
     const r = tabelaMemoria('leads').get(id)
     if (!r) return null
     r.dados = { ...r.dados, ...mudancas, atualizadoEm }
+    await salvarNoDisco()
     return doc(r)
   }
   await preparar()

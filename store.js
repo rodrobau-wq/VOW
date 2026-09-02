@@ -17,7 +17,7 @@
  * mexeu em nenhuma chamada.
  */
 import crypto from 'node:crypto'
-import { consulta, preparar, emMemoria, tabelaMemoria } from './db.js'
+import { consulta, preparar, emMemoria, tabelaMemoria, salvarNoDisco } from './db.js'
 
 /** Coleções que nunca são atualizadas, só recebem linha nova. */
 const APPEND_ONLY = new Set(['verificacao', 'interacao'])
@@ -48,6 +48,7 @@ export async function inserir(colecao, dados, redeId = null) {
 
   if (emMemoria()) {
     tabelaMemoria('registros').set(id, { id, colecao, rede_id: redeId, dados: doc })
+    await salvarNoDisco()
   } else {
     await preparar()
     await consulta(
@@ -68,6 +69,7 @@ export async function atualizar(colecao, id, mudancas) {
     const r = tabelaMemoria('registros').get(id)
     if (!r || r.colecao !== colecao) throw new Error(`${colecao}/${id} não existe`)
     r.dados = { ...r.dados, ...mudancas, atualizadoEm }
+    await salvarNoDisco()
     return linha(r)
   }
   await preparar()

@@ -49,7 +49,64 @@ if (URL) {
 /* ----------------------------------------------------------- em memória */
 // Espelha só o que as consultas do projeto usam. Não é um banco: é o
 // suficiente para os testes rodarem sem depender de rede.
+//
+// REDE DE SEGURANÇA: quando LEADS_DB/APP_DB apontam para um caminho, o
+// conteúdo é lido na subida e regravado a cada escrita. Sem isso, um deploy
+// feito antes de o Postgres existir apagaria em silêncio tudo que foi
+// capturado — foi o que aconteceu, e não pode acontecer de novo. A gravação
+// desliga sozinha assim que DATABASE_URL aparece.
 const memoria = { leads: new Map(), registros: new Map() }
+
+const ARQ_LEADS = process.env.LEADS_DB || ''
+const ARQ_REGISTROS = process.env.APP_DB || ''
+const espelhaEmDisco = () => !temPostgres() && Boolean(ARQ_LEADS || ARQ_REGISTROS)
+
+async function carregarDoDisco() {
+  if (!espelhaEmDisco()) return
+  const fs = await import('node:fs/promises')
+  try {
+    for (const l of JSON.parse(await fs.readFile(ARQ_LEADS, 'utf8'))) {
+      const { id, ...dados } = l
+      memoria.leads.set(id, { id, dados })
+    }
+  } catch { /* arquivo ausente é o caso normal na primeira vez */ }
+  try {
+    const doc = JSON.parse(await fs.readFile(ARQ_REGISTROS, 'utf8'))
+    for (const [colecao, linhas] of Object.entries(doc)) {
+      if (!Array.isArray(linhas)) continue
+      for (const l of linhas) {
+        const { id, redeId, ...dados } = l
+        memoria.registros.set(id, { id, colecao, rede_id: redeId || null, dados })
+      }
+    }
+  } catch { /* idem */ }
+}
+
+let gravando = null
+export function salvarNoDisco() {
+  if (!espelhaEmDisco()) return Promise.resolve()
+  // Agrupa escritas do mesmo tique: a captura grava várias linhas seguidas.
+  gravando ||= Promise.resolve().then(async () => {
+    gravando = null
+    const fs = await import('node:fs/promises')
+    const path = await import('node:path')
+    if (ARQ_LEADS) {
+      await fs.mkdir(path.dirname(ARQ_LEADS), { recursive: true })
+      await fs.writeFile(ARQ_LEADS, JSON.stringify([...memoria.leads.values()].map((r) => ({ id: r.id, ...r.dados })), null, 2))
+    }
+    if (ARQ_REGISTROS) {
+      const doc = {}
+      for (const r of memoria.registros.values()) {
+        ;(doc[r.colecao] ||= []).push({ id: r.id, ...(r.rede_id ? { redeId: r.rede_id } : {}), ...r.dados })
+      }
+      await fs.mkdir(path.dirname(ARQ_REGISTROS), { recursive: true })
+      await fs.writeFile(ARQ_REGISTROS, JSON.stringify(doc, null, 2))
+    }
+  })
+  return gravando
+}
+
+await carregarDoDisco()
 
 export const emMemoria = () => !temPostgres()
 export function limparMemoria() {
