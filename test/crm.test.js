@@ -128,3 +128,33 @@ test('cada fase aberta declara critério de saída e meta', () => {
   assert.equal(MOTIVOS_PERDA.length, 6)
   assert.ok(MOTIVOS_PERDA.every((m) => m.id && m.rotulo && m.acao))
 })
+
+test('a feira ganha a coluna que separa "simulou" de "conversamos"', () => {
+  const ids = ESTAGIOS.map((e) => e.id)
+  assert.deepEqual(ids, ['capturado', 'abordado', 'qualificado', 'reuniao',
+                         'levantamento', 'proposta', 'fechado', 'perdido'])
+  // Seis colunas abertas no quadro; fechado e perdido saem dele.
+  assert.equal(ABERTOS.length, 6)
+  // A probabilidade sobe monotonicamente até a proposta: um lead nunca vale
+  // menos por ter avançado.
+  const abertos = ESTAGIOS.filter((e) => !e.final)
+  for (let i = 1; i < abertos.length; i++) {
+    assert.ok(abertos[i].prob > abertos[i - 1].prob,
+      `${abertos[i].id} não vale mais que ${abertos[i - 1].id}`)
+  }
+})
+
+test('abordado tira o lead do atraso de primeiro contato', () => {
+  const antigo = { id: 'x', criadoEm: atras(9), diagnosticos: [] }
+  // Capturado há nove dias sem contato: está fora do prazo.
+  assert.equal(comCrm({ ...antigo, estagio: 'capturado' }).foraDoSla, true)
+  // Movido para abordado, a conversa aconteceu — mesmo sem a data gravada.
+  assert.equal(comCrm({ ...antigo, estagio: 'abordado' }).foraDoSla, false)
+})
+
+test('cada fase aberta tem dica e critério de saída', () => {
+  for (const e of ESTAGIOS.filter((x) => !x.final)) {
+    assert.ok(e.dica, `${e.id} sem dica`)
+    assert.ok(e.saida, `${e.id} sem critério de saída`)
+  }
+})

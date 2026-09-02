@@ -265,13 +265,18 @@ app.post('/api/app/rede', async (req, res, next) => {
 
 app.get('/app/inicio', exigeRede, tela('inicio'))
 
-app.get('/app', async (req, res, next) => {
-  // Consultor sem nenhuma rede cliente ainda tem trabalho: a carteira de
-  // leads é da VOW e não depende de tenant. Mandar para o funil é melhor do
-  // que travar numa tela de escolher rede que não tem o que escolher.
-  if (!req.redesPermitidas.length) return res.redirect('/app/pipeline')
-  next()
-}, exigeRede, async (req, res, next) => {
+/**
+ * A porta de entrada é o CRM da feira.
+ *
+ * O foco agora é a ABRAS: capturar lead e movê-lo. Os três sistemas
+ * (fornecedores, contratos, itens) continuam de pé e acessíveis pelo
+ * endereço próprio, mas não disputam a abertura — abrir no onboarding de um
+ * cliente que ainda não existe é ruído entre o consultor e o trabalho dele.
+ */
+app.get('/app', (_req, res) => res.redirect('/app/pipeline'))
+
+/** O painel dos três sistemas, quando houver base de cliente para mostrar. */
+app.get('/app/rede', exigeRede, async (req, res, next) => {
   try {
     // Rede sem base importada cai no onboarding, não num painel de zeros.
     const fornecedores = await store.listar('fornecedor', req.redeId)
@@ -482,11 +487,10 @@ app.patch('/api/app/crm/leads/:id', async (req, res, next) => {
         if (b.estagio === 'fechado' || b.estagio === 'perdido') {
           mudancas.fechadoEm = new Date().toISOString()
         }
-        // Sair de "capturado" é, por definição, ter falado com a pessoa.
-        if (atual.estagio === undefined || atual.estagio === 'capturado') {
-          if (b.estagio !== 'capturado' && !atual.primeiroContatoEm) {
-            mudancas.primeiroContatoEm = new Date().toISOString()
-          }
+        // Sair de "capturado" é, por definição, ter falado com a pessoa —
+        // e "abordado" é justamente esse momento, nomeado.
+        if (b.estagio !== 'capturado' && !atual.primeiroContatoEm) {
+          mudancas.primeiroContatoEm = new Date().toISOString()
         }
         notas.push(`Fase: ${estagio(atual.estagio).nome} → ${estagio(b.estagio).nome}`)
       }

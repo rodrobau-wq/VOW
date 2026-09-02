@@ -4,9 +4,11 @@
  * Fica num módulo só porque cinco telas usam. Foi exatamente repetindo isto
  * inline que os tokens divergiram em três paletas antes — não repete de novo.
  */
+// Só o CRM da feira. Os três sistemas ficam fora da barra enquanto o foco é
+// a ABRAS — o que não se usa todo dia vira ruído entre o consultor e a tela
+// que ele abre vinte vezes por dia.
 const ABAS = [
   { href: '/app/feira',     rotulo: 'Feira' },
-  { href: '/app',           rotulo: 'Painel' },
   { href: '/app/hoje',      rotulo: 'Hoje' },
   { href: '/app/capturar',  rotulo: 'Capturar' },
   { href: '/app/pipeline',  rotulo: 'Funil' },
@@ -22,7 +24,7 @@ export async function montarNav(atual) {
   const el = document.createElement('div')
   el.className = 'appbar'
   el.innerHTML = `
-    <a class="marca" href="/app" style="text-decoration:none;color:inherit">
+    <a class="marca" href="/app/pipeline" style="text-decoration:none;color:inherit">
       <span class="caduceu">V</span>
       <span><span class="nome">VOW</span><span class="sob">Plataforma</span></span>
     </a>

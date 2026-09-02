@@ -11,15 +11,33 @@
  * fila de quem atender primeiro.
  */
 
-/** Fase sem critério de saída não é pipeline, é lista de desejos. */
+/**
+ * Fase sem critério de saída não é pipeline, é lista de desejos.
+ *
+ * `Abordado` existe por causa da feira. Durante o evento, a distinção que
+ * decide tudo não é entre qualificado e proposta — é entre **quem simulou no
+ * totem sem ninguém falar** e **quem a gente conversou**. Sem essa coluna, o
+ * quadro do estande mostra uma pilha só e o consultor não sabe para quem ir.
+ * Fora da feira ela continua servindo: separa contato feito de contato
+ * pendente.
+ */
 export const ESTAGIOS = [
-  { id: 'capturado',  n: '01', nome: 'Capturado',       saida: 'Alguém da VOW falou com a pessoa.',                    metaDias: 2,  prob: 0.05 },
-  { id: 'qualificado',n: '02', nome: 'Qualificado',     saida: 'Porte acima do mínimo e acesso ao decisor.',           metaDias: 7,  prob: 0.15 },
-  { id: 'reuniao',    n: '03', nome: 'Reunião marcada', saida: 'Reunião aconteceu e autorizou o levantamento.',        metaDias: 14, prob: 0.30 },
-  { id: 'levantamento', n: '04', nome: 'Levantamento',  saida: 'Número real apurado e apresentado.',                   metaDias: 30, prob: 0.50 },
-  { id: 'proposta',   n: '05', nome: 'Proposta',        saida: 'Resposta do cliente — sim ou não, mas resposta.',      metaDias: 21, prob: 0.70 },
-  { id: 'fechado',    n: '06', nome: 'Fechado',         saida: null, metaDias: null, prob: 1, final: true },
-  { id: 'perdido',    n: '06', nome: 'Perdido',         saida: null, metaDias: null, prob: 0, final: true },
+  { id: 'capturado',   n: '01', nome: 'Capturado',       saida: 'Alguém da VOW falou com a pessoa.',               metaDias: 2,  prob: 0.03,
+    dica: 'Simulou no totem ou deixou o cartão. Ninguém falou ainda.' },
+  { id: 'abordado',    n: '02', nome: 'Abordado',        saida: 'Porte confere e há acesso a quem decide.',        metaDias: 3,  prob: 0.10,
+    dica: 'Conversamos. Ainda não se sabe se compensa.' },
+  { id: 'qualificado', n: '03', nome: 'Qualificado',     saida: 'Reunião marcada com data.',                       metaDias: 7,  prob: 0.20,
+    dica: 'Vale a pena e dá para chegar em quem decide.' },
+  { id: 'reuniao',     n: '04', nome: 'Reunião marcada', saida: 'Reunião aconteceu e autorizou o levantamento.',   metaDias: 14, prob: 0.35,
+    dica: 'Data no calendário para apresentar o número real.' },
+  { id: 'levantamento',n: '05', nome: 'Levantamento',    saida: 'Número real apurado e apresentado.',              metaDias: 30, prob: 0.55,
+    dica: 'Varredura de 12 meses. É aqui que a VOW gasta hora antes de faturar.' },
+  { id: 'proposta',    n: '06', nome: 'Proposta',        saida: 'Resposta do cliente — sim ou não, mas resposta.', metaDias: 21, prob: 0.70,
+    dica: 'Escopo e honorário na mesa.' },
+  { id: 'fechado',     n: '07', nome: 'Fechado',         saida: null, metaDias: null, prob: 1, final: true,
+    dica: 'Contrato assinado.' },
+  { id: 'perdido',     n: '07', nome: 'Perdido',         saida: null, metaDias: null, prob: 0, final: true,
+    dica: 'Com motivo registrado.' },
 ]
 
 export const ESTAGIO_PADRAO = 'capturado'
@@ -69,7 +87,8 @@ export function comCrm(lead) {
   const prob = est.final ? est.prob : (lead.probabilidade ?? est.prob)
 
   // Fora do prazo: capturado há mais de 48 h e ninguém falou com ele ainda.
-  const semContato = !lead.primeiroContatoEm
+  // Só a fase `capturado` conta — a partir de `abordado` a conversa já houve.
+  const semContato = !lead.primeiroContatoEm && est.id === 'capturado'
   const foraDoSla = semContato && !est.final &&
     agora() - ts(lead.criadoEm) > SLA_PRIMEIRO_CONTATO_H * HORA
 
