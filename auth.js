@@ -16,6 +16,10 @@ import * as store from './store.js'
 const COOKIE = 'vow_sess'
 const DURACAO_MS = 12 * 60 * 60 * 1000 // um dia de trabalho
 const MAGIC_MS = 15 * 60 * 1000
+const SENHA_MS = 30 * 60 * 1000        // redefinir senha exige achar o e-mail
+
+/** Piso de tamanho. Não é política de segurança, é o mínimo defensável. */
+export const SENHA_MINIMA = 10
 
 /** Papéis do brief. `vow` é o consultor, e enxerga todas as redes. */
 export const PAPEIS = ['comprador', 'fiscal', 'juridico', 'suprimentos', 'diretoria', 'vow']
@@ -106,6 +110,35 @@ export function gerarLinkMagico(usuarioId) {
 export function lerLinkMagico(token) {
   const p = verificar(token)
   return p?.magico ? p : null
+}
+
+/* ------------------------------------------------ redefinição de senha */
+
+/**
+ * Impressão digital da senha atual. Ela entra no token de redefinição, e é o
+ * que torna o link de uso único sem guardar estado: assim que a senha muda, o
+ * hash muda, a digital não confere mais e o link morre — inclusive se alguém
+ * tiver interceptado o e-mail e tentar usar depois.
+ */
+const digital = (senhaHash) =>
+  crypto.createHash('sha256').update(String(senhaHash || '')).digest('base64url').slice(0, 16)
+
+export function gerarLinkSenha(usuario) {
+  return assinar({
+    usuarioId: usuario.id,
+    senha: true,
+    dg: digital(usuario.senhaHash),
+    exp: Date.now() + SENHA_MS,
+  })
+}
+
+/** Devolve o payload só se o token for de senha E a senha não tiver mudado. */
+export function lerLinkSenha(token, usuario) {
+  const p = verificar(token)
+  if (!p?.senha) return null
+  if (!usuario || p.usuarioId !== usuario.id) return null
+  if (p.dg !== digital(usuario.senhaHash)) return null
+  return p
 }
 
 /* ------------------------------------------------------------- middlewares */

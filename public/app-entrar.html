@@ -49,13 +49,19 @@
       <label for="email">E-mail</label>
       <input id="email" type="email" autocomplete="username" placeholder="voce@suarede.com.br" required>
       <label for="senha">Senha</label>
-      <input id="senha" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      <span class="senha-campo">
+        <input id="senha" type="password" autocomplete="current-password" placeholder="••••••••" required>
+        <button type="button" class="olho" id="olho" aria-pressed="false" aria-label="Mostrar a senha"
+                aria-controls="senha"></button>
+      </span>
       <button class="btn lg" id="btn" type="submit">Entrar</button>
     </form>
 
     <div class="msg" id="msg" role="status" aria-live="polite"></div>
 
     <div class="alt">
+      <button type="button" id="esqueci">Esqueci minha senha</button>
+      <span style="color:var(--faint);margin:0 8px">·</span>
       <button type="button" id="magico">Entrar por link no e-mail</button>
     </div>
     <div class="volta"><a href="/">← Voltar ao site</a></div>
@@ -63,6 +69,27 @@
 
 <script type="module">
 const $ = (id) => document.getElementById(id)
+
+/* --------------------------------------------------------- olhinho */
+const OLHO = {
+  fechado: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>',
+  aberto: '<svg viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/><path d="M3.5 3.5l17 17"/></svg>',
+}
+function ligarOlho(botao, campo) {
+  const pintar = () => {
+    const visivel = campo.type === 'text'
+    botao.innerHTML = visivel ? OLHO.aberto : OLHO.fechado
+    botao.setAttribute('aria-pressed', String(visivel))
+    botao.setAttribute('aria-label', visivel ? 'Ocultar a senha' : 'Mostrar a senha')
+  }
+  botao.addEventListener('click', () => {
+    campo.type = campo.type === 'password' ? 'text' : 'password'
+    pintar()
+    campo.focus()
+  })
+  pintar()
+}
+ligarOlho($('olho'), $('senha'))
 const msg = (texto, ok = false) => { $('msg').innerHTML = texto; $('msg').className = 'msg' + (ok ? ' ok' : '') }
 
 if (new URLSearchParams(location.search).get('erro') === 'link') {
@@ -85,6 +112,19 @@ $('f').addEventListener('submit', async (e) => {
     msg(err.message)
     $('btn').disabled = false
   }
+})
+
+$('esqueci').addEventListener('click', async () => {
+  const email = $('email').value.trim()
+  if (!email) return msg('Informe o e-mail para receber o link.')
+  const r = await fetch('/api/app/senha/esqueci', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+  const j = await r.json()
+  // Sem Resend configurado o link volta na resposta, para o time não ficar
+  // trancado para fora da própria plataforma.
+  msg(j.mensagem + (j.link ? `<a href="${j.link}">${j.link}</a>` : ''), true)
 })
 
 $('magico').addEventListener('click', async () => {

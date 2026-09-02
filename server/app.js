@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url'
 
 import * as store from '../store.js'
 import crypto from 'node:crypto'
+import { baseUrl } from '../lib-url.js'
 import { lerLeads, atualizarLead, gravarLead, porCapturaId } from '../leads-db.js'
 import { temPostgres } from '../db.js'
 import { diagnosticar } from '../motor.js'
@@ -17,11 +18,12 @@ import {
   ESTAGIOS, MOTIVOS_PERDA, TIPOS_INTERACAO, SLA_PRIMEIRO_CONTATO_H,
   comCrm, ehEstagio, ehMotivo, estagio, montarPipeline, montarResultado, montarHoje,
 } from '../crm.js'
-import { baseUrl } from '../lib-url.js'
+
 import { montarPainel, CLASSES_CREDITO, RISCOS, CALENDARIO } from '../painel.js'
 import {
-  abrirSessao, fecharSessao, carregaContexto, conferirSenha,
+  abrirSessao, fecharSessao, carregaContexto, conferirSenha, hashSenha,
   exigeLogin, exigeRede, gerarLinkMagico, lerLinkMagico, lerSessao,
+  gerarLinkSenha, lerLinkSenha, SENHA_MINIMA,
 } from '../auth.js'
 
 const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -102,6 +104,68 @@ app.get('/app/entrar/:token', async (req, res, next) => {
       : usuario.redes || []
     abrirSessao(res, { usuarioId: usuario.id, redeId: redes.length === 1 ? redes[0] : null })
     res.redirect(redes.length === 1 ? '/app' : '/app/redes')
+  } catch (e) { next(e) }
+})
+
+/* ------------------------------------------------ esqueci minha senha */
+
+/**
+ * Pede o link de redefinição. A resposta é sempre a mesma, exista ou não o
+ * e-mail — senão a tela vira um verificador de quem é cliente da VOW.
+ */
+app.post('/api/app/senha/esqueci', async (req, res, next) => {
+  try {
+    const email = String(req.body?.email || '').trim().toLowerCase()
+    const resposta = { ok: true, mensagem: 'Se este e-mail tiver acesso, o link chega em instantes. Ele vale por 30 minutos.' }
+    const usuario = await store.achar('usuario', (u) => u.email === email)
+    if (!usuario) return res.json(resposta)
+
+    const base = baseUrl(req)
+    const link = `${base}/app/senha/${gerarLinkSenha(usuario)}`
+
+    if (!process.env.RESEND_API_KEY) {
+      // Sem e-mail configurado o link volta na resposta: melhor do que
+      // deixar o time trancado para fora da própria plataforma.
+      resposta.link = link
+    } else {
+      const { Resend } = await import('resend')
+      await new Resend(process.env.RESEND_API_KEY).emails.send({
+        from: process.env.MAIL_FROM || 'VOW <onboarding@resend.dev>',
+        to: [usuario.email],
+        subject: 'Redefinir sua senha da plataforma VOW',
+        text: `Para escolher uma senha nova, abra o link abaixo. Ele vale por 30 minutos e só funciona uma vez.\n\n${link}\n\nSe não foi você que pediu, ignore: sua senha atual continua valendo.`,
+      })
+    }
+    res.json(resposta)
+  } catch (e) { next(e) }
+})
+
+app.get('/app/senha/:token', tela('senha'))
+
+app.post('/api/app/senha/redefinir', async (req, res, next) => {
+  try {
+    const token = String(req.body?.token || '')
+    const senha = String(req.body?.senha || '')
+
+    // Descobre de quem é o token antes de validar a digital da senha.
+    const bruto = token.split('.')[0]
+    let usuarioId = null
+    try {
+      usuarioId = JSON.parse(Buffer.from(bruto, 'base64url').toString()).usuarioId
+    } catch { /* token deformado cai no erro padrão abaixo */ }
+
+    const usuario = usuarioId ? await store.porId('usuario', usuarioId) : null
+    if (!lerLinkSenha(token, usuario)) {
+      return res.status(400).json({ erro: 'Este link expirou ou já foi usado. Peça outro.' })
+    }
+    if (senha.length < SENHA_MINIMA) {
+      return res.status(400).json({ erro: `A senha precisa de ao menos ${SENHA_MINIMA} caracteres.` })
+    }
+
+    // Trocar o hash invalida o próprio link que trouxe a pessoa até aqui.
+    await store.atualizar('usuario', usuario.id, { senhaHash: hashSenha(senha) })
+    abrirSessao(res, { usuarioId: usuario.id, redeId: null })
+    res.json({ ok: true, destino: '/app' })
   } catch (e) { next(e) }
 })
 

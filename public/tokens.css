@@ -218,3 +218,17 @@ body.paper .chip[aria-pressed="true"]{color:var(--surface)}
   .appbar .quem{display:none}
   .appbar .abas{order:3;flex-basis:100%}
 }
+
+/* ------------------------------------------------- campo de senha */
+/* O olho fica dentro do campo. `type=button` é obrigatório: dentro de um
+   form, um button sem type envia o formulário ao ser clicado. */
+.senha-campo{position:relative;display:block}
+.senha-campo input{padding-right:52px;width:100%}
+.senha-campo .olho{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;display:grid;place-items:center;
+  background:none;border:0;border-radius:50%;cursor:pointer;color:var(--muted);
+}
+.senha-campo .olho:hover{color:var(--gold)}
+.senha-campo .olho svg{width:20px;height:20px;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
