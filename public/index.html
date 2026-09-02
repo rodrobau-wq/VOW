@@ -372,6 +372,7 @@ window.enviar = async () => {
         faturamento: est.faturamento,
         percentualVerba: est.percentualVerba,
         percentualBase: est.percentualBase,
+        origem: est.origem,
       }),
     })
     const j = await r.json()
@@ -441,7 +442,16 @@ window.reiniciar = () => {
   ir('abertura')
 }
 
-ir('abertura')
+// Deep-link da landing: /totem?d=revenda abre já na simulação daquele produto.
+// Sem o parâmetro, o totem começa na abertura, como no estande.
+const _q = new URLSearchParams(location.search)
+// origem separa lead de feira de lead orgânico do site. O totem do estande
+// roda com ?e=abras; a landing manda ?e=site.
+est.origem = (_q.get('e') || 'site').slice(0, 40)
+if (est.origem === 'abras') document.body.dataset.origem = 'abras'
+const _d = _q.get('d')
+if (_d === 'revenda' || _d === 'indiretos') escolher(_d)
+else ir('abertura')
 </script>
 </body>
 </html>

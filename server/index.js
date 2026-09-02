@@ -117,7 +117,7 @@ app.post('/api/simular', (req, res, next) => {
 
 app.post('/api/lead', async (req, res, next) => {
   try {
-    const { nome, empresa, email, telefone, tipos } = req.body || {}
+    const { nome, empresa, email, telefone, tipos, origem } = req.body || {}
     if (!email || !EMAIL_RE.test(String(email))) {
       return res.status(400).json({ erro: 'e-mail inválido' })
     }
@@ -137,6 +137,9 @@ app.post('/api/lead', async (req, res, next) => {
       empresa: String(empresa || '').slice(0, 160),
       email: String(email).slice(0, 200),
       telefone: String(telefone || '').slice(0, 40),
+      // De onde veio: 'abras' no estande, 'site' na landing. É o corte que o
+      // comercial mais usa depois da feira.
+      origem: String(origem || 'site').slice(0, 40),
       faturamento: entrada.faturamento,
       // "fez os dois" é o sinal comercial que a plataforma exibe.
       fezOsDois: diagnosticos.length > 1,
@@ -175,10 +178,11 @@ app.get('/api/leads.csv', protegido, async (_req, res, next) => {
     const leads = await lerLeads()
     const campo = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
     const linhas = [
-      ['criado_em', 'nome', 'empresa', 'email', 'telefone', 'faturamento', 'fez_os_dois', 'revenda', 'indiretos', 'email_enviado'].join(','),
+      ['criado_em', 'origem', 'nome', 'empresa', 'email', 'telefone', 'faturamento', 'fez_os_dois', 'revenda', 'indiretos', 'email_enviado'].join(','),
       ...leads.map((l) =>
         [
           l.criadoEm,
+          l.origem || 'site',
           l.nome,
           l.empresa,
           l.email,
