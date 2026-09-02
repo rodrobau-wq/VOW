@@ -14,7 +14,7 @@ import { baseUrl } from '../lib-url.js'
 import { lerLeads, atualizarLead, gravarLead, porCapturaId } from '../leads-db.js'
 import { temPostgres } from '../db.js'
 import { protegido } from '../basic-auth.js'
-import { diagnosticar } from '../motor.js'
+import { diagnosticar, PREMISSAS } from '../motor.js'
 import { enviarEmail, emailAcesso } from '../email.js'
 import {
   ESTAGIOS, MOTIVOS_PERDA, TIPOS_INTERACAO, SLA_PRIMEIRO_CONTATO_H,
@@ -219,8 +219,35 @@ app.get('/api/app/contexto', async (req, res, next) => {
   } catch (e) { next(e) }
 })
 
+/**
+ * Cadastra uma rede cliente. Não havia como criar nenhuma pela plataforma: a
+ * única origem era o script de seed, que não roda em produção. Quem entrasse
+ * numa instalação limpa caía numa tela de escolher rede sem rede nenhuma para
+ * escolher, e sem saída.
+ */
+app.post('/api/app/redes', async (req, res, next) => {
+  try {
+    if (req.usuario.papel !== 'vow') return res.status(403).json({ erro: 'acesso restrito' })
+    const razao = String(req.body?.razao || '').trim().slice(0, 160)
+    if (!razao) return res.status(400).json({ erro: 'Informe o nome da rede.' })
+
+    const rede = await store.inserir('rede', {
+      razao,
+      cnpj: String(req.body?.cnpj || '').slice(0, 20),
+      porte: String(req.body?.porte || '').slice(0, 60),
+      plano: String(req.body?.plano || 'piloto').slice(0, 40),
+      programaConformidade: req.body?.programaConformidade === true,
+      // Cada rede carrega as premissas dela. Nunca hardcode premissa fora daqui.
+      premissas: { aliquota: PREMISSAS.aliquota, parcelaCestaBasica: PREMISSAS.indiretos.parcelaCestaBasicaPadrao },
+    })
+    abrirSessao(res, { usuarioId: req.usuario.id, redeId: rede.id })
+    res.json({ ok: true, id: rede.id, destino: '/app' })
+  } catch (e) { next(e) }
+})
+
 app.get('/app/redes', (req, res, next) => {
-  // Escolher rede só faz sentido para quem atende mais de uma.
+  // Escolher rede só faz sentido para quem atende mais de uma. Com nenhuma,
+  // a tela vira o cadastro da primeira.
   if (req.redesPermitidas.length === 1) return res.redirect('/app')
   tela('redes')(req, res, next)
 })
@@ -238,7 +265,13 @@ app.post('/api/app/rede', async (req, res, next) => {
 
 app.get('/app/inicio', exigeRede, tela('inicio'))
 
-app.get('/app', exigeRede, async (req, res, next) => {
+app.get('/app', async (req, res, next) => {
+  // Consultor sem nenhuma rede cliente ainda tem trabalho: a carteira de
+  // leads é da VOW e não depende de tenant. Mandar para o funil é melhor do
+  // que travar numa tela de escolher rede que não tem o que escolher.
+  if (!req.redesPermitidas.length) return res.redirect('/app/pipeline')
+  next()
+}, exigeRede, async (req, res, next) => {
   try {
     // Rede sem base importada cai no onboarding, não num painel de zeros.
     const fornecedores = await store.listar('fornecedor', req.redeId)
