@@ -73,6 +73,76 @@ function blocoIndiretos(d) {
   }
 }
 
+/**
+ * Envio genérico. Todo e-mail do produto sai por aqui, com o mesmo remetente
+ * e o mesmo responder-para do diagnóstico — antes as mensagens de acesso
+ * montavam o cliente do Resend por conta própria e esqueciam o replyTo, então
+ * a resposta do cliente caía no vazio.
+ */
+export async function enviarEmail({ para, assunto, html, texto }) {
+  const r = resend()
+  if (!r) return { enviado: false, motivo: 'RESEND_API_KEY ausente' }
+  try {
+    const { data, error } = await r.emails.send({
+      from: FROM, to: [para], replyTo: REPLY_TO, subject: assunto, html, text: texto,
+    })
+    if (error) return { enviado: false, motivo: error.message || String(error) }
+    return { enviado: true, id: data?.id }
+  } catch (e) {
+    return { enviado: false, motivo: e.message }
+  }
+}
+
+/**
+ * E-mail de acesso à plataforma: redefinir senha ou entrar sem senha.
+ * Mesma identidade do diagnóstico, para não parecer phishing — é justamente
+ * a mensagem em que a pessoa desconfia de link.
+ */
+export function emailAcesso({ nome, link, tipo, minutos }) {
+  const redefinir = tipo === 'senha'
+  const titulo = redefinir ? 'Redefinir sua senha' : 'Entrar na plataforma'
+  const chamada = redefinir ? 'Escolher uma senha nova' : 'Entrar na plataforma'
+  const explica = redefinir
+    ? `Você pediu para trocar a senha da plataforma VOW. O link abaixo vale por ${minutos} minutos e funciona uma única vez.`
+    : `Use o link abaixo para entrar sem senha. Ele vale por ${minutos} minutos.`
+  const rodape = redefinir
+    ? 'Se não foi você que pediu, ignore este e-mail: a sua senha atual continua valendo.'
+    : 'Se não foi você que pediu, ignore este e-mail.'
+
+  // "Rodrigo, Você pediu" fica errado: depois da vírgula a frase continua.
+  const abre = (frase) => nome ? esc(nome) + ', ' + frase[0].toLowerCase() + frase.slice(1) : frase
+
+  const html = `<!doctype html><html lang="pt-BR"><body style="margin:0;background:#FAF9F7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <table width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
+    <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border:1px solid ${COR.line}">
+      <tr><td style="background:${COR.ink};padding:22px 32px">
+        <div style="color:#fff;font-size:17px;font-weight:700">Grupo VOW</div>
+        <div style="color:${COR.gold};font-size:10px;letter-spacing:.14em;text-transform:uppercase;margin-top:2px">Plataforma</div>
+      </td></tr>
+      <tr><td style="padding:32px">
+        <div style="font-size:24px;font-weight:700;color:${COR.ink};margin-bottom:14px">${esc(titulo)}</div>
+        <p style="margin:0 0 26px;font-size:15px;color:${COR.storm};line-height:1.6">
+          ${esc(abre(explica))}
+        </p>
+        <table cellpadding="0" cellspacing="0"><tr><td style="background:${COR.gold};padding:14px 28px">
+          <a href="${esc(link)}" style="color:#fff;font-size:15px;font-weight:600;text-decoration:none">${esc(chamada)}</a>
+        </td></tr></table>
+        <p style="margin:24px 0 0;font-size:12.5px;color:${COR.storm};line-height:1.6">
+          Se o botão não abrir, copie este endereço:<br>
+          <span style="word-break:break-all;color:${COR.gold}">${esc(link)}</span>
+        </p>
+        <p style="margin:24px 0 0;font-size:13px;color:${COR.storm};line-height:1.6">${esc(rodape)}</p>
+      </td></tr>
+      <tr><td style="background:#FAF9F7;border-top:1px solid ${COR.line};padding:18px 32px;font-size:12px;color:${COR.storm}">
+        Grupo VOW · A inteligência tributária que alimenta o Brasil
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>`
+
+  const texto = `${abre(explica)}\n\n${link}\n\n${rodape}\n\nGrupo VOW`
+  return { assunto: redefinir ? 'Redefinir sua senha da plataforma VOW' : 'Seu acesso à plataforma VOW', html, texto }
+}
+
 export function montarHtml({ nome, empresa, diagnosticos }) {
   const blocos = diagnosticos.map((d) => (d.tipo === 'revenda' ? blocoRevenda(d) : blocoIndiretos(d)))
   const ambos = blocos.length > 1

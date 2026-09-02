@@ -14,6 +14,7 @@ import { baseUrl } from '../lib-url.js'
 import { lerLeads, atualizarLead, gravarLead, porCapturaId } from '../leads-db.js'
 import { temPostgres } from '../db.js'
 import { diagnosticar } from '../motor.js'
+import { enviarEmail, emailAcesso } from '../email.js'
 import {
   ESTAGIOS, MOTIVOS_PERDA, TIPOS_INTERACAO, SLA_PRIMEIRO_CONTATO_H,
   comCrm, ehEstagio, ehMotivo, estagio, montarPipeline, montarResultado, montarHoje,
@@ -78,16 +79,11 @@ app.post('/api/app/link-magico', async (req, res, next) => {
     const base = baseUrl(req)
     const link = `${base}/app/entrar/${token}`
 
-    if (!process.env.RESEND_API_KEY) resposta.link = link
-    else {
-      const { Resend } = await import('resend')
-      await new Resend(process.env.RESEND_API_KEY).emails.send({
-        from: process.env.MAIL_FROM || 'VOW <onboarding@resend.dev>',
-        to: [usuario.email],
-        subject: 'Seu acesso à plataforma VOW',
-        text: `Entre pelo link abaixo. Ele vale por 15 minutos.\n\n${link}\n\nSe não foi você, ignore.`,
-      })
-    }
+    const peca = emailAcesso({ nome: usuario.nome, link, tipo: 'magico', minutos: 15 })
+    const envio = await enviarEmail({ para: usuario.email, assunto: peca.assunto, html: peca.html, texto: peca.texto })
+    // Sem e-mail configurado o link volta na resposta: melhor do que deixar
+    // o time trancado para fora da própria plataforma.
+    if (!envio.enviado) resposta.link = link
     res.json(resposta)
   } catch (e) { next(e) }
 })
@@ -123,19 +119,10 @@ app.post('/api/app/senha/esqueci', async (req, res, next) => {
     const base = baseUrl(req)
     const link = `${base}/app/senha/${gerarLinkSenha(usuario)}`
 
-    if (!process.env.RESEND_API_KEY) {
-      // Sem e-mail configurado o link volta na resposta: melhor do que
-      // deixar o time trancado para fora da própria plataforma.
-      resposta.link = link
-    } else {
-      const { Resend } = await import('resend')
-      await new Resend(process.env.RESEND_API_KEY).emails.send({
-        from: process.env.MAIL_FROM || 'VOW <onboarding@resend.dev>',
-        to: [usuario.email],
-        subject: 'Redefinir sua senha da plataforma VOW',
-        text: `Para escolher uma senha nova, abra o link abaixo. Ele vale por 30 minutos e só funciona uma vez.\n\n${link}\n\nSe não foi você que pediu, ignore: sua senha atual continua valendo.`,
-      })
-    }
+    const peca = emailAcesso({ nome: usuario.nome, link, tipo: 'senha', minutos: 30 })
+    const envio = await enviarEmail({ para: usuario.email, assunto: peca.assunto, html: peca.html, texto: peca.texto })
+    // Sem e-mail configurado o link volta na resposta.
+    if (!envio.enviado) resposta.link = link
     res.json(resposta)
   } catch (e) { next(e) }
 })
