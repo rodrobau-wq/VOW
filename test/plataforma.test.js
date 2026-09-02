@@ -3,16 +3,13 @@
  */
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import fs from 'node:fs/promises'
-import os from 'node:os'
-import path from 'node:path'
-
-process.env.APP_DB = path.join(os.tmpdir(), `vow-test-${process.pid}.json`)
+// Sem DATABASE_URL, db.js usa memória: o teste não depende de banco de pé
+// e não deixa arquivo nenhum na máquina.
+delete process.env.DATABASE_URL
 const store = await import('../store.js')
 const { hashSenha, conferirSenha } = await import('../auth.js')
 const { montarPainel, creditoEsperado } = await import('../painel.js')
 
-test.after(() => fs.rm(process.env.APP_DB, { force: true }))
 
 test('verificacao é append-only: atualizar é recusado', async () => {
   const rede = await store.inserir('rede', { razao: 'Teste' })

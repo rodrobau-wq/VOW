@@ -4,20 +4,12 @@
  */
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import fs from 'node:fs/promises'
-import os from 'node:os'
-import path from 'node:path'
-
-const tmp = path.join(os.tmpdir(), `vow-cap-${process.pid}`)
-process.env.LEADS_DB = path.join(tmp, 'leads.json')
-process.env.APP_DB = path.join(tmp, 'db.json')
-
+delete process.env.DATABASE_URL
 const { capturar } = await import('../server/app.js')
 const { lerLeads } = await import('../leads-db.js')
 const store = await import('../store.js')
 
 const eu = { nome: 'Rodrigo Bauer' }
-test.after(() => fs.rm(tmp, { recursive: true, force: true }))
 
 test('reenvio com o mesmo capturaId não cria lead novo', async () => {
   const captura = { capturaId: 'abc-123', nome: 'Marina', telefone: '51999990000', origem: 'abras' }

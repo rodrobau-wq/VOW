@@ -8,17 +8,20 @@
  * declarado, CNPJ pago sem contrato, item sem alíquota efetiva. É justamente
  * o que está faltando que o painel precisa saber mostrar.
  */
-import fs from 'node:fs/promises'
-import path from 'node:path'
 import * as store from '../store.js'
 import { hashSenha } from '../auth.js'
+import { consulta, temPostgres } from '../db.js'
 
 const SENHA = process.env.SEED_PASSWORD || 'vow-piloto'
-const ARQUIVO = process.env.APP_DB || path.join(process.cwd(), 'data', 'db.json')
 
 if (process.argv.includes('--forcar')) {
-  await fs.rm(ARQUIVO, { force: true })
-  store.esquecerCache()
+  if (!temPostgres) {
+    console.error('Sem DATABASE_URL não há o que apagar: os dados vivem na memória do processo.')
+    process.exit(1)
+  }
+  // Apaga só o que o seed cria. Leads capturados nunca entram nesta conta.
+  await consulta('delete from registros')
+  console.log('Registros da plataforma apagados. Leads preservados.')
 }
 if (!(await store.vazio())) {
   console.log('Já existe base. Use --forcar para recriar.')

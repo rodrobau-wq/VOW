@@ -1,5 +1,13 @@
 # Blueprint do Render — https://render.com/docs/blueprint-spec
 # Deploy: New > Blueprint > aponte para github.com/rodrobau-wq/VOW
+
+databases:
+  - name: vow-db
+    databaseName: vow
+    user: vow
+    plan: basic-256mb
+    postgresMajorVersion: "16"
+
 services:
   - type: web
     name: vow-abras
@@ -12,9 +20,10 @@ services:
     healthCheckPath: /healthz
     autoDeploy: true
 
-    # Leads gravam em arquivo. Sem disco o Render zera o conteúdo a cada
-    # redeploy — para uma feira de três dias isso é inaceitável, então o
-    # disco é parte do blueprint, não um extra. Exige plano pago.
+    # O disco continua montado só enquanto a migração para o Postgres não
+    # tiver rodado em produção. Os leads capturados antes da troca moram nele,
+    # e o boot os importa uma única vez. Remover o disco antes disso apaga
+    # captura de cliente. Depois de confirmada a migração, este bloco sai.
     disk:
       name: vow-data
       mountPath: /var/data
@@ -23,23 +32,23 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "20"
+      - key: NODE_ENV
+        value: production
+      # A persistência agora é banco. As duas variáveis abaixo só apontam
+      # para os arquivos antigos, que a migração lê uma vez.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vow-db
+          property: connectionString
       - key: LEADS_DB
         value: /var/data/leads.json
-      # A base da plataforma (redes, usuários, fornecedores) mora no disco.
-      # Sem isto ela nasceria no filesystem efêmero e sumiria a cada deploy.
       - key: APP_DB
         value: /var/data/db.json
       # Assina o cookie de sessão. Gerado uma vez pelo Render e mantido entre
       # deploys — se mudar, todo mundo é deslogado.
       - key: SESSION_SECRET
         generateValue: true
-      - key: NODE_ENV
-        value: production
-      # PUBLIC_BASE_URL fica de fora de propósito. `fromService property: host`
-      # devolve o hostname INTERNO ("vow-abras", sem domínio) e quebrava o QR
-      # do totem. O Render injeta RENDER_EXTERNAL_URL sozinho, e é dela que
-      # lib-url.js parte. Só defina PUBLIC_BASE_URL ao ligar domínio próprio.
-      # Definir no dashboard do Render (marcados como sync:false = não versionados)
+      # Definir no dashboard do Render (sync:false = não versionados)
       - key: RESEND_API_KEY
         sync: false
       - key: MAIL_FROM

@@ -1,57 +1,89 @@
 /**
  * Persistência dos leads — a carteira comercial da própria VOW.
  *
- * Fica fora do store.js de propósito: aquele é multi-tenant e escopa tudo por
- * `redeId`, e lead não pertence a rede nenhuma. Lead é da VOW até virar
- * cliente.
- *
- * A fila serializa as escritas: o arquivo inteiro é reescrito a cada uma, e
- * durante a feira o totem e o CRM gravam ao mesmo tempo.
+ * Tabela separada de `registros` porque lead não pertence a rede nenhuma:
+ * é da VOW até virar cliente. E porque `captura_id` precisa de restrição de
+ * unicidade no banco — é ela que impede a fila offline de criar o mesmo lead
+ * quatro vezes quando o sinal do pavilhão oscila. Antes isso dependia de ler
+ * antes de escrever, o que falha com dois aparelhos sincronizando juntos.
  */
-import fs from 'node:fs/promises'
-import path from 'node:path'
+import { consulta, preparar, emMemoria, tabelaMemoria } from './db.js'
 
-const ARQUIVO = process.env.LEADS_DB || path.join(process.cwd(), 'data', 'leads.json')
-let fila = Promise.resolve()
+const doc = (r) => ({ id: r.id, ...r.dados })
 
 export async function lerLeads() {
+  if (emMemoria()) {
+    return [...tabelaMemoria('leads').values()].map(doc)
+      .sort((a, b) => String(a.criadoEm).localeCompare(String(b.criadoEm)))
+  }
+  await preparar()
+  const r = await consulta('select * from leads order by criado_em')
+  return r.rows.map(doc)
+}
+
+export async function porCapturaId(capturaId) {
+  if (!capturaId) return null
+  if (emMemoria()) {
+    return [...tabelaMemoria('leads').values()].map(doc)
+      .find((l) => l.capturaId === capturaId) || null
+  }
+  await preparar()
+  const r = await consulta('select * from leads where captura_id = $1', [capturaId])
+  return r.rowCount ? doc(r.rows[0]) : null
+}
+
+export async function gravarLead(lead) {
+  const { id, ...dados } = lead
+  if (emMemoria()) {
+    tabelaMemoria('leads').set(id, { id, dados })
+    return lead
+  }
+  await preparar()
   try {
-    return JSON.parse(await fs.readFile(ARQUIVO, 'utf8'))
+    const r = await consulta(
+      `insert into leads (id, captura_id, criado_em, origem, dados)
+       values ($1,$2,$3,$4,$5)
+       on conflict (id) do update set dados = excluded.dados, origem = excluded.origem
+       returning *`,
+      [id, lead.capturaId || null, lead.criadoEm || new Date().toISOString(), lead.origem || null, dados])
+    return doc(r.rows[0])
   } catch (e) {
-    if (e.code === 'ENOENT') return []
+    /**
+     * 23505 é violação de unicidade. `on conflict (id)` acima não cobre o
+     * caso de dois ids diferentes com o mesmo `captura_id` — que é
+     * exatamente o que acontece quando dois aparelhos sincronizam a mesma
+     * captura ao mesmo tempo e a checagem anterior perde a corrida.
+     * A restrição do banco decide, e devolvemos o lead que já existe.
+     */
+    if (e.code === '23505' && lead.capturaId) {
+      const existente = await porCapturaId(lead.capturaId)
+      if (existente) return existente
+    }
     throw e
   }
 }
 
-export function gravarLead(lead) {
-  fila = fila.then(async () => {
-    const leads = await lerLeads()
-    const i = leads.findIndex((l) => l.id === lead.id)
-    if (i >= 0) leads[i] = lead
-    else leads.push(lead)
-    await fs.mkdir(path.dirname(ARQUIVO), { recursive: true })
-    await fs.writeFile(ARQUIVO, JSON.stringify(leads, null, 2))
-  })
-  return fila
-}
-
-/**
- * Aplica mudanças a um lead existente. Devolve o lead atualizado, ou null se
- * não existir — quem chama decide se isso é 404.
- */
 export async function atualizarLead(id, mudancas) {
-  let saida = null
-  fila = fila.then(async () => {
-    const leads = await lerLeads()
-    const i = leads.findIndex((l) => l.id === id)
-    if (i < 0) return
-    leads[i] = { ...leads[i], ...mudancas, atualizadoEm: new Date().toISOString() }
-    saida = leads[i]
-    await fs.mkdir(path.dirname(ARQUIVO), { recursive: true })
-    await fs.writeFile(ARQUIVO, JSON.stringify(leads, null, 2))
-  })
-  await fila
-  return saida
+  const atualizadoEm = new Date().toISOString()
+  if (emMemoria()) {
+    const r = tabelaMemoria('leads').get(id)
+    if (!r) return null
+    r.dados = { ...r.dados, ...mudancas, atualizadoEm }
+    return doc(r)
+  }
+  await preparar()
+  const r = await consulta(
+    `update leads set dados = dados || $2::jsonb where id = $1 returning *`,
+    [id, JSON.stringify({ ...mudancas, atualizadoEm })])
+  return r.rowCount ? doc(r.rows[0]) : null
 }
 
-export const caminhoDb = () => ARQUIVO
+export async function contarLeads() {
+  if (emMemoria()) return tabelaMemoria('leads').size
+  await preparar()
+  const r = await consulta('select count(*)::int as n from leads')
+  return r.rows[0].n
+}
+
+export const caminhoDb = () =>
+  process.env.DATABASE_URL ? 'Postgres' : 'memória (sem DATABASE_URL)'

@@ -27,6 +27,7 @@ import { enviarDiagnostico, montarHtml } from '../email.js'
 import { app as rotasApp } from './app.js'
 import { lerLeads, gravarLead, caminhoDb } from '../leads-db.js'
 import { primeiroAcesso } from '../bootstrap.js'
+import { migrarDoDisco } from '../migrar.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const RAIZ = path.join(__dirname, '..')
@@ -306,6 +307,10 @@ app.listen(port, async () => {
   // Cria o acesso inicial se o banco estiver vazio. Falhar aqui não pode
   // derrubar o site público: o totem da feira não depende da plataforma.
   try {
+    // Traz o que ficou no disco antes de criar qualquer coisa nova, senão o
+    // primeiro acesso ocuparia o banco e a migração se recusaria a rodar.
+    const m = await migrarDoDisco()
+    if (!m.migrou) console.log(`Migração: ${m.motivo}`)
     const r = await primeiroAcesso()
     if (!r.criado) console.log(`Plataforma: ${r.motivo}`)
   } catch (e) {

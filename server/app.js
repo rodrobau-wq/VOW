@@ -10,7 +10,8 @@ import { fileURLToPath } from 'node:url'
 
 import * as store from '../store.js'
 import crypto from 'node:crypto'
-import { lerLeads, atualizarLead, gravarLead } from '../leads-db.js'
+import { lerLeads, atualizarLead, gravarLead, porCapturaId } from '../leads-db.js'
+import { temPostgres } from '../db.js'
 import { diagnosticar } from '../motor.js'
 import {
   ESTAGIOS, MOTIVOS_PERDA, TIPOS_INTERACAO, SLA_PRIMEIRO_CONTATO_H,
@@ -249,7 +250,7 @@ export async function capturar(b, usuario) {
    */
   const capturaId = String(b.capturaId || '').slice(0, 64)
   if (capturaId) {
-    const jaExiste = (await lerLeads()).find((l) => l.capturaId === capturaId)
+    const jaExiste = await porCapturaId(capturaId)
     if (jaExiste) return { ...comCrm(jaExiste), duplicado: true }
   }
 
@@ -470,9 +471,74 @@ app.get('/api/app/crm/feira', async (req, res, next) => {
   } catch (e) { next(e) }
 })
 
+/* ======================================================================
+ * Onde os dados moram.
+ *
+ * Não há serviço de banco: a persistência é JSON em disco, como o brief
+ * mandou para o piloto. Isso é invisível no painel do Render, o que faz
+ * parecer que não há dado nenhum. Estas rotas mostram o que existe, quanto
+ * ocupa e desde quando — e deixam baixar para conferir ou guardar cópia.
+ * ====================================================================== */
+
+/** Só o consultor VOW enxerga a base inteira. */
+function soVow(req, res, next) {
+  if (req.usuario.papel !== 'vow') return res.status(403).json({ erro: 'acesso restrito' })
+  next()
+}
+
+app.get('/api/app/dados', soVow, async (_req, res, next) => {
+  try {
+    const leads = await lerLeads()
+    const colecoes = {}
+    for (const c of ['rede', 'usuario', 'fornecedor', 'verificacao', 'item', 'contrato', 'excecao', 'interacao']) {
+      try {
+        colecoes[c] = (await store.listar(c, null)).length
+      } catch {
+        // Coleção por tenant não pode ser contada sem rede — e não deve.
+        colecoes[c] = null
+      }
+    }
+    res.json({
+      tipo: temPostgres ? 'Postgres' : 'memória do processo',
+      // Sem banco, a plataforma perde tudo no próximo deploy. Isso precisa
+      // gritar na tela, não ficar escondido num log.
+      persistente: temPostgres,
+      leads: {
+        total: leads.length,
+        porOrigem: { abras: leads.filter((l) => l.origem === 'abras').length,
+                     site: leads.filter((l) => l.origem !== 'abras').length },
+        maisAntigo: leads.length ? leads.reduce((a, b) => a.criadoEm < b.criadoEm ? a : b).criadoEm : null,
+        maisRecente: leads.length ? leads.reduce((a, b) => a.criadoEm > b.criadoEm ? a : b).criadoEm : null,
+      },
+      colecoes,
+    })
+  } catch (e) { next(e) }
+})
+
+/** Baixa a base para conferência ou cópia. Hash de senha nunca sai daqui. */
+app.get('/api/app/dados/:qual.json', soVow, async (req, res, next) => {
+  try {
+    let dados
+    if (req.params.qual === 'leads') {
+      dados = await lerLeads()
+    } else if (req.params.qual === 'plataforma') {
+      dados = {}
+      for (const c of ['rede', 'usuario', 'interacao']) {
+        dados[c] = await store.listar(c, null)
+      }
+      dados.usuario = dados.usuario.map((u) => ({ ...u, senhaHash: '[redigido]' }))
+    } else {
+      return res.status(404).json({ erro: 'arquivo desconhecido' })
+    }
+    res.set('Content-Disposition', `attachment; filename="vow-${req.params.qual}-${new Date().toISOString().slice(0, 10)}.json"`)
+    res.type('application/json').send(JSON.stringify(dados, null, 2))
+  } catch (e) { next(e) }
+})
+
 /* ------------------------------------------------------------ telas CRM */
 app.get('/app/capturar', tela('capturar'))
 app.get('/app/feira', tela('feira'))
+app.get('/app/dados', tela('dados'))
 app.get('/app/pipeline', tela('pipeline'))
 app.get('/app/hoje', tela('hoje'))
 app.get('/app/resultado', tela('resultado'))

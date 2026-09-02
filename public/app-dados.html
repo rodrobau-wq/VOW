@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Base de dados · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  main{padding:24px 28px 60px;max-width:900px;margin:0 auto}
+  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--gold)}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 24px;max-width:70ch}
+  .bloco{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+         padding:22px 24px;margin-bottom:14px}
+  .bloco h2{font-size:22px;margin:0 0 6px}
+  .bloco .leg{font-size:13.5px;color:var(--muted);margin:0 0 16px}
+  .linha{display:flex;justify-content:space-between;gap:14px;padding:12px 0;
+         border-bottom:1px solid var(--line);font-size:14px;color:var(--dim);align-items:baseline}
+  .linha:last-child{border-bottom:0}
+  .linha b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--gold)}
+  .estado{display:flex;gap:10px;align-items:center;padding:14px 16px;border-radius:var(--r-md);
+          margin-bottom:16px;font-size:14px;line-height:1.5}
+  .estado.ok{background:rgba(47,122,85,.1);border:1px solid rgba(47,122,85,.35);color:var(--ok)}
+  .estado.risco{background:rgba(162,74,44,.1);border:1px solid rgba(162,74,44,.35);color:var(--risk)}
+  .acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+  .acoes a{height:42px;display:inline-flex;align-items:center;padding:0 18px;border-radius:var(--r-pill);
+           border:1px solid var(--line-2);color:var(--ink);text-decoration:none;font-size:14px}
+  .acoes a:hover{border-color:var(--gold);color:var(--gold)}
+  .aviso{font-size:13px;color:var(--faint);line-height:1.6;margin-top:14px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .cx{border:1px solid var(--line);border-radius:var(--r-sm);padding:14px}
+  .cx .n{font-family:var(--serif);font-size:26px;line-height:1;font-variant-numeric:tabular-nums}
+  .cx .r{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+</style>
+</head>
+<body class="paper">
+<main>
+  <h1>A <em>base</em></h1>
+  <p class="sub">Onde os dados moram, e o que existe lá dentro.</p>
+  <div id="tudo" style="color:var(--faint)">Carregando…</div>
+</main>
+
+<script type="module">
+import { montarNav, esc } from '/app-nav.js'
+await montarNav('/app/dados')
+
+const $ = (id) => document.getElementById(id)
+const kb = (b) => b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(1) + ' KB' : (b / 1048576).toFixed(1) + ' MB'
+const dt = (iso) => iso ? new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—'
+
+const d = await (await fetch('/api/app/dados')).json()
+if (d.erro) { $('tudo').textContent = d.erro; throw new Error(d.erro) }
+
+const NOMES = {
+  rede: 'Redes clientes', usuario: 'Usuários', fornecedor: 'Fornecedores',
+  verificacao: 'Verificações', item: 'Itens', contrato: 'Contratos',
+  excecao: 'Exceções', interacao: 'Interações do CRM',
+}
+
+$('tudo').innerHTML = `
+  <div class="estado ${d.persistente ? 'ok' : 'risco'}">
+    <span>${d.persistente
+      ? 'Postgres gerenciado no Render. Backup automático, e os dados sobrevivem a qualquer deploy.'
+      : 'Sem banco configurado: os dados estão na memória do processo e somem no próximo deploy. Defina DATABASE_URL.'}</span>
+  </div>
+
+  <div class="bloco">
+    <h2>Leads</h2>
+    <p class="leg">A carteira comercial. Tabela própria, porque lead não pertence a rede
+    nenhuma — é da VOW até virar cliente.</p>
+    <div class="grid">
+      <div class="cx"><div class="n">${d.leads.total}</div><div class="r">no total</div></div>
+      <div class="cx"><div class="n">${d.leads.porOrigem.abras}</div><div class="r">do totem</div></div>
+      <div class="cx"><div class="n">${d.leads.porOrigem.site}</div><div class="r">do site</div></div>
+    </div>
+    <div class="linha" style="margin-top:14px"><span>Primeiro lead</span><b>${dt(d.leads.maisAntigo)}</b></div>
+    <div class="linha"><span>Último lead</span><b>${dt(d.leads.maisRecente)}</b></div>
+    <div class="acoes">
+      <a href="/api/app/dados/leads.json">Baixar leads (JSON)</a>
+      <a href="/api/leads.csv">Baixar leads (CSV)</a>
+    </div>
+  </div>
+
+  <div class="bloco">
+    <h2>Plataforma</h2>
+    <p class="leg">Redes clientes, usuários e os dados dos três sistemas, na tabela
+    <span class="mono">registros</span>.</p>
+    ${Object.entries(d.colecoes).map(([k, v]) => `
+      <div class="linha"><span>${esc(NOMES[k] || k)}</span>
+        <b>${v === null ? 'por rede' : v}</b></div>`).join('')}
+    <div class="acoes">
+      <a href="/api/app/dados/plataforma.json">Baixar plataforma (JSON)</a>
+    </div>
+    <p class="aviso">O hash de senha é removido do arquivo baixado. Contagens marcadas como
+    “por rede” só existem dentro de um cliente e não são somadas aqui — nenhuma consulta
+    atravessa tenant, nem esta.</p>
+  </div>
+
+  <div class="bloco">
+    <h2>Onde consultar por fora</h2>
+    <p class="leg">O banco é um Postgres gerenciado. No painel do Render, em
+    <span class="mono">vow-db</span>, ficam a string de conexão, o console SQL e os backups.</p>
+    <div class="linha"><span>Duas tabelas</span><b class="mono">leads · registros</b></div>
+    <div class="linha"><span>Documento em</span><b class="mono">jsonb</b></div>
+    <div class="linha"><span>Idempotência da captura</span><b class="mono">unique (captura_id)</b></div>
+    <p class="aviso">O documento fica em <span class="mono">jsonb</span> e não em colunas
+    porque o formato ainda muda a cada semana de produto. Quando estabilizar, as consultas
+    mais usadas viram colunas com índice — sem migrar dado, só promovendo campo.</p>
+  </div>`
+</script>
+</body>
+</html>

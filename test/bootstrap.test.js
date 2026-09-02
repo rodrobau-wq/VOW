@@ -4,17 +4,11 @@
  */
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import fs from 'node:fs/promises'
-import os from 'node:os'
-import path from 'node:path'
-
-const tmp = path.join(os.tmpdir(), `vow-boot-${process.pid}`)
-process.env.APP_DB = path.join(tmp, 'db.json')
+delete process.env.DATABASE_URL
 const store = await import('../store.js')
 const { primeiroAcesso } = await import('../bootstrap.js')
 const { conferirSenha } = await import('../auth.js')
 
-test.after(() => fs.rm(tmp, { recursive: true, force: true }))
 
 test('sem ADMIN_EMAIL não cria nada', async () => {
   delete process.env.ADMIN_EMAIL
