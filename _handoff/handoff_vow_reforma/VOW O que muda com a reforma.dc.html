@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;1,8..60,300&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; height: 100%; font-family: "Manrope", system-ui, sans-serif; color: #16181A; background: #0E0F10; }
+  a { color: #8A6A28; text-decoration: none; }
+  a:hover { color: #B08A3E; }
+</style>
+</helmet>
+
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <section data-label="Capa" data-speaker-notes="Abrir com a pergunta. O varejo já opera. A reforma não muda o que ele faz." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; font-family: 'Manrope', sans-serif">
+    <div style="display: flex; align-items: center; gap: 18px"><div style="width: 44px; height: 44px; border: 2px solid #B08A3E; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #B08A3E; font-weight: 800">V</div><div style="font-size: 22px; font-weight: 800">Grupo VOW</div></div>
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Reforma tributária · varejo supermercadista</div>
+      <div style="font-size: 132px; line-height: 0.95; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em">Você já compra, recebe e paga.<br /><strong style="font-weight: 800">O que muda?</strong></div>
+    </div>
+    <div style="font-size: 26px; color: #7A7F86">Setembro 2026</div>
+  </section>
+
+  <section data-label="O que não muda" data-speaker-notes="Tranquilizar: pedido, recebimento, gôndola, cliente continuam iguais. A operação física é a mesma." style="width: 1920px; height: 1080px; background: #F6F6F5; color: #16181A; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">O que não muda</div>
+    <div style="font-size: 96px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 64px">O pedido. O recebimento.<br /><strong style="font-weight: 800">A gôndola. O cliente.</strong></div>
+    <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 40px; line-height: 1.4; color: #3F444A; max-width: 30em">A operação física continua igual. O que muda é de quem depende o imposto que você recupera, e onde a decisão precisa acontecer.</div>
+  </section>
+
+  <section data-label="Três mudanças" data-speaker-notes="As três mudanças que atravessam a operação. Cada uma cai numa área diferente." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">O que muda</div>
+    <div style="font-size: 80px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 72px">Três coisas que ninguém olhava <strong style="font-weight: 800">passam a definir margem</strong></div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; flex: 1">
+      <div style="border-top: 4px solid #B08A3E; padding-top: 32px"><div style="font-size: 28px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A7F86; margin-bottom: 20px">01 · Cadastro do item</div><div style="font-size: 44px; font-weight: 800; line-height: 1.15; margin-bottom: 20px">A classificação define a alíquota</div><div style="font-size: 28px; line-height: 1.45; color: #A8ADB3">Cesta básica a zero, alimentos com redução, bebida açucarada com Imposto Seletivo. NCM errado no cadastro é imposto a mais em cada cupom.</div></div>
+      <div style="border-top: 4px solid #B08A3E; padding-top: 32px"><div style="font-size: 28px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A7F86; margin-bottom: 20px">02 · Cadastro do fornecedor</div><div style="font-size: 44px; font-weight: 800; line-height: 1.15; margin-bottom: 20px">Seu crédito depende dele</div><div style="font-size: 28px; line-height: 1.45; color: #A8ADB3">O crédito de IBS/CBS só existe depois que o fornecedor paga o imposto dele. Fornecedor irregular é crédito travado no seu balanço.</div></div>
+      <div style="border-top: 4px solid #B08A3E; padding-top: 32px"><div style="font-size: 28px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A7F86; margin-bottom: 20px">03 · O acordo comercial</div><div style="font-size: 44px; font-weight: 800; line-height: 1.15; margin-bottom: 20px">Acordo comercial virou operação tributada</div><div style="font-size: 28px; line-height: 1.45; color: #A8ADB3">Bonificação, verba, ponta de gôndola, serviço: tudo precisa de nota e de contrato. Sem isso, o crédito não se sustenta.</div></div>
+    </div>
+  </section>
+
+  <section data-label="Calendário" data-speaker-notes="Responde a primeira pergunta de todo varejista: quando isso me pega? 2027 é o ano de se preparar com risco baixo; 2028 é quando a conta chega." style="width: 1920px; height: 1080px; background: #fff; color: #16181A; padding: 110px 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Quando isso pega em você</div>
+    <div style="font-size: 84px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 28px">Sete anos com <strong style="font-weight: 800">dois sistemas convivendo</strong></div>
+    <div style="font-size: 30px; line-height: 1.45; color: #3F444A; margin-bottom: 60px; max-width: 46em">A transição já começou. O que muda a cada ano não é o discurso — é o que trava o seu crédito.</div>
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; border-top: 2px solid #16181A">
+      <div style="padding: 34px 30px 0 0; border-right: 1px solid #DDDEE0"><div style="font-size: 44px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 16px">2026</div><div style="font-size: 28px; font-weight: 800; margin-bottom: 10px; line-height: 1.2">Teste</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">CBS 0,9% e IBS 0,1%. Desde 3 de agosto, nota sem os campos consistentes é rejeitada na origem.</div></div>
+      <div style="padding: 34px 30px 0; border-right: 1px solid #DDDEE0"><div style="font-size: 44px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 16px">Set/26</div><div style="font-size: 28px; font-weight: 800; margin-bottom: 10px; line-height: 1.2">Janela do Simples</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">Seu fornecedor escolhe o regime até dia 30. A escolha define seu crédito e não é consultável.</div></div>
+      <div style="padding: 34px 30px 0; border-right: 1px solid #DDDEE0"><div style="font-size: 44px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 16px">2027</div><div style="font-size: 28px; font-weight: 800; margin-bottom: 10px; line-height: 1.2">CBS cheia</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">Substitui PIS e Cofins. IBS em transição. Split payment opcional, RAD disponível.</div></div>
+      <div style="padding: 34px 30px 0; border-right: 1px solid #DDDEE0"><div style="font-size: 44px; font-weight: 800; color: #A32B23; line-height: 1; margin-bottom: 16px">2028</div><div style="font-size: 28px; font-weight: 800; margin-bottom: 10px; line-height: 1.2">Split obrigatório</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">O crédito passa a depender integralmente da extinção do débito do fornecedor.</div></div>
+      <div style="padding: 34px 0 0 30px"><div style="font-size: 44px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 16px">2033</div><div style="font-size: 28px; font-weight: 800; margin-bottom: 10px; line-height: 1.2">Fim do antigo</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">ICMS e ISS encerram. Até lá, dois sistemas rodando ao mesmo tempo.</div></div>
+    </div>
+    <div style="margin-top: 52px; border-left: 6px solid #B08A3E; padding: 22px 32px; background: #F6F6F5; font-size: 30px; line-height: 1.4; color: #16181A"><strong>2027 é o ano de se preparar com risco baixo.</strong> Em 2028 você descobre se preparou.</div>
+  </section>
+
+  <section data-label="Regime vira preço" data-speaker-notes="Exemplo concreto do comprador. Não citar valores de cliente." style="width: 1920px; height: 1080px; background: #fff; color: #16181A; padding: 120px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: center; font-family: 'Manrope', sans-serif">
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Na prática · compras</div>
+      <div style="font-size: 88px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 40px">O menor preço <strong style="font-weight: 800">pode ser o mais caro</strong></div>
+      <div style="font-size: 32px; line-height: 1.45; color: #3F444A">O regime do fornecedor define quanto do imposto volta para você. O comprador precisa ver isso na cotação, não no fechamento do mês.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 20px">
+      <div style="background: #F6F6F5; border-left: 8px solid #2E7D5B; padding: 36px 40px; display: flex; justify-content: space-between; align-items: center"><div><div style="font-size: 36px; font-weight: 800">Lucro Real ou Simples híbrido</div><div style="font-size: 26px; color: #5A6068; margin-top: 6px">regime regular de IBS/CBS</div></div><div style="font-size: 32px; font-weight: 800; color: #2E7D5B; text-align: right">crédito integral</div></div>
+      <div style="background: #F6F6F5; border-left: 8px solid #B4551F; padding: 36px 40px; display: flex; justify-content: space-between; align-items: center"><div><div style="font-size: 36px; font-weight: 800">Simples por dentro do DAS</div><div style="font-size: 26px; color: #5A6068; margin-top: 6px">a maioria dos pequenos fornecedores</div></div><div style="font-size: 32px; font-weight: 800; color: #B4551F; text-align: right">crédito limitado</div></div>
+      <div style="background: #F6F6F5; border-left: 8px solid #A32B23; padding: 36px 40px; display: flex; justify-content: space-between; align-items: center"><div><div style="font-size: 36px; font-weight: 800">Irregular ou sem nota</div><div style="font-size: 26px; color: #5A6068; margin-top: 6px">CND positiva, cadastro suspenso, bonificação sem documento</div></div><div style="font-size: 32px; font-weight: 800; color: #A32B23; text-align: right">crédito travado</div></div>
+    </div>
+  </section>
+
+  <section data-label="Saldo credor" data-speaker-notes="O argumento que fala com o CFO. Metade do faturamento sai a alíquota zero, o crédito acumula, e a devolução leva de 30 a 180 dias conforme conformidade." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 110px 120px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 88px; align-items: center; font-family: 'Manrope', sans-serif">
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Na prática · caixa</div>
+      <div style="font-size: 84px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 36px">Você vende a zero <strong style="font-weight: 800">e compra tributado</strong></div>
+      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 34px; line-height: 1.45; color: #C9C9C7; margin-bottom: 32px">Cesta básica sai da gôndola com alíquota zero e responde por boa parte do faturamento. Energia, aluguel, frete e serviços entram tributados e agora geram crédito. O resultado é saldo credor todo mês — dinheiro seu, parado.</div>
+      <div style="font-size: 30px; line-height: 1.4; color: #fff; border-left: 6px solid #B08A3E; padding-left: 28px">A lei devolve esse saldo. A pergunta é <strong>em quanto tempo</strong>.</div>
+    </div>
+    <div>
+      <div style="font-size: 26px; letter-spacing: 0.14em; text-transform: uppercase; color: #B08A3E; margin-bottom: 28px">Prazo de ressarcimento</div>
+      <div style="display: flex; flex-direction: column; gap: 18px">
+        <div style="background: #1F2A24; border-left: 8px solid #2E7D5B; padding: 34px 38px; display: grid; grid-template-columns: 190px 1fr; gap: 24px; align-items: center"><div style="font-size: 52px; font-weight: 800; color: #6FBF97; line-height: 1">30 dias</div><div style="font-size: 27px; line-height: 1.35; color: #C9C9C7">Para quem está em programa de conformidade reconhecido.</div></div>
+        <div style="background: #2A2119; border-left: 8px solid #B4551F; padding: 34px 38px; display: grid; grid-template-columns: 190px 1fr; gap: 24px; align-items: center"><div style="font-size: 52px; font-weight: 800; color: #DE9260; line-height: 1">60 dias</div><div style="font-size: 27px; line-height: 1.35; color: #C9C9C7">Para quem atende aos critérios, mas está fora da conformidade.</div></div>
+        <div style="background: #2A1C1A; border-left: 8px solid #A32B23; padding: 34px 38px; display: grid; grid-template-columns: 190px 1fr; gap: 24px; align-items: center"><div style="font-size: 52px; font-weight: 800; color: #E08279; line-height: 1">180 dias</div><div style="font-size: 27px; line-height: 1.35; color: #C9C9C7">Para todos os demais. Seis meses de caixa esperando na fila.</div></div>
+      </div>
+      <div style="margin-top: 30px; font-size: 27px; line-height: 1.4; color: #A8ADB3">A diferença entre a primeira e a última linha é meio ano de capital de giro — e depende de como você documenta a sua cadeia.</div>
+    </div>
+  </section>
+
+  <section data-label="Onde a decisão acontece" data-speaker-notes="Fazer a pergunta e esperar. A sala responde sozinha: ninguém. A dor aparece na resposta deles, não na nossa afirmação." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Onde a decisão acontece</div>
+    <div style="font-size: 80px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 72px">Seis momentos do dia a dia <strong style="font-weight: 800">que agora são decisão fiscal</strong></div>
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; flex: 1; border-top: 1px solid #3F444A">
+      <div style="padding: 40px 28px 0 0; border-right: 1px solid #3F444A"><div style="font-size: 64px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 20px">1</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px">Cadastrar o item</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Qual NCM e cClassTrib? Quem confere?</div></div>
+      <div style="padding: 40px 28px 0; border-right: 1px solid #3F444A"><div style="font-size: 64px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 20px">2</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px">Cotar</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Qual o custo líquido de crédito de cada proposta?</div></div>
+      <div style="padding: 40px 28px 0; border-right: 1px solid #3F444A"><div style="font-size: 64px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 20px">3</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px">Emitir o pedido</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">O fornecedor está regular hoje? Tem contrato?</div></div>
+      <div style="padding: 40px 28px 0; border-right: 1px solid #3F444A"><div style="font-size: 64px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 20px">4</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px">Receber a nota</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">IBS/CBS destacado bate com o regime dele?</div></div>
+      <div style="padding: 40px 28px 0; border-right: 1px solid #3F444A"><div style="font-size: 64px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 20px">5</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px">Pagar</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Segrega o imposto? Ou eu recolho para garantir o crédito?</div></div>
+      <div style="padding: 40px 0 0 28px"><div style="font-size: 64px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 20px">6</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px">Fechar acordo</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">A verba tem nota? O contrato prevê?</div></div>
+    </div>
+    <div style="font-size: 30px; color: #A8ADB3; margin-top: 48px; line-height: 1.4">Compras não olha regime. Fiscal não vê o pedido. Financeiro paga o que chegou. <strong style="color: #fff">Na sua empresa, quem é o dono desses seis momentos?</strong></div>
+  </section>
+
+  <section data-label="Dá para fazer sozinho?" data-speaker-notes="Ser honesto: sim, cada peça é pública. O problema é volume, continuidade e interpretação." style="width: 1920px; height: 1080px; background: #F6F6F5; color: #16181A; padding: 120px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: center; font-family: 'Manrope', sans-serif">
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">A pergunta certa</div>
+      <div style="font-size: 96px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 40px">Dá para fazer <strong style="font-weight: 800">sozinho?</strong></div>
+      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 40px; line-height: 1.4; color: #3F444A">Sim. Cada peça é pública. Consultar um CNPJ na Receita é grátis. O ERP vai entregar os campos novos. Um contador revisa contratos.</div>
+    </div>
+    <div style="background: #16181A; color: #fff; padding: 64px">
+      <div style="font-size: 28px; letter-spacing: 0.14em; text-transform: uppercase; color: #B08A3E; margin-bottom: 32px">O que não fecha</div>
+      <div style="display: flex; flex-direction: column; gap: 28px; font-size: 30px; line-height: 1.4">
+        <div style="display: grid; grid-template-columns: 56px 1fr; gap: 16px"><span style="color: #B08A3E; font-weight: 800">01</span><span><strong>Volume.</strong> 1.500 CNPJs, todo dia, na hora do pedido e na entrada da nota. Não é trabalho humano.</span></div>
+        <div style="display: grid; grid-template-columns: 56px 1fr; gap: 16px"><span style="color: #B08A3E; font-weight: 800">02</span><span><strong>O ERP entrega o campo, não a resposta.</strong> Ele grava o código que alguém digitar. Não tem opinião fiscal.</span></div>
+        <div style="display: grid; grid-template-columns: 56px 1fr; gap: 16px"><span style="color: #B08A3E; font-weight: 800">03</span><span><strong>A regra ainda está sendo escrita.</strong> Um ato novo por mês até 2033. Quem opera loja não acompanha.</span></div>
+        <div style="display: grid; grid-template-columns: 56px 1fr; gap: 16px"><span style="color: #B08A3E; font-weight: 800">04</span><span><strong>Contrato genérico não protege.</strong> A cláusula certa depende de fornecedor × pagamento × operação.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="O que a VOW traz" data-speaker-notes="Base mestre, método já validado em campo, um dono, continuidade, gente." style="width: 1920px; height: 1080px; background: #fff; color: #16181A; padding: 96px 120px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Por que a VOW</div>
+    <div style="font-size: 80px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 48px">O que você não monta <strong style="font-weight: 800">por conta própria</strong></div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 20px; flex: 1; min-height: 0">
+      <div style="border: 2px solid #16181A; padding: 28px 32px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 12px">Base mestre</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">Cada CNPJ e cada item classificado para um cliente fica classificado para todos. Você não começa do zero.</div></div>
+      <div style="border: 2px solid #16181A; padding: 28px 32px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 12px">Método que já rodou</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">A VOW faz isso manualmente em supermercados há anos. A plataforma automatiza o método; a consultoria confere o resultado.</div></div>
+      <div style="border: 2px solid #16181A; padding: 28px 32px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 12px">Um dono para o problema</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">Regularidade, classificação e cláusula com trilha de auditoria. Se o fisco perguntar, tem resposta documentada.</div></div>
+      <div style="border: 2px solid #16181A; padding: 28px 32px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 12px">Continuidade</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">Regra mudou, base reprocessada, você avisado do que fazer. Não é projeto, é serviço.</div></div>
+      <div style="border: 2px solid #16181A; padding: 28px 32px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 12px">Dentro do seu fluxo</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">Integrado ao ERP, nos seis momentos. O comprador vê a classe na cotação; o financeiro vê o alerta antes de pagar.</div></div>
+      <div style="background: #16181A; color: #fff; padding: 28px 32px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 12px">Gente onde a máquina não chega</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Sociedade, centro de distribuição, benefício regional, item de peso variável, caso raro. Isso é conhecimento do setor, não software.</div></div>
+    </div>
+  </section>
+
+  <section data-label="O que você ganha" data-speaker-notes="Sem número. Cada item é verificável. O valor em reais só depois do diagnóstico na base do cliente." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 28px">O que você ganha</div>
+    <div style="display: flex; flex-direction: column; gap: 0">
+      <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; padding: 28px 0; border-top: 1px solid #3F444A; align-items: baseline"><div style="font-size: 48px; font-weight: 800; line-height: 1.1">Crédito que se sustenta</div><div style="font-size: 30px; line-height: 1.4; color: #A8ADB3">Fornecedor verificado, pagamento documentado. Crédito de IBS/CBS que resiste à fiscalização.</div></div>
+      <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; padding: 28px 0; border-top: 1px solid #3F444A; align-items: baseline"><div style="font-size: 48px; font-weight: 800; line-height: 1.1">Imposto certo em cada item</div><div style="font-size: 30px; line-height: 1.4; color: #A8ADB3">Cadastro com embasamento legal por SKU. Nem a mais, nem a menos.</div></div>
+      <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; padding: 28px 0; border-top: 1px solid #3F444A; align-items: baseline"><div style="font-size: 48px; font-weight: 800; line-height: 1.1">Menos ruptura surpresa</div><div style="font-size: 30px; line-height: 1.4; color: #A8ADB3">O alerta de fornecedor irregular chega antes do pedido, com alternativa.</div></div>
+      <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; padding: 28px 0; border-top: 1px solid #3F444A; align-items: baseline"><div style="font-size: 48px; font-weight: 800; line-height: 1.1">Contrato para cada relação</div><div style="font-size: 30px; line-height: 1.4; color: #A8ADB3">Com a cláusula que cobre a reforma, não um modelo da internet.</div></div>
+      <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; padding: 28px 0; border-top: 1px solid #3F444A; border-bottom: 1px solid #3F444A; align-items: baseline"><div style="font-size: 48px; font-weight: 800; line-height: 1.1">Tempo de volta</div><div style="font-size: 30px; line-height: 1.4; color: #A8ADB3">Do fiscal, do comprador e do financeiro. Para o trabalho que só gente faz.</div></div>
+    </div>
+  </section>
+
+  <section data-label="Quanto vale" data-speaker-notes="Fechar com honestidade: não prometemos número. Medimos na base do cliente. É isso que a consultoria já faz." style="width: 1920px; height: 1080px; background: #B08A3E; color: #16181A; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #16181A; opacity: .7">O próximo passo</div>
+    <div>
+      <div style="font-size: 120px; line-height: 0.98; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 48px">Comece pelo diagnóstico.<br /><strong style="font-weight: 800">O número sai da sua base.</strong></div>
+      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 40px; line-height: 1.4; max-width: 30em">Não prometemos um número porque ele depende do seu mix, dos seus fornecedores e dos seus contratos. O diagnóstico entrega o valor validado, não estimado — é o que a VOW já faz há anos.</div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end"><div style="font-size: 36px; font-weight: 800">Diagnóstico gratuito na sua base</div><div style="font-size: 26px; opacity: .8">grupovow.com.br · Porto Alegre · São Paulo · Brasília</div></div>
+  </section>
+
+</x-import>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "vow-abras",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Totem ABRAS + plataforma de leads · Grupo VOW",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch --env-file=.env server/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "qrcode": "^1.5.4",
+    "resend": "^4.0.1"
+  }
+}

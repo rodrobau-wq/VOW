@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plataforma VOW · Leads ABRAS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#14120F;--gold:#B08A3E;--paper:#fff;--muted:#FAF9F7;--line:#E5E2DC;
+        --storm:#5C5A55;--concrete:#8E8B84;--green:#2F7A55;--red:#B23A2F;--blue:#35618E}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,system-ui,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  header{display:flex;align-items:center;justify-content:space-between;gap:20px;
+         padding:16px 28px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .marca{display:flex;align-items:center;gap:12px}
+  .caduceu{width:30px;height:30px;border:2px solid var(--gold);display:grid;place-items:center;
+           color:var(--gold);font-weight:700;font-size:12px}
+  .marca b{font-family:Archivo;font-size:16px;display:block;line-height:1}
+  .marca span{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold)}
+  main{padding:28px}
+  h1{font-family:Archivo;font-size:34px;text-transform:uppercase;font-weight:400;margin:0 0 4px}
+  h1 b{font-weight:700}
+  .sub{color:var(--storm);font-size:15px;margin:0 0 26px}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:26px}
+  .kpi{border:1px solid var(--line);padding:18px 20px;position:relative}
+  .kpi::before{content:'';position:absolute;inset:0 0 auto;height:3px;background:var(--gold)}
+  .kpi.g::before{background:var(--green)} .kpi.b::before{background:var(--blue)}
+  .kpi .rot{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--concrete);font-weight:600}
+  .kpi .num{font-family:Archivo;font-size:31px;font-weight:700;margin-top:6px;line-height:1}
+  .kpi .pe{font-size:12px;color:var(--concrete);margin-top:5px}
+
+  .barra{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  input[type=search]{padding:10px 14px;border:1px solid var(--line);font-size:14px;
+                     font-family:inherit;min-width:250px;outline:0}
+  input[type=search]:focus{border-color:var(--gold)}
+  .filtro{padding:9px 15px;border:1px solid var(--line);background:#fff;cursor:pointer;
+          font-size:13px;font-family:inherit;color:var(--storm)}
+  .filtro.on{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600}
+  a.csv{margin-left:auto;padding:9px 16px;background:var(--gold);color:#fff;text-decoration:none;
+        font-size:13px;font-weight:600}
+  a.csv:hover{background:#8E6E31}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{background:var(--ink);color:#fff;text-align:left;padding:11px 14px;font-size:10px;
+     letter-spacing:.12em;text-transform:uppercase;font-weight:600;position:sticky;top:0}
+  th.num,td.num{text-align:right;font-variant-numeric:tabular-nums}
+  td{padding:13px 14px;border-bottom:1px solid var(--line)}
+  tr:hover td{background:var(--muted)}
+  .nome{font-weight:600}
+  .meta{font-size:12px;color:var(--concrete);margin-top:2px}
+  .selo{display:inline-block;padding:3px 9px;font-size:11px;font-weight:600}
+  .selo.dois{background:#F3EBDC;color:#8E6E31}
+  .selo.um{background:var(--muted);color:var(--storm)}
+  .selo.ok{background:#E6F0EA;color:var(--green)}
+  .selo.falhou{background:#F7E9E7;color:var(--red)}
+  .vazio{padding:60px 20px;text-align:center;color:var(--concrete)}
+  .val{color:var(--red);font-weight:600} .val.g{color:var(--green)}
+</style>
+</head>
+<body>
+<header>
+  <div class="marca"><div class="caduceu">V</div>
+    <div><b>Grupo VOW</b><span>Plataforma de leads</span></div></div>
+  <div style="font-size:13px;color:var(--storm)" id="atualizado"></div>
+</header>
+
+<main>
+  <h1>Leads da <b>ABRAS</b></h1>
+  <p class="sub">Cada lead veio de uma simulação no totem. O valor é o que a própria pessoa
+  viu na tela — é por ele que a conversa começa.</p>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="barra">
+    <input type="search" id="busca" placeholder="Buscar por nome, rede ou e-mail…">
+    <button class="filtro on" data-f="todos">Todos</button>
+    <button class="filtro" data-f="dois">Fez os dois</button>
+    <button class="filtro" data-f="revenda">Só verbas</button>
+    <button class="filtro" data-f="indiretos">Só indiretos</button>
+    <button class="filtro" data-f="falhou">E-mail falhou</button>
+    <a class="csv" href="/api/leads.csv">Exportar CSV</a>
+  </div>
+
+  <table>
+    <thead><tr>
+      <th>Lead</th><th>Rede</th><th class="num">Faturamento</th>
+      <th class="num">Verbas · perda</th><th class="num">Indiretos · crédito</th>
+      <th>Cobertura</th><th>E-mail</th><th>Quando</th>
+    </tr></thead>
+    <tbody id="corpo"></tbody>
+  </table>
+  <div class="vazio" id="vazio" hidden>Nenhum lead ainda. Assim que alguém simular no totem, aparece aqui.</div>
+</main>
+
+<script type="module">
+import { brl, brlCurto } from '/motor.js'
+
+const $ = (id) => document.getElementById(id)
+let leads = []
+let filtro = 'todos'
+let busca = ''
+
+const dtf = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+const valor = (l, tipo) => l.diagnosticos.find((d) => d.tipo === tipo)?.destaque ?? null
+
+function visiveis() {
+  const q = busca.trim().toLowerCase()
+  return leads.filter((l) => {
+    if (filtro === 'dois' && !l.fezOsDois) return false
+    if (filtro === 'revenda' && !(valor(l, 'revenda') !== null && valor(l, 'indiretos') === null)) return false
+    if (filtro === 'indiretos' && !(valor(l, 'indiretos') !== null && valor(l, 'revenda') === null)) return false
+    if (filtro === 'falhou' && l.email_enviado) return false
+    if (!q) return true
+    return [l.nome, l.empresa, l.email].some((v) => String(v || '').toLowerCase().includes(q))
+  })
+}
+
+function pintarKpis() {
+  const dois = leads.filter((l) => l.fezOsDois).length
+  // Soma o que os leads viram na tela: é a régua de valor do pipeline da feira.
+  const emJogo = leads.reduce((s, l) => s + l.diagnosticos.reduce((a, d) => a + (d.destaque || 0), 0), 0)
+  const falhas = leads.filter((l) => !l.email_enviado).length
+  $('kpis').innerHTML = `
+    <div class="kpi"><div class="rot">Leads capturados</div><div class="num">${leads.length}</div>
+      <div class="pe">no totem da ABRAS</div></div>
+    <div class="kpi g"><div class="rot">Valor em jogo</div><div class="num">${brlCurto(emJogo)}</div>
+      <div class="pe">soma do que os leads viram na tela</div></div>
+    <div class="kpi b"><div class="rot">Fizeram os dois</div><div class="num">${dois}</div>
+      <div class="pe">${leads.length ? Math.round((dois / leads.length) * 100) : 0}% da base · lead mais quente</div></div>
+    <div class="kpi"><div class="rot">E-mail pendente</div><div class="num">${falhas}</div>
+      <div class="pe">${falhas ? 'reenviar manualmente' : 'nenhuma falha'}</div></div>`
+}
+
+function pintarTabela() {
+  const lista = visiveis()
+  $('vazio').hidden = lista.length > 0
+  $('corpo').innerHTML = lista.map((l) => {
+    const r = valor(l, 'revenda'), i = valor(l, 'indiretos')
+    return `<tr>
+      <td><div class="nome">${esc(l.nome) || '—'}</div><div class="meta">${esc(l.email)}${l.telefone ? ' · ' + esc(l.telefone) : ''}</div></td>
+      <td>${esc(l.empresa) || '—'}</td>
+      <td class="num">${brlCurto(l.faturamento)}</td>
+      <td class="num">${r !== null ? `<span class="val">${brl(r)}</span>` : '—'}</td>
+      <td class="num">${i !== null ? `<span class="val g">${brl(i)}</span>` : '—'}</td>
+      <td>${l.fezOsDois ? '<span class="selo dois">fez os dois</span>' : '<span class="selo um">um diagnóstico</span>'}</td>
+      <td>${l.email_enviado ? '<span class="selo ok">enviado</span>' : '<span class="selo falhou">falhou</span>'}</td>
+      <td>${dtf.format(new Date(l.criadoEm))}</td>
+    </tr>`
+  }).join('')
+}
+
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]))
+
+async function carregar() {
+  const r = await fetch('/api/leads')
+  if (!r.ok) return
+  leads = await r.json()
+  pintarKpis(); pintarTabela()
+  $('atualizado').textContent = 'Atualizado ' + dtf.format(new Date())
+}
+
+$('busca').addEventListener('input', (e) => { busca = e.target.value; pintarTabela() })
+document.querySelectorAll('.filtro').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('.filtro').forEach((x) => x.classList.remove('on'))
+  b.classList.add('on'); filtro = b.dataset.f; pintarTabela()
+}))
+
+carregar()
+setInterval(carregar, 20000) // durante a feira, a mesa acompanha ao vivo
+</script>
+</body>
+</html>

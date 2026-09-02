@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; font-family: "Manrope", system-ui, sans-serif; color: #16181A; }
+  a { color: #8A6A28; text-decoration: none; }
+  a:hover { color: #B08A3E; text-decoration: underline; }
+  doc-page:not(:defined) { visibility: hidden; }
+</style>
+<script src="./doc-page.js"></script>
+</helmet>
+
+<doc-page margin="0.7in">
+
+<div style="display: flex; flex-direction: column; gap: 4px; padding-bottom: 18px; border-bottom: 3px solid #16181A; margin-bottom: 34px">
+  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px">
+    <div style="font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 700; color: #B08A3E">Grupo VOW</div>
+    <div style="font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A7F86">v1.0 &nbsp;·&nbsp; Setembro 2026</div>
+  </div>
+</div>
+
+<h1 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 46px; line-height: 1.04; letter-spacing: -0.02em; text-transform: uppercase; margin: 0 0 22px">Manual de<br /><strong style="font-weight: 800">marca e produto</strong></h1>
+
+<p style="font-family: 'Source Serif 4', Georgia, serif; font-size: 19px; line-height: 1.5; color: #3F444A; max-width: 30em; margin: 0 0 30px">A inteligência tributária que alimenta o Brasil. Este documento define como a marca VOW se comporta — no papel, na web e dentro de um produto digital.</p>
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #DDDEE0; border: 1px solid #DDDEE0; margin-bottom: 36px; break-inside: avoid">
+  <div style="background: #fff; padding: 14px 16px">
+    <div style="font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A7F86; margin-bottom: 6px">Escopo</div>
+    <div style="font-size: 13px; line-height: 1.45; font-weight: 500">Marca, sistema visual e biblioteca de interface para SaaS</div>
+  </div>
+  <div style="background: #fff; padding: 14px 16px">
+    <div style="font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A7F86; margin-bottom: 6px">Público</div>
+    <div style="font-size: 13px; line-height: 1.45; font-weight: 500">Marketing, agências, design e engenharia de produto</div>
+  </div>
+  <div style="background: #fff; padding: 14px 16px">
+    <div style="font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A7F86; margin-bottom: 6px">Status</div>
+    <div style="font-size: 13px; line-height: 1.45; font-weight: 500">Reconstruído a partir do site. Valores marcados <em>a confirmar</em> precisam de validação</div>
+  </div>
+</div>
+
+<div style="background: #16181A; color: #fff; padding: 26px 28px; margin-bottom: 8px; break-inside: avoid">
+  <div style="font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #B08A3E; margin-bottom: 12px">Sumário</div>
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 32px; font-size: 13px; line-height: 1.4">
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">01</span><span>A marca</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">07</span><span>Fotografia</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">02</span><span>Logotipo e usos</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">08</span><span>Ícones</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">03</span><span>Paleta</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">09</span><span>Produto SaaS</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">04</span><span>Tipografia</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">10</span><span>Slides e impressos</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">05</span><span>Grid e espaçamento</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">11</span><span>Tom de voz</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">06</span><span>Web</span></div>
+    <div style="display: flex; gap: 12px"><span style="color: #B08A3E; font-weight: 700; width: 18px">12</span><span>Pendências</span></div>
+  </div>
+</div>
+
+<div style="break-before: page; display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin-bottom: 26px">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">01</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0">A <strong style="font-weight: 800">marca</strong></h2>
+</div>
+
+<p style="font-size: 14.5px; line-height: 1.65; color: #3F444A; margin: 0 0 22px; max-width: 34em">A VOW nasce de uma posição, não de um serviço. O empresário é o herói; o excesso de tributação é o antagonista; a VOW é a inteligência que devolve o resultado a quem o produziu. Toda decisão visual desta marca serve a essa narrativa: firmeza, precisão e sobriedade — nunca euforia.</p>
+
+<div style="border-left: 3px solid #B08A3E; padding: 4px 0 4px 20px; margin: 0 0 30px; break-inside: avoid">
+  <p style="font-family: 'Source Serif 4', Georgia, serif; font-size: 21px; line-height: 1.42; margin: 0; color: #16181A">“Esse é o nosso juramento para todos os empresários desse país: vamos fazer a economia brasileira crescer.”</p>
+  <div style="font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A7F86; margin-top: 12px">Manifesto Grupo VOW</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 28px">
+  <div style="break-inside: avoid">
+    <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: #B08A3E; margin-bottom: 8px">Propósito</div>
+    <p style="font-size: 13px; line-height: 1.55; margin: 0; color: #3F444A">Impulsionar as empresas a gerarem os melhores resultados.</p>
+  </div>
+  <div style="break-inside: avoid">
+    <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: #B08A3E; margin-bottom: 8px">Missão</div>
+    <p style="font-size: 13px; line-height: 1.55; margin: 0; color: #3F444A">Desenvolver inteligência tributária com excelência, reduzindo a carga tributária das empresas de forma segura.</p>
+  </div>
+  <div style="break-inside: avoid">
+    <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: #B08A3E; margin-bottom: 8px">Visão</div>
+    <p style="font-size: 13px; line-height: 1.55; margin: 0; color: #3F444A">Ser reconhecida como uma das consultorias tributárias mais admiradas do país e uma das melhores empresas para se trabalhar.</p>
+  </div>
+</div>
+
+<h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 14px; color: #16181A">Valores</h3>
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: #DDDEE0; border: 1px solid #DDDEE0; margin-bottom: 30px">
+  <div style="background: #fff; padding: 16px 18px; break-inside: avoid">
+    <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px">Ética e transparência</div>
+    <p style="font-size: 12.5px; line-height: 1.5; margin: 0; color: #5A6068">Relações pautadas em lealdade, honestidade, confiança e respeito.</p>
+  </div>
+  <div style="background: #fff; padding: 16px 18px; break-inside: avoid">
+    <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px">Foco no cliente e foco do cliente</div>
+    <p style="font-size: 12.5px; line-height: 1.5; margin: 0; color: #5A6068">Resultados transformadores dentro das organizações atendidas.</p>
+  </div>
+  <div style="background: #fff; padding: 16px 18px; break-inside: avoid">
+    <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px">Excelência</div>
+    <p style="font-size: 12.5px; line-height: 1.5; margin: 0; color: #5A6068">Rigor técnico como condição, não como diferencial opcional.</p>
+  </div>
+  <div style="background: #fff; padding: 16px 18px; break-inside: avoid">
+    <div style="font-size: 14px; font-weight: 700; margin-bottom: 6px">Valorização do ser humano</div>
+    <p style="font-size: 12.5px; line-height: 1.5; margin: 0; color: #5A6068">O ser humano é o principal ativo: desenvolvimento, reconhecimento e retenção.</p>
+  </div>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px; break-before: page">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">02</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0">Logotipo e <strong style="font-weight: 800">usos</strong></h2>
+</div>
+
+<p style="font-size: 14.5px; line-height: 1.65; color: #3F444A; margin: 0 0 22px; max-width: 34em">A assinatura é composta pelo símbolo do <strong>caduceu</strong> e pelo logotipo <strong>GRUPO VOW</strong>. O símbolo pode operar isolado quando o contexto já identifica a empresa: favicon, avatar de app, ícone de sistema, marca d'água.</p>
+
+<div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; margin-bottom: 14px">
+  <div style="border: 1px dashed #B9BDC2; background: #F6F6F5; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; break-inside: avoid">
+    <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A7F86">Assinatura horizontal</div>
+    <div style="font-size: 11px; color: #9AA0A6">inserir o SVG oficial</div>
+  </div>
+  <div style="border: 1px dashed #B9BDC2; background: #F6F6F5; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; break-inside: avoid">
+    <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A7F86">Símbolo isolado</div>
+    <div style="font-size: 11px; color: #9AA0A6">caduceu</div>
+  </div>
+</div>
+<div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; margin-bottom: 30px">
+  <div style="border: 1px solid #16181A; background: #16181A; height: 110px; display: flex; align-items: center; justify-content: center; break-inside: avoid">
+    <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #6E747B">Versão negativa — fundo grafite</div>
+  </div>
+  <div style="border: 1px solid #B08A3E; background: #B08A3E; height: 110px; display: flex; align-items: center; justify-content: center; break-inside: avoid">
+    <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #3A2C0E">Sobre cor de acento</div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; margin-bottom: 28px">
+  <div style="break-inside: avoid">
+    <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 10px">Área de respiro</h3>
+    <p style="font-size: 13px; line-height: 1.55; margin: 0 0 8px; color: #3F444A">Margem livre em todos os lados equivalente à <strong>altura do caduceu ÷ 2</strong>. Nenhum texto, imagem ou borda entra nessa área.</p>
+    <p style="font-size: 13px; line-height: 1.55; margin: 0; color: #3F444A">Tamanho mínimo: <strong>28 mm</strong> de largura em impressos, <strong>120 px</strong> em telas, <strong>24 px</strong> para o símbolo isolado.</p>
+  </div>
+  <div style="break-inside: avoid">
+    <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 10px">Usos incorretos</h3>
+    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12.5px; line-height: 1.5; color: #3F444A">
+      <div style="display: flex; gap: 8px"><span style="color: #A32B23; font-weight: 700">×</span><span>Distorcer, rotacionar ou aplicar contorno</span></div>
+      <div style="display: flex; gap: 8px"><span style="color: #A32B23; font-weight: 700">×</span><span>Recolorir fora da paleta aprovada</span></div>
+      <div style="display: flex; gap: 8px"><span style="color: #A32B23; font-weight: 700">×</span><span>Sombra, brilho, degradê ou bisel</span></div>
+      <div style="display: flex; gap: 8px"><span style="color: #A32B23; font-weight: 700">×</span><span>Aplicar sobre foto de baixo contraste sem véu escuro</span></div>
+      <div style="display: flex; gap: 8px"><span style="color: #A32B23; font-weight: 700">×</span><span>Redesenhar o caduceu ou trocar o espaçamento do logotipo</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="background: #F6F6F5; border-top: 2px solid #16181A; padding: 18px 20px; margin-bottom: 8px; break-inside: avoid">
+  <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: #B08A3E; margin-bottom: 8px">Marca do produto SaaS</div>
+  <p style="font-size: 13px; line-height: 1.6; margin: 0; color: #3F444A">O produto assina como <strong>submarca endossada</strong>: nome do produto em Manrope 700, precedido pelo caduceu, com “por Grupo VOW” em corpo menor. O logotipo institucional completo não vai na barra de navegação do app — apenas o símbolo, a 24 px, seguido do nome do produto.</p>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px; break-before: page">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">03</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0"><strong style="font-weight: 800">Paleta</strong></h2>
+</div>
+
+<p style="font-size: 14.5px; line-height: 1.65; color: #3F444A; margin: 0 0 22px; max-width: 34em">A base da marca é uma escala de cinzas — os arquivos originais nomeiam <em>Cinza Concrete</em> e <em>Cinza Storm</em>. Sobre ela atua um único acento quente, usado com parcimônia: ele marca o que importa, nunca decora.</p>
+
+<h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Cores institucionais</h3>
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 26px; break-inside: avoid">
+  <div>
+    <div style="height: 76px; background: #16181A; border: 1px solid #DDDEE0"></div>
+    <div style="font-size: 12.5px; font-weight: 700; margin-top: 8px">Grafite</div>
+    <div style="font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">#16181A</div>
+    <div style="font-size: 10.5px; color: #9AA0A6; margin-top: 3px">--vow-ink</div>
+  </div>
+  <div>
+    <div style="height: 76px; background: #3F444A; border: 1px solid #DDDEE0"></div>
+    <div style="font-size: 12.5px; font-weight: 700; margin-top: 8px">Cinza Storm</div>
+    <div style="font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">#3F444A</div>
+    <div style="font-size: 10.5px; color: #9AA0A6; margin-top: 3px">--vow-storm</div>
+  </div>
+  <div>
+    <div style="height: 76px; background: #C9C9C7; border: 1px solid #DDDEE0"></div>
+    <div style="font-size: 12.5px; font-weight: 700; margin-top: 8px">Cinza Concrete</div>
+    <div style="font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">#C9C9C7</div>
+    <div style="font-size: 10.5px; color: #9AA0A6; margin-top: 3px">--vow-concrete</div>
+  </div>
+  <div>
+    <div style="height: 76px; background: #B08A3E; border: 1px solid #DDDEE0"></div>
+    <div style="font-size: 12.5px; font-weight: 700; margin-top: 8px">Dourado VOW</div>
+    <div style="font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">#B08A3E</div>
+    <div style="font-size: 10.5px; color: #9AA0A6; margin-top: 3px">--vow-accent · a confirmar</div>
+  </div>
+</div>
+
+<h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Neutros de interface</h3>
+<div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 26px; break-inside: avoid">
+  <div><div style="height: 52px; background: #FFFFFF; border: 1px solid #DDDEE0"></div><div style="font-size: 10.5px; margin-top: 6px; color: #5A6068; font-variant-numeric: tabular-nums">#FFFFFF</div><div style="font-size: 9.5px; color: #9AA0A6">surface</div></div>
+  <div><div style="height: 52px; background: #F6F6F5; border: 1px solid #DDDEE0"></div><div style="font-size: 10.5px; margin-top: 6px; color: #5A6068; font-variant-numeric: tabular-nums">#F6F6F5</div><div style="font-size: 9.5px; color: #9AA0A6">canvas</div></div>
+  <div><div style="height: 52px; background: #EAEBEA; border: 1px solid #DDDEE0"></div><div style="font-size: 10.5px; margin-top: 6px; color: #5A6068; font-variant-numeric: tabular-nums">#EAEBEA</div><div style="font-size: 9.5px; color: #9AA0A6">subtle</div></div>
+  <div><div style="height: 52px; background: #DDDEE0; border: 1px solid #DDDEE0"></div><div style="font-size: 10.5px; margin-top: 6px; color: #5A6068; font-variant-numeric: tabular-nums">#DDDEE0</div><div style="font-size: 9.5px; color: #9AA0A6">border</div></div>
+  <div><div style="height: 52px; background: #7A7F86; border: 1px solid #DDDEE0"></div><div style="font-size: 10.5px; margin-top: 6px; color: #5A6068; font-variant-numeric: tabular-nums">#7A7F86</div><div style="font-size: 9.5px; color: #9AA0A6">muted</div></div>
+  <div><div style="height: 52px; background: #24272B; border: 1px solid #DDDEE0"></div><div style="font-size: 10.5px; margin-top: 6px; color: #5A6068; font-variant-numeric: tabular-nums">#24272B</div><div style="font-size: 9.5px; color: #9AA0A6">dark surface</div></div>
+</div>
+
+<h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Cores semânticas (produto)</h3>
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 22px; break-inside: avoid">
+  <div><div style="height: 52px; background: #2E7D5B"></div><div style="font-size: 12px; font-weight: 700; margin-top: 7px">Sucesso</div><div style="font-size: 11px; color: #7A7F86">#2E7D5B · crédito recuperado</div></div>
+  <div><div style="height: 52px; background: #B4551F"></div><div style="font-size: 12px; font-weight: 700; margin-top: 7px">Atenção</div><div style="font-size: 11px; color: #7A7F86">#B4551F · prazo, pendência</div></div>
+  <div><div style="height: 52px; background: #A32B23"></div><div style="font-size: 12px; font-weight: 700; margin-top: 7px">Risco</div><div style="font-size: 11px; color: #7A7F86">#A32B23 · autuação, erro</div></div>
+  <div><div style="height: 52px; background: #35607F"></div><div style="font-size: 12px; font-weight: 700; margin-top: 7px">Informação</div><div style="font-size: 11px; color: #7A7F86">#35607F · neutro, em análise</div></div>
+</div>
+
+<div style="border: 1px solid #DDDEE0; padding: 16px 18px; break-inside: avoid">
+  <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: #B08A3E; margin-bottom: 8px">Regra de proporção</div>
+  <p style="font-size: 13px; line-height: 1.6; margin: 0 0 10px; color: #3F444A">Em qualquer peça: <strong>60%</strong> neutro claro, <strong>30%</strong> grafite/Storm, <strong>10%</strong> acento. O dourado nunca preenche áreas grandes nem fundos de seção.</p>
+  <div style="display: flex; height: 14px; width: 100%">
+    <div style="flex: 6; background: #F6F6F5; border: 1px solid #DDDEE0"></div>
+    <div style="flex: 3; background: #16181A"></div>
+    <div style="flex: 1; background: #B08A3E"></div>
+  </div>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px; break-before: page">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">04</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0"><strong style="font-weight: 800">Tipografia</strong></h2>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 28px">
+  <div style="break-inside: avoid">
+    <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #7A7F86; margin-bottom: 6px">Primária · títulos e interface</div>
+    <div style="font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -0.02em">Manrope</div>
+    <p style="font-size: 12.5px; line-height: 1.55; color: #5A6068; margin: 10px 0 0">Pesos 300 / 500 / 700 / 800. Grotesca geométrica de eixo neutro: sustenta títulos em caixa-alta e números tabulares em tabelas de crédito. Fonte única da interface do produto.</p>
+  </div>
+  <div style="break-inside: avoid">
+    <div style="font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #7A7F86; margin-bottom: 6px">Secundária · editorial</div>
+    <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 40px; font-weight: 400; line-height: 1; letter-spacing: -0.01em">Source Serif</div>
+    <p style="font-size: 12.5px; line-height: 1.55; color: #5A6068; margin: 10px 0 0">Pesos 300 / 400 e itálico. Reservada a manifesto, citações, aberturas de seção e artigos do blog. Não usar em botões, rótulos ou dados.</p>
+  </div>
+</div>
+
+<div style="background: #16181A; color: #fff; padding: 26px 28px; margin-bottom: 26px; break-inside: avoid">
+  <div style="font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #B08A3E; margin-bottom: 14px">Assinatura tipográfica da marca</div>
+  <div style="font-size: 34px; line-height: 1.06; font-weight: 300; text-transform: uppercase; letter-spacing: -0.015em">Empresários<br /><strong style="font-weight: 800">são heróis.</strong></div>
+  <p style="font-size: 12.5px; line-height: 1.6; color: #A8ADB3; margin: 16px 0 0; max-width: 36em">O padrão VOW: duas linhas em caixa-alta, primeira em peso 300, segunda em 800. Aplica-se a títulos de seção, capas de slide e headlines de campanha. Nunca mais de duas linhas nesse formato.</p>
+</div>
+
+<h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Escala</h3>
+<table style="width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 12px">
+  <thead>
+    <tr style="border-bottom: 2px solid #16181A; text-align: left">
+      <th style="padding: 8px 10px 8px 0; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A7F86; font-weight: 700">Token</th>
+      <th style="padding: 8px 10px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A7F86; font-weight: 700">Tamanho / entrelinha</th>
+      <th style="padding: 8px 10px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A7F86; font-weight: 700">Peso</th>
+      <th style="padding: 8px 0 8px 10px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: #7A7F86; font-weight: 700">Uso</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom: 1px solid #EAEBEA"><td style="padding: 9px 10px 9px 0; font-weight: 700">display</td><td style="padding: 9px 10px; font-variant-numeric: tabular-nums">48 / 52</td><td style="padding: 9px 10px">300 + 800</td><td style="padding: 9px 0 9px 10px; color: #5A6068">Capa, hero</td></tr>
+    <tr style="border-bottom: 1px solid #EAEBEA"><td style="padding: 9px 10px 9px 0; font-weight: 700">h1</td><td style="padding: 9px 10px; font-variant-numeric: tabular-nums">32 / 38</td><td style="padding: 9px 10px">700</td><td style="padding: 9px 0 9px 10px; color: #5A6068">Título de página</td></tr>
+    <tr style="border-bottom: 1px solid #EAEBEA"><td style="padding: 9px 10px 9px 0; font-weight: 700">h2</td><td style="padding: 9px 10px; font-variant-numeric: tabular-nums">24 / 30</td><td style="padding: 9px 10px">700</td><td style="padding: 9px 0 9px 10px; color: #5A6068">Seção</td></tr>
+    <tr style="border-bottom: 1px solid #EAEBEA"><td style="padding: 9px 10px 9px 0; font-weight: 700">h3</td><td style="padding: 9px 10px; font-variant-numeric: tabular-nums">18 / 24</td><td style="padding: 9px 10px">600</td><td style="padding: 9px 0 9px 10px; color: #5A6068">Card, subseção</td></tr>
+    <tr style="border-bottom: 1px solid #EAEBEA"><td style="padding: 9px 10px 9px 0; font-weight: 700">body</td><td style="padding: 9px 10px; font-variant-numeric: tabular-nums">15 / 24</td><td style="padding: 9px 10px">400</td><td style="padding: 9px 0 9px 10px; color: #5A6068">Texto corrente</td></tr>
+    <tr style="border-bottom: 1px solid #EAEBEA"><td style="padding: 9px 10px 9px 0; font-weight: 700">ui</td><td style="padding: 9px 10px; font-variant-numeric: tabular-nums">14 / 20</td><td style="padding: 9px 10px">500</td><td style="padding: 9px 0 9px 10px; color: #5A6068">Botões, campos, tabelas</td></tr>
+    <tr style="border-bottom: 1px solid #EAEBEA"><td style="padding: 9px 10px 9px 0; font-weight: 700">caption</td><td style="padding: 9px 10px; font-variant-numeric: tabular-nums">12 / 16</td><td style="padding: 9px 10px">500</td><td style="padding: 9px 0 9px 10px; color: #5A6068">Legenda, ajuda</td></tr>
+    <tr><td style="padding: 9px 10px 9px 0; font-weight: 700">eyebrow</td><td style="padding: 9px 10px; font-variant-numeric: tabular-nums">10 / 14 · +0.18em</td><td style="padding: 9px 10px">700 caps</td><td style="padding: 9px 0 9px 10px; color: #5A6068">Rótulo de seção</td></tr>
+  </tbody>
+</table>
+<p style="font-size: 11.5px; line-height: 1.5; color: #7A7F86; margin: 0">Valores monetários e percentuais sempre com <code style="font-family: ui-monospace, monospace; font-size: 11px">font-variant-numeric: tabular-nums</code>. Padrão brasileiro: R$ 1.234.567,89.</p>
+
+<div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px; break-before: page">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">05</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0">Grid e <strong style="font-weight: 800">espaçamento</strong></h2>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 26px">
+  <div style="break-inside: avoid">
+    <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 10px">Grid</h3>
+    <div style="display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; line-height: 1.5; color: #3F444A">
+      <div><strong>Web / app:</strong> 12 colunas, gutter 24 px, largura máxima de conteúdo 1280 px, margem lateral mínima 32 px.</div>
+      <div><strong>Mobile:</strong> 4 colunas, gutter 16 px, margem 20 px.</div>
+      <div><strong>Impresso:</strong> 6 colunas, margem 18 mm.</div>
+      <div><strong>Slide 16:9:</strong> 12 colunas, margem de segurança 80 px em 1920 × 1080.</div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; margin-top: 14px">
+      <div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div><div style="height: 44px; background: #EAEBEA"></div>
+    </div>
+  </div>
+  <div style="break-inside: avoid">
+    <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 10px">Escala de 4 px</h3>
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">4</div><div style="height: 10px; width: 4px; background: #B08A3E"></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">8</div><div style="height: 10px; width: 8px; background: #B08A3E"></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">12</div><div style="height: 10px; width: 12px; background: #B08A3E"></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">16</div><div style="height: 10px; width: 16px; background: #B08A3E"></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">24</div><div style="height: 10px; width: 24px; background: #B08A3E"></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">32</div><div style="height: 10px; width: 32px; background: #B08A3E"></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">48</div><div style="height: 10px; width: 48px; background: #B08A3E"></div></div>
+      <div style="display: flex; align-items: center; gap: 10px"><div style="width: 34px; font-size: 11.5px; color: #7A7F86; font-variant-numeric: tabular-nums">64</div><div style="height: 10px; width: 64px; background: #B08A3E"></div></div>
+    </div>
+    <p style="font-size: 12.5px; line-height: 1.55; color: #3F444A; margin: 14px 0 0"><strong>Raio de canto:</strong> 0 para blocos institucionais e faixas; 4 px para componentes de produto (botões, campos, cards); 999 px apenas em <em>badges</em> e avatares.</p>
+    <p style="font-size: 12.5px; line-height: 1.55; color: #3F444A; margin: 8px 0 0"><strong>Elevação:</strong> uma só sombra — <code style="font-family: ui-monospace, monospace; font-size: 11px">0 1px 2px rgba(22,24,26,.08), 0 8px 24px rgba(22,24,26,.06)</code>. Preferir borda de 1 px a sombra.</p>
+  </div>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">06</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0">Aplicação <strong style="font-weight: 800">web</strong></h2>
+</div>
+
+<p style="font-size: 14.5px; line-height: 1.65; color: #3F444A; margin: 0 0 18px; max-width: 34em">O site institucional trabalha com blocos de largura total, vídeo silencioso em abertura, títulos em caixa-alta de duas linhas e contadores numéricos. Mantenha esse ritmo: uma ideia por bloco, respiro vertical de 96 px a 160 px entre seções.</p>
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 8px; break-inside: avoid">
+  <div style="border: 1px solid #DDDEE0; padding: 14px 16px"><div style="font-size: 12.5px; font-weight: 700; margin-bottom: 5px">Abertura</div><p style="font-size: 12px; line-height: 1.5; margin: 0; color: #5A6068">Vídeo ou foto com véu grafite a 55%; título de duas linhas; um único CTA.</p></div>
+  <div style="border: 1px solid #DDDEE0; padding: 14px 16px"><div style="font-size: 12.5px; font-weight: 700; margin-bottom: 5px">Prova</div><p style="font-size: 12px; line-height: 1.5; margin: 0; color: #5A6068">Números grandes em Manrope 800, rótulo em caps 10 px, logos de clientes em cinza uniforme.</p></div>
+  <div style="border: 1px solid #DDDEE0; padding: 14px 16px"><div style="font-size: 12.5px; font-weight: 700; margin-bottom: 5px">Conversão</div><p style="font-size: 12px; line-height: 1.5; margin: 0; color: #5A6068">Formulário curto sobre fundo grafite; botão em dourado; campos com borda 1 px.</p></div>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px; break-before: page">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">07</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0"><strong style="font-weight: 800">Fotografia</strong></h2>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 26px">
+  <div style="break-inside: avoid">
+    <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 10px">Direção</h3>
+    <p style="font-size: 13px; line-height: 1.6; margin: 0 0 10px; color: #3F444A">Três territórios, na ordem: <strong>a cadeia alimentar</strong> (campo, indústria, distribuição, gôndola), <strong>as pessoas do cliente</strong> (empresário no seu ambiente real) e <strong>a equipe VOW</strong> em trabalho.</p>
+    <p style="font-size: 13px; line-height: 1.6; margin: 0; color: #3F444A">Luz natural, contraste alto, cor dessaturada. Sem stock genérico de aperto de mão, sem gráfico de setas subindo, sem martelo de juiz.</p>
+  </div>
+  <div style="break-inside: avoid">
+    <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 10px">Tratamento</h3>
+    <div style="display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; line-height: 1.5; color: #3F444A">
+      <div>Saturação reduzida em 30% a 50%.</div>
+      <div>Retratos institucionais em preto e branco, fundo grafite.</div>
+      <div>Véu <code style="font-family: ui-monospace, monospace; font-size: 11px">rgba(22,24,26,.55)</code> sob qualquer texto.</div>
+      <div>Recorte em ângulo reto; sem cantos arredondados em foto.</div>
+    </div>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 30px">
+  <div style="border: 1px dashed #B9BDC2; background: #F6F6F5; height: 118px; display: flex; align-items: center; justify-content: center; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #9AA0A6; text-align: center; padding: 8px">Cadeia alimentar</div>
+  <div style="border: 1px dashed #B9BDC2; background: #F6F6F5; height: 118px; display: flex; align-items: center; justify-content: center; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #9AA0A6; text-align: center; padding: 8px">Retrato do cliente</div>
+  <div style="border: 1px dashed #B9BDC2; background: #F6F6F5; height: 118px; display: flex; align-items: center; justify-content: center; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #9AA0A6; text-align: center; padding: 8px">Equipe em trabalho</div>
+</div>
+
+<div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">08</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0"><strong style="font-weight: 800">Ícones</strong></h2>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 8px">
+  <div style="break-inside: avoid">
+    <p style="font-size: 13px; line-height: 1.6; margin: 0 0 10px; color: #3F444A">Traço linear de <strong>1,5 px</strong> em grade de <strong>24 px</strong>, cantos vivos, terminais retos, sem preenchimento. Um ícone comunica uma coisa; se precisar de duas, use dois.</p>
+    <p style="font-size: 13px; line-height: 1.6; margin: 0; color: #3F444A">Cor padrão: Storm. Dourado apenas quando o ícone é o próprio acento da tela. Nunca em cor semântica fora de um estado real.</p>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; break-inside: avoid">
+    <div style="border: 1px solid #DDDEE0; height: 58px; display: flex; align-items: center; justify-content: center"><div style="width: 22px; height: 22px; border: 1.5px solid #3F444A"></div></div>
+    <div style="border: 1px solid #DDDEE0; height: 58px; display: flex; align-items: center; justify-content: center"><div style="width: 22px; height: 22px; border: 1.5px solid #3F444A; border-radius: 50%"></div></div>
+    <div style="border: 1px solid #DDDEE0; height: 58px; display: flex; align-items: center; justify-content: center"><div style="width: 22px; height: 22px; border: 1.5px solid #3F444A; border-right: 0; border-bottom: 0"></div></div>
+    <div style="border: 1px solid #DDDEE0; height: 58px; display: flex; align-items: center; justify-content: center"><div style="width: 22px; height: 2px; background: #3F444A"></div></div>
+    <div style="border: 1px solid #DDDEE0; height: 58px; box-sizing: border-box; display: flex; align-items: flex-end; justify-content: center; gap: 3px; padding: 8px"><div style="width: 4px; height: 8px; background: #3F444A"></div><div style="width: 4px; height: 14px; background: #3F444A"></div><div style="width: 4px; height: 20px; background: #3F444A"></div></div>
+    <div style="border: 1px solid #DDDEE0; height: 58px; display: flex; align-items: center; justify-content: center"><div style="width: 18px; height: 22px; border: 1.5px solid #3F444A; border-top-width: 6px"></div></div>
+    <div style="border: 1px solid #DDDEE0; height: 58px; display: flex; align-items: center; justify-content: center"><div style="width: 22px; height: 14px; border: 1.5px solid #3F444A; border-left-width: 6px"></div></div>
+    <div style="border: 1px solid #DDDEE0; height: 58px; display: flex; align-items: center; justify-content: center; color: #B08A3E; font-size: 20px; font-weight: 300">↗</div>
+  </div>
+</div>
+<p style="font-size: 11.5px; line-height: 1.5; color: #7A7F86; margin: 12px 0 0">Grade de referência — as formas acima demonstram peso e construção, não o conjunto final de ícones.</p>
+
+<sc-if value="{{ incluirProduto }}" hint-placeholder-val="{{ true }}">
+<div>
+  <div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px; break-before: page">
+    <div style="font-size: 13px; font-weight: 800; color: #B08A3E">09</div>
+    <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0">Produto <strong style="font-weight: 800">SaaS</strong></h2>
+  </div>
+
+  <p style="font-size: 14.5px; line-height: 1.65; color: #3F444A; margin: 0 0 22px; max-width: 34em">A marca institucional é declarativa; o produto é operacional. A tradução: mantém-se a paleta, a tipografia e o rigor geométrico, mas o dourado recua para ações primárias e o grafite deixa de ser fundo para virar texto. Densidade alta, ornamento zero — a tela mostra número, prazo e risco.</p>
+
+  <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Botões</h3>
+  <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 10px; break-inside: avoid">
+    <div style="background: #B08A3E; color: #fff; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 4px">Recuperar crédito</div>
+    <div style="background: #16181A; color: #fff; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 4px">Ação secundária</div>
+    <div style="border: 1px solid #C9C9C7; color: #16181A; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 4px">Contorno</div>
+    <div style="color: #8A6A28; font-size: 14px; font-weight: 600; padding: 10px 4px">Texto</div>
+    <div style="background: #EAEBEA; color: #9AA0A6; font-size: 14px; font-weight: 600; padding: 10px 18px; border-radius: 4px">Desabilitado</div>
+  </div>
+  <p style="font-size: 11.5px; line-height: 1.5; color: #7A7F86; margin: 0 0 24px">Altura 40 px (32 px em densidade compacta), raio 4 px, peso 600. Um único botão dourado por tela.</p>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px">
+    <div style="break-inside: avoid">
+      <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Campo</h3>
+      <div style="font-size: 12px; font-weight: 600; color: #3F444A; margin-bottom: 5px">CNPJ</div>
+      <div style="border: 1px solid #C9C9C7; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #16181A; background: #fff; font-variant-numeric: tabular-nums">00.000.000/0001-00</div>
+      <div style="font-size: 12px; color: #7A7F86; margin-top: 5px">Somente números. Máscara automática.</div>
+      <div style="border: 1px solid #A32B23; border-radius: 4px; padding: 10px 12px; font-size: 14px; color: #16181A; background: #fff; margin-top: 12px">Sem registro na base</div>
+      <div style="font-size: 12px; color: #A32B23; margin-top: 5px">Verifique o documento informado.</div>
+    </div>
+    <div style="break-inside: avoid">
+      <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Estados</h3>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <div style="background: #E7F1EC; color: #1F5B42; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px">Crédito homologado</div>
+        <div style="background: #FBEDE4; color: #8A3D14; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px">Prazo em 12 dias</div>
+        <div style="background: #F7E6E4; color: #7E1F19; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px">Risco de autuação</div>
+        <div style="background: #E5EDF3; color: #274A62; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px">Em análise</div>
+        <div style="background: #EAEBEA; color: #5A6068; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 999px">Arquivado</div>
+      </div>
+      <p style="font-size: 12.5px; line-height: 1.55; color: #3F444A; margin: 14px 0 0">O rótulo diz o estado do processo, não a cor. Cada estado tem fundo a 10% e texto a 80% da matiz semântica.</p>
+    </div>
+  </div>
+
+  <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Indicadores</h3>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; break-inside: avoid">
+    <div style="border: 1px solid #DDDEE0; border-top: 3px solid #B08A3E; padding: 16px">
+      <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A7F86; margin-bottom: 8px">Crédito identificado</div>
+      <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">R$ 4.812.390</div>
+      <div style="font-size: 12px; color: #2E7D5B; font-weight: 600; margin-top: 4px">+ 12,4% no trimestre</div>
+    </div>
+    <div style="border: 1px solid #DDDEE0; border-top: 3px solid #DDDEE0; padding: 16px">
+      <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A7F86; margin-bottom: 8px">Teses em análise</div>
+      <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">17</div>
+      <div style="font-size: 12px; color: #7A7F86; margin-top: 4px">3 aguardam documento</div>
+    </div>
+    <div style="border: 1px solid #DDDEE0; border-top: 3px solid #DDDEE0; padding: 16px">
+      <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #7A7F86; margin-bottom: 8px">Prazo mais próximo</div>
+      <div style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">12 dias</div>
+      <div style="font-size: 12px; color: #B4551F; font-weight: 600; margin-top: 4px">PIS/Cofins · Rede Fort</div>
+    </div>
+  </div>
+
+  <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Tabela de dados</h3>
+  <table style="width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 10px">
+    <thead>
+      <tr style="background: #16181A; color: #fff; text-align: left">
+        <th style="padding: 9px 12px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700">Cliente</th>
+        <th style="padding: 9px 12px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700">Tese</th>
+        <th style="padding: 9px 12px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; text-align: right">Valor</th>
+        <th style="padding: 9px 12px; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700">Situação</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid #EAEBEA"><td style="padding: 10px 12px; font-weight: 600">Rede Fort</td><td style="padding: 10px 12px; color: #5A6068">ICMS-ST na base do PIS/Cofins</td><td style="padding: 10px 12px; text-align: right; font-variant-numeric: tabular-nums">R$ 1.204.880</td><td style="padding: 10px 12px"><span style="background: #E7F1EC; color: #1F5B42; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px">Homologado</span></td></tr>
+      <tr style="border-bottom: 1px solid #EAEBEA; background: #FAFAF9"><td style="padding: 10px 12px; font-weight: 600">Cotrilac</td><td style="padding: 10px 12px; color: #5A6068">Crédito presumido — insumos</td><td style="padding: 10px 12px; text-align: right; font-variant-numeric: tabular-nums">R$ 862.410</td><td style="padding: 10px 12px"><span style="background: #E5EDF3; color: #274A62; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px">Em análise</span></td></tr>
+      <tr style="border-bottom: 1px solid #EAEBEA"><td style="padding: 10px 12px; font-weight: 600">Belebas</td><td style="padding: 10px 12px; color: #5A6068">Exclusão do ICMS — base própria</td><td style="padding: 10px 12px; text-align: right; font-variant-numeric: tabular-nums">R$ 517.230</td><td style="padding: 10px 12px"><span style="background: #FBEDE4; color: #8A3D14; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px">Prazo curto</span></td></tr>
+    </tbody>
+  </table>
+  <p style="font-size: 11.5px; line-height: 1.5; color: #7A7F86; margin: 0 0 24px">Cabeçalho grafite, linhas de 40 px, zebra em #FAFAF9, valores alinhados à direita em números tabulares. Sem bordas verticais.</p>
+
+  <div style="background: #16181A; padding: 20px 22px; break-inside: avoid">
+    <div style="font-size: 9.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #B08A3E; margin-bottom: 10px">Regras não negociáveis do produto</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 12.5px; line-height: 1.5; color: #D4D7DA">
+      <div>Contraste mínimo AA (4.5:1) em todo texto.</div>
+      <div>Alvo de toque mínimo de 44 px no mobile.</div>
+      <div>Um acento dourado por tela.</div>
+      <div>Nenhum degradê, nenhuma sombra colorida.</div>
+      <div>Todo número monetário em tabular-nums.</div>
+      <div>Estado vazio sempre com próxima ação explícita.</div>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px; break-before: page">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">10</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0">Slides e <strong style="font-weight: 800">impressos</strong></h2>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 26px">
+  <div style="break-inside: avoid">
+    <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 10px">Slides</h3>
+    <div style="background: #16181A; height: 168px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 10px">
+      <div style="font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: #B08A3E">Grupo VOW</div>
+      <div style="font-size: 22px; line-height: 1.08; font-weight: 300; text-transform: uppercase; color: #fff">Reforma<br /><strong style="font-weight: 800">tributária</strong></div>
+      <div style="font-size: 8px; color: #6E747B">Setembro 2026</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; line-height: 1.5; color: #3F444A">
+      <div>1920 × 1080. Capa e divisores em grafite; conteúdo em branco.</div>
+      <div>Corpo mínimo 24 px; títulos 54 px a 72 px.</div>
+      <div>Máximo de um gráfico por slide, sempre com a conclusão escrita.</div>
+    </div>
+  </div>
+  <div style="break-inside: avoid">
+    <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 10px">Impressos</h3>
+    <div style="border: 1px solid #DDDEE0; height: 168px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; margin-bottom: 10px; background: #fff">
+      <div style="font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: #B08A3E">Parecer técnico</div>
+      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 18px; line-height: 1.3; color: #16181A">Exclusão do ICMS-ST da base de cálculo do PIS e da Cofins</div>
+      <div style="height: 3px; width: 40px; background: #16181A"></div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; line-height: 1.5; color: #3F444A">
+      <div>Corpo 11 pt a 12 pt, entrelinha 1,5; margem 18 mm.</div>
+      <div>Papel offset 120 g; sem verniz nem cor de fundo cheia.</div>
+      <div>Documentos técnicos em Source Serif; comerciais em Manrope.</div>
+    </div>
+  </div>
+</div>
+
+<sc-if value="{{ incluirTomDeVoz }}" hint-placeholder-val="{{ true }}">
+<div>
+  <div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px; break-before: page">
+    <div style="font-size: 13px; font-weight: 800; color: #B08A3E">11</div>
+    <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0">Tom de <strong style="font-weight: 800">voz</strong></h2>
+  </div>
+
+  <p style="font-size: 14.5px; line-height: 1.65; color: #3F444A; margin: 0 0 22px; max-width: 34em">A VOW fala como quem domina o assunto e não precisa levantar a voz. Institucionalmente, o tom é de convicção; no produto, é de instrução — curto, literal, sem adjetivo.</p>
+
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; break-inside: avoid">
+    <div style="border-top: 2px solid #16181A; padding-top: 10px"><div style="font-size: 13px; font-weight: 700; margin-bottom: 4px">Firme</div><p style="font-size: 12px; line-height: 1.5; margin: 0; color: #5A6068">Afirma. Não sugere, não pede desculpa.</p></div>
+    <div style="border-top: 2px solid #16181A; padding-top: 10px"><div style="font-size: 13px; font-weight: 700; margin-bottom: 4px">Preciso</div><p style="font-size: 12px; line-height: 1.5; margin: 0; color: #5A6068">Número, prazo e base legal no lugar de promessa.</p></div>
+    <div style="border-top: 2px solid #16181A; padding-top: 10px"><div style="font-size: 13px; font-weight: 700; margin-bottom: 4px">Claro</div><p style="font-size: 12px; line-height: 1.5; margin: 0; color: #5A6068">Traduz o jargão fiscal sem diluir o rigor.</p></div>
+    <div style="border-top: 2px solid #16181A; padding-top: 10px"><div style="font-size: 13px; font-weight: 700; margin-bottom: 4px">Do lado do cliente</div><p style="font-size: 12px; line-height: 1.5; margin: 0; color: #5A6068">O herói é o empresário; a VOW é o meio.</p></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #DDDEE0; border: 1px solid #DDDEE0; margin-bottom: 24px">
+    <div style="background: #fff; padding: 14px 16px; break-inside: avoid">
+      <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #2E7D5B; font-weight: 700; margin-bottom: 8px">Escreva assim</div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; line-height: 1.5; color: #3F444A">
+        <div>“Identificamos R$ 4,8 milhões em créditos recuperáveis nos últimos 60 meses.”</div>
+        <div>“Prazo prescricional em 12 dias. Envie as notas de entrada para prosseguir.”</div>
+        <div>“Nenhuma tese em análise. Cadastre a primeira empresa para começar.”</div>
+      </div>
+    </div>
+    <div style="background: #fff; padding: 14px 16px; break-inside: avoid">
+      <div style="font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #A32B23; font-weight: 700; margin-bottom: 8px">Não escreva assim</div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; line-height: 1.5; color: #7A7F86">
+        <div>“Podemos ajudar sua empresa a economizar muito dinheiro!”</div>
+        <div>“Atenção! Você pode perder seu direito, corra!”</div>
+        <div>“Ops, nada por aqui ainda 😀”</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; margin: 0 0 12px">Padrões de escrita</h3>
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 24px; font-size: 12.5px; line-height: 1.55; color: #3F444A; margin-bottom: 8px">
+    <div><strong>Marca:</strong> “Grupo VOW” na primeira menção, “VOW” depois. Nunca “Vow” nem “V.O.W.”</div>
+    <div><strong>Valores:</strong> R$ 4,8 milhões em texto corrido; R$ 4.812.390 em dados.</div>
+    <div><strong>Botões:</strong> verbo no infinitivo — “Enviar documentos”, não “Envio”.</div>
+    <div><strong>Erros:</strong> diga o que aconteceu e qual é a próxima ação. Nunca culpe o usuário.</div>
+    <div><strong>Jargão:</strong> explique na primeira aparição — “ICMS-ST (substituição tributária)”.</div>
+    <div><strong>Emoji:</strong> não se usa em nenhuma peça da marca.</div>
+  </div>
+</div>
+</sc-if>
+
+<div style="display: flex; align-items: baseline; gap: 14px; border-bottom: 1px solid #16181A; padding-bottom: 10px; margin: 0 0 26px; break-before: page">
+  <div style="font-size: 13px; font-weight: 800; color: #B08A3E">12</div>
+  <h2 style="font-family: 'Manrope', sans-serif; font-weight: 300; font-size: 26px; text-transform: uppercase; letter-spacing: -0.01em; margin: 0"><strong style="font-weight: 800">Pendências</strong></h2>
+</div>
+
+<p style="font-size: 14.5px; line-height: 1.65; color: #3F444A; margin: 0 0 20px; max-width: 34em">Este manual foi reconstruído a partir do site público. Os itens abaixo precisam dos arquivos originais para fechar em versão definitiva.</p>
+
+<div style="display: flex; flex-direction: column; gap: 1px; background: #DDDEE0; border: 1px solid #DDDEE0; margin-bottom: 26px">
+  <div style="background: #fff; padding: 12px 16px; display: flex; gap: 14px; align-items: baseline"><div style="width: 14px; height: 14px; border: 1.5px solid #B08A3E; flex-shrink: 0"></div><div style="font-size: 13px; line-height: 1.5">Hex exatos do <strong>Cinza Concrete</strong> e do <strong>Cinza Storm</strong> conforme manual original — os valores aqui são aproximações.</div></div>
+  <div style="background: #fff; padding: 12px 16px; display: flex; gap: 14px; align-items: baseline"><div style="width: 14px; height: 14px; border: 1.5px solid #B08A3E; flex-shrink: 0"></div><div style="font-size: 13px; line-height: 1.5">Confirmação do <strong>Dourado VOW</strong> como cor de acento, ou substituição pela cor de sinalização já em uso.</div></div>
+  <div style="background: #fff; padding: 12px 16px; display: flex; gap: 14px; align-items: baseline"><div style="width: 14px; height: 14px; border: 1.5px solid #B08A3E; flex-shrink: 0"></div><div style="font-size: 13px; line-height: 1.5">Arquivos vetoriais do <strong>caduceu</strong> e do logotipo, em positivo, negativo e monocromático.</div></div>
+  <div style="background: #fff; padding: 12px 16px; display: flex; gap: 14px; align-items: baseline"><div style="width: 14px; height: 14px; border: 1.5px solid #B08A3E; flex-shrink: 0"></div><div style="font-size: 13px; line-height: 1.5">Tipografia licenciada em uso hoje no site e nos materiais — se houver, substitui as escolhas deste documento.</div></div>
+  <div style="background: #fff; padding: 12px 16px; display: flex; gap: 14px; align-items: baseline"><div style="width: 14px; height: 14px; border: 1.5px solid #B08A3E; flex-shrink: 0"></div><div style="font-size: 13px; line-height: 1.5">Nome e posicionamento do <strong>produto SaaS</strong>, para fechar a regra de submarca.</div></div>
+  <div style="background: #fff; padding: 12px 16px; display: flex; gap: 14px; align-items: baseline"><div style="width: 14px; height: 14px; border: 1.5px solid #B08A3E; flex-shrink: 0"></div><div style="font-size: 13px; line-height: 1.5">Banco de imagens próprio da VOW, para substituir os espaços reservados de fotografia.</div></div>
+</div>
+
+<div style="border-top: 3px solid #16181A; padding-top: 14px; display: flex; justify-content: space-between; align-items: baseline; gap: 16px">
+  <div style="font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; color: #B08A3E">Grupo VOW</div>
+  <div style="font-size: 11px; color: #7A7F86">Porto Alegre · São Paulo · Brasília &nbsp;·&nbsp; grupovow.com.br</div>
+</div>
+
+</doc-page>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;incluirProduto&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Seções&quot;},&quot;incluirTomDeVoz&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Seções&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      incluirProduto: this.props.incluirProduto ?? true,
+      incluirTomDeVoz: this.props.incluirTomDeVoz ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>

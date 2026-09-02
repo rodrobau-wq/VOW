@@ -1,0 +1,686 @@
+<title>Dossiê VOW ABRAS 2027</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,400&display=swap">
+<style>
+  :root{
+    --ink:#16181A; --storm:#3F444A; --concrete:#C9C9C7; --gold:#B08A3E;
+    --surface:#FFFFFF; --canvas:#F6F6F5; --subtle:#EAEBEA; --border:#DDDEE0; --muted:#7A7F86;
+    --ok:#2E7D5B; --warn:#B4551F; --risk:#A32B23; --info:#35607F;
+    --ok-bg:#E7F0EB; --warn-bg:#F7EAE1; --risk-bg:#F6E3E1; --info-bg:#E4EDF3; --gold-bg:#F5EFE2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#F1F1F0; --storm:#B7BCC2; --concrete:#4A4E53; --gold:#D2AC63;
+      --surface:#24272B; --canvas:#16181A; --subtle:#2C3035; --border:#383C41; --muted:#9AA0A7;
+      --ok:#6FBF97; --warn:#DE9260; --risk:#E08279; --info:#7FAECB;
+      --ok-bg:#1B2E25; --warn-bg:#33231A; --risk-bg:#331E1C; --info-bg:#1B2A33; --gold-bg:#2E2716;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#F1F1F0; --storm:#B7BCC2; --concrete:#4A4E53; --gold:#D2AC63;
+    --surface:#24272B; --canvas:#16181A; --subtle:#2C3035; --border:#383C41; --muted:#9AA0A7;
+    --ok:#6FBF97; --warn:#DE9260; --risk:#E08279; --info:#7FAECB;
+    --ok-bg:#1B2E25; --warn-bg:#33231A; --risk-bg:#331E1C; --info-bg:#1B2A33; --gold-bg:#2E2716;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{
+    margin:0; background:var(--canvas); color:var(--ink);
+    font-family:Manrope,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px; line-height:1.62; font-variant-numeric:tabular-nums;
+  }
+  .wrap{max-width:940px; margin:0 auto; padding:0 28px}
+
+  /* ---------- capa ---------- */
+  .cover{background:var(--ink); color:#F1F1F0; padding:56px 0 44px; border-bottom:3px solid var(--gold)}
+  .mark{display:flex; align-items:center; gap:12px; margin-bottom:38px}
+  .mark .glyph{
+    width:34px; height:34px; border:1.5px solid var(--gold); color:var(--gold);
+    display:grid; place-items:center; font-weight:800; font-size:16px; letter-spacing:.02em;
+  }
+  .mark .who{font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--concrete); font-weight:500}
+  .sig{margin:0; line-height:1.02; text-transform:uppercase}
+  .sig .l1{display:block; font-weight:300; font-size:clamp(30px,6vw,58px); letter-spacing:-.01em; color:#F1F1F0}
+  .sig .l2{display:block; font-weight:800; font-size:clamp(30px,6vw,58px); letter-spacing:-.015em; color:var(--gold)}
+  .cover .sub{
+    margin:26px 0 0; max-width:60ch; color:var(--concrete);
+    font-family:"Source Serif 4",Georgia,serif; font-weight:300; font-size:19px; line-height:1.55;
+  }
+  .facts{display:flex; flex-wrap:wrap; gap:0; margin-top:34px; border-top:1px solid #3F444A}
+  .facts div{padding:14px 26px 12px 0; margin-right:26px; border-right:1px solid #3F444A}
+  .facts div:last-child{border-right:0}
+  .facts b{display:block; font-size:17px; font-weight:700; color:#F1F1F0}
+  .facts span{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+
+  /* ---------- navegação ---------- */
+  nav{position:sticky; top:0; z-index:30; background:var(--canvas); border-bottom:1px solid var(--border)}
+  nav .row{max-width:940px; margin:0 auto; padding:9px 28px; display:flex; gap:6px; flex-wrap:wrap}
+  nav a{
+    font-size:12.5px; font-weight:700; letter-spacing:.02em; color:var(--storm); text-decoration:none;
+    padding:6px 11px; border:1px solid var(--border); background:var(--surface);
+  }
+  nav a:hover{border-color:var(--gold); color:var(--ink)}
+  a:focus-visible, summary:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+
+  /* ---------- estrutura ---------- */
+  section{padding:46px 0 6px; scroll-margin-top:58px}
+  .secnum{
+    font-size:11.5px; font-weight:800; letter-spacing:.2em; color:var(--gold);
+    display:flex; align-items:center; gap:12px; margin-bottom:10px;
+  }
+  .secnum::after{content:""; flex:1; height:1px; background:var(--border)}
+  h2{font-size:clamp(22px,3.2vw,31px); font-weight:800; letter-spacing:-.02em; margin:0 0 16px; text-wrap:balance; line-height:1.14}
+  h3{font-size:17.5px; font-weight:700; margin:32px 0 8px; letter-spacing:-.01em}
+  h4{font-size:14.5px; font-weight:700; margin:22px 0 6px}
+  p,li{max-width:70ch}
+  p{margin:0 0 14px}
+  ul,ol{padding-left:20px; margin:12px 0}
+  li{margin:7px 0}
+  li::marker{color:var(--gold)}
+  strong{font-weight:700}
+  .muted{color:var(--muted)}
+  .serif{font-family:"Source Serif 4",Georgia,serif; font-weight:300}
+
+  .lead{
+    font-family:"Source Serif 4",Georgia,serif; font-weight:300; font-size:20px; line-height:1.55;
+    max-width:64ch; margin:0 0 22px; color:var(--ink);
+  }
+  .rule{border-left:3px solid var(--gold); background:var(--gold-bg); padding:16px 20px; margin:20px 0}
+  .rule p{margin:0}
+  .rule p + p{margin-top:10px}
+  .note{border:1px solid var(--border); background:var(--surface); padding:16px 20px; margin:18px 0}
+  .note p{margin:0}
+  .note p + p{margin-top:10px}
+
+  /* ---------- tabelas ---------- */
+  .tw{overflow-x:auto; margin:18px 0; border:1px solid var(--border); background:var(--surface)}
+  table{border-collapse:collapse; width:100%; font-size:14px; min-width:580px}
+  th{
+    font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+    text-align:left; color:var(--muted); background:var(--subtle); padding:10px 14px; border-bottom:1px solid var(--border);
+  }
+  td{padding:11px 14px; border-top:1px solid var(--border); vertical-align:top; line-height:1.5}
+  tbody tr:first-child td{border-top:0}
+
+  .tag{display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; white-space:nowrap}
+  .t-ok{background:var(--ok-bg); color:var(--ok)}
+  .t-warn{background:var(--warn-bg); color:var(--warn)}
+  .t-risk{background:var(--risk-bg); color:var(--risk)}
+  .t-info{background:var(--info-bg); color:var(--info)}
+
+  /* ---------- cards ---------- */
+  .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); margin:20px 0}
+  .grid > div{background:var(--surface); padding:20px}
+  .grid .lbl{font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--gold)}
+  .grid h4{margin:8px 0 8px; font-size:16.5px; font-weight:800}
+  .grid p{font-size:14px; color:var(--storm); margin:0 0 10px}
+  .grid .role{font-size:12px; font-weight:700; color:var(--ink); border-top:1px solid var(--border); padding-top:10px; display:block}
+
+  .steps{counter-reset:s; margin:20px 0; display:flex; flex-direction:column; gap:1px; background:var(--border); border:1px solid var(--border)}
+  .steps > div{background:var(--surface); padding:15px 20px; display:grid; grid-template-columns:30px 1fr; gap:14px}
+  .steps .n{font-size:13px; font-weight:800; color:var(--gold); padding-top:1px}
+  .steps h4{margin:0 0 3px; font-size:14.5px}
+  .steps p{margin:0; font-size:14px; color:var(--storm)}
+
+  details{border:1px solid var(--border); background:var(--surface); margin:10px 0}
+  summary{cursor:pointer; padding:13px 18px; font-weight:700; font-size:14.5px}
+  details[open] summary{border-bottom:1px solid var(--border)}
+  details .body{padding:14px 20px 16px}
+  details .body p:last-child, details .body ul:last-child{margin-bottom:0}
+
+  dl{display:grid; grid-template-columns:minmax(130px,max-content) 1fr; gap:7px 20px; margin:16px 0; font-size:14px}
+  dt{font-weight:700}
+  dd{margin:0; color:var(--storm)}
+
+  .srcs{font-size:13.5px}
+  .srcs li{margin:5px 0}
+  .srcs a{color:var(--info)}
+
+  footer{border-top:1px solid var(--border); margin-top:44px; padding:22px 0 46px; color:var(--muted); font-size:12.5px}
+
+  @media (max-width:640px){
+    .facts div{border-right:0; padding-right:0; margin-right:0; min-width:46%}
+    dl{grid-template-columns:1fr}
+    dd{margin-bottom:8px}
+    .steps > div{grid-template-columns:24px 1fr; gap:10px}
+  }
+</style>
+
+<header class="cover">
+  <div class="wrap">
+    <div class="mark">
+      <div class="glyph">V</div>
+      <div class="who">Grupo VOW &middot; Reforma tributária no varejo supermercadista</div>
+    </div>
+    <h1 class="sig"><span class="l1">Suíte</span><span class="l2">Reforma</span></h1>
+    <p class="sub">Documento único de trabalho: o que muda, os três produtos, o Raio-X do fornecedor, os acordos comerciais e a estratégia comercial até a feira. Consolida tudo o que foi produzido entre 1º e 2 de setembro de 2026.</p>
+    <div class="facts">
+      <div><b>3 produtos</b><span>Itens · Fornecedores · Contratos</span></div>
+      <div><b>30/09/2026</b><span>Janela do Simples</span></div>
+      <div><b>Jan/2027</b><span>CBS em vigor</span></div>
+      <div><b>12–13/04/2027</b><span>Smart Market ABRAS</span></div>
+    </div>
+  </div>
+</header>
+
+<nav aria-label="Seções">
+  <div class="row">
+    <a href="#tese">1 · Tese</a>
+    <a href="#reforma">2 · O que muda</a>
+    <a href="#produtos">3 · Produtos</a>
+    <a href="#raiox">4 · Raio-X</a>
+    <a href="#acordos">5 · Acordos</a>
+    <a href="#ritual">6 · Ritual anual</a>
+    <a href="#nomes">7 · Nomes</a>
+    <a href="#comercial">8 · Estratégia</a>
+    <a href="#decisoes">9 · Decisões</a>
+    <a href="#glossario">Glossário</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<!-- 1 -->
+<section id="tese">
+  <div class="secnum">01 · A tese</div>
+  <h2>A operação física não muda. Muda de quem depende o imposto que você recupera.</h2>
+  <p class="lead">O pedido, o recebimento, a gôndola e o cliente continuam iguais. O que a reforma faz é transferir ao varejista uma responsabilidade que era do governo: o crédito de IBS/CBS só existe depois que o fornecedor paga o imposto dele. Três documentos que ninguém olhava passam a definir margem — o cadastro do item, o cadastro do fornecedor e o contrato.</p>
+
+  <p>A VOW resolve isso hoje à mão, cliente a cliente. A tese do projeto é embarcar essa inteligência numa suíte plugável nos ERPs, automatizando o repetitivo e mantendo o interpretativo como serviço humano. Estimativa da própria equipe: <strong>30% a 50% do pacote de consultoria é migrável</strong> — o suficiente para multiplicar a capacidade de entrega sem multiplicar o time.</p>
+
+  <h3>Os cinco princípios que governam tudo o que vem depois</h3>
+  <div class="tw"><table>
+    <tbody>
+      <tr><td style="width:34%"><strong>Sistema para o repetitivo, gente para o interpretativo</strong></td><td>Um alimenta o outro. Societário, logística e caso raro nunca viram software.</td></tr>
+      <tr><td><strong>A inteligência é da VOW</strong></td><td>Parâmetros, modelos e critérios embarcados; segmentáveis por ramo. É o que separa a ferramenta de um concorrente com a mesma stack.</td></tr>
+      <tr><td><strong>Resolver 20–30% da reforma já é produto</strong></td><td>Não é preciso cobrir tudo para vender. Melhorias entram a cada regulamentação.</td></tr>
+      <tr><td><strong>Nunca vender velocidade</strong></td><td>"Fazemos em 3 horas o que levava 15 dias" destrói a âncora de preço da consultoria. Vender segurança, compliance e crédito preservado.</td></tr>
+      <tr><td><strong>Nunca prometer um número</strong></td><td>Nada de valor em reais em deck, totem ou site. A promessa é "medimos na sua base". Os números deste documento são munição interna.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="rule"><p><strong>Sobre os números que aparecem aqui.</strong> Este documento tem exemplos em reais porque ele existe para vocês decidirem onde investir. Nenhum deles vai para material comercial. A separação é por camada, não por escolha: <strong>número dimensiona a oportunidade internamente; diagnóstico entrega o número ao cliente.</strong></p></div>
+</section>
+
+<!-- 2 -->
+<section id="reforma">
+  <div class="secnum">02 · O que muda com a reforma</div>
+  <h2>A mecânica, o calendário e os números</h2>
+
+  <h3>A mecânica do crédito — três artigos explicam o produto inteiro</h3>
+  <div class="tw"><table>
+    <thead><tr><th style="width:16%">Dispositivo</th><th>O que estabelece</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Art. 27</strong><br>LC 214/2025</td><td>O débito do fornecedor se extingue por cinco modalidades: compensação, pagamento pelo contribuinte, <em>split payment</em>, recolhimento pelo adquirente (RAD) e pagamento por responsável legal.</td></tr>
+      <tr><td><strong>Art. 47</strong></td><td>O adquirente apropria o crédito <strong>quando ocorrer a extinção do débito</strong>. É a ruptura central: por quarenta anos o crédito nascia com a nota idônea; agora nasce com o comportamento de um terceiro.</td></tr>
+      <tr><td><strong>Art. 48</strong></td><td>O requisito de extinção <strong>fica dispensado</strong> enquanto <em>split payment</em> e RAD não estiverem implementados. É a válvula que segura a bomba hoje — e é por isso que o problema é entendido antes de doer.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Efeito de fundo: a apuração fiscal do varejo deixa de ser conferência de documento e vira <strong>análise de risco de contraparte</strong>.</p>
+
+  <h3>O calendário — e onde está a janela comercial</h3>
+  <div class="tw"><table>
+    <thead><tr><th style="width:19%">Quando</th><th>O que acontece</th><th style="width:22%">Efeito no crédito</th></tr></thead>
+    <tbody>
+      <tr><td><strong>2026</strong><br>agora</td><td>Fase de teste: CBS 0,9% + IBS 0,1%. Desde <strong>03/08/2026</strong>, nota sem os campos de IBS/CBS consistentes é rejeitada na origem.</td><td>Valor irrisório — mas <strong>o dado já circula</strong> e permite construir o monitoramento com notas reais.</td></tr>
+      <tr><td><strong>01–30/09/2026</strong></td><td>Janela de opção do Simples pelo regime regular de IBS/CBS, no Portal de Serviços da Receita. Efeitos a partir de jan/2027; revisável em <strong>março e setembro</strong> de cada ano.</td><td>Define a classe de crédito de boa parte da cadeia. <strong>Não é consultável por terceiros.</strong></td></tr>
+      <tr><td><strong>2027</strong></td><td>CBS em vigor cheia (substitui PIS/Cofins); IBS em transição. <em>Split payment</em> <strong>opcional</strong>. RAD disponível.</td><td>A condição do art. 47 passa a valer onde <em>split</em> ou RAD forem usados. Adesão desigual = risco desigual.</td></tr>
+      <tr><td><strong>2028</strong></td><td><em>Split payment</em> obrigatório — a Receita anunciou o adiamento em 30/08/2026; mais de 200 instituições financeiras aderem gradualmente ao longo de 2027.</td><td>Condição plenamente aplicável. Sem monitoramento, o crédito vira loteria.</td></tr>
+      <tr><td><strong>2029–2033</strong></td><td>Transição do IBS; fim de ICMS e ISS em 2033.</td><td>Sete anos com dois sistemas convivendo.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="rule"><p><strong>A leitura estratégica.</strong> O adiamento do <em>split payment</em> não elimina o problema — ele define a janela de venda. O varejista tem 2027 para se preparar com risco baixo e 2028 para descobrir se preparou. Vender em abril de 2027 é vender no ponto em que a dor já é entendida e ainda não dói. É o melhor momento comercial que existe.</p></div>
+
+  <h3>Alíquotas — e por que a alíquota cheia não serve para calcular nada</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Faixa</th><th>Alíquota</th><th>O que entra</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag t-ok">Zero</span></td><td>0%</td><td>Cesta Básica Nacional: arroz, feijão, carnes, leite, ovos, farinhas, óleos, hortifrúti in natura, açúcar, sal, café, pão francês, massas.</td></tr>
+      <tr><td><span class="tag t-info">Redução 60%</span></td><td>≈ 10,6% efetivos</td><td>Anexos IV a XI: alimentos fora da cesta, higiene e limpeza, dispositivos médicos, insumos agropecuários, entre outros.</td></tr>
+      <tr><td><span class="tag t-warn">Referência</span></td><td>26,5% (trava)<br>27,91% estimada pelo CGIBS</td><td>Demais itens.</td></tr>
+      <tr><td><span class="tag t-risk">Seletivo</span></td><td>a definir</td><td>Bebidas açucaradas, alcoólicas e cigarros — categorias relevantes no mix de supermercado.</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Consequência de produto:</strong> supermercado compra os três tipos ao mesmo tempo. Calcular exposição com alíquota cheia produz número falso — e número falso no painel do CFO custa o contrato. Só a classificação correta dos itens (Produto 1) permite valorar o risco de um fornecedor.</p>
+
+  <h3>O saldo credor — o maior número do setor, e o que faltava no material</h3>
+  <p>Categorias de cesta básica representam <strong>35% a 50% do faturamento</strong> de supermercados de bairro, com alíquota zero. Vender a zero comprando insumo e serviço tributados (energia, aluguel, frete, facilities, TI — todos agora creditáveis) produz <strong>saldo credor estrutural e recorrente</strong>. E a LC 214 devolve esse saldo em prazos escalonados:</p>
+  <div class="tw"><table>
+    <thead><tr><th style="width:14%">Prazo</th><th>Para quem</th></tr></thead>
+    <tbody>
+      <tr><td><span class="tag t-ok">30 dias</span></td><td>Contribuintes em <strong>programa de conformidade</strong> reconhecido pelo Comitê Gestor e pela Receita Federal.</td></tr>
+      <tr><td><span class="tag t-warn">60 dias</span></td><td>Quem atende aos critérios do art. 40 sem estar em conformidade.</td></tr>
+      <tr><td><span class="tag t-risk">180 dias</span></td><td>Os demais.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="rule">
+    <p><strong>Hipótese de maior valor de todo o projeto — a validar com a VOW.</strong> Se a diligência documentada sobre fornecedores contar como critério de programa de conformidade, o produto deixa de ser defesa e vira a chave do caixa: sair de 180 para 30 dias libera cinco meses de saldo credor.</p>
+    <p>Numa rede que acumula R$ 2 milhões por mês, são R$ 10 milhões de capital de giro destravados. É o argumento que faz um CFO assinar — e ele ainda não está em nenhum deck.</p>
+  </div>
+
+  <h3>O mercado que estará na feira</h3>
+  <p>Ranking ABRAS 2026, ano-base 2025: varejo alimentar de <strong>R$ 1,14 trilhão</strong> (+7,32% nominal, +3,68% real), <strong>439.728 lojas</strong>, 9 milhões de empregos, <strong>9,02% do PIB</strong>. Autosserviço R$ 563,6 bi (49%), atacarejo R$ 327,7 bi (29%), <strong>empresas do Simples R$ 167,1 bi (15%)</strong>, mercearias R$ 79,4 bi (7%), marketplaces R$ 7,3 bi (1%).</p>
+  <p class="muted">Esse último número é o argumento do regime do fornecedor em uma linha: uma fatia enorme da cadeia está exatamente no regime que limita crédito.</p>
+</section>
+
+<!-- 3 -->
+<section id="produtos">
+  <div class="secnum">03 · Os três produtos</div>
+  <h2>Papéis diferentes, não três apostas iguais</h2>
+  <p class="lead">P1 vende o P2, e o P2 prepara o P3. O saneamento abre a porta porque já existe e todo mundo precisa; o monitoramento cria a assinatura mensal que sustenta o negócio; contratos transforma o cliente em cliente de dez anos.</p>
+
+  <div class="grid">
+    <div>
+      <div class="lbl">Produto 1</div>
+      <h4>Saneamento de itens</h4>
+      <p>Importa a base de SKUs, cruza com a base mestre, aponta erros de cClassTrib, NCM e CST e calcula o ganho da correção sobre o histórico de vendas.</p>
+      <span class="role">Porta de entrada · protótipo pronto</span>
+    </div>
+    <div>
+      <div class="lbl">Produto 2</div>
+      <h4>Monitoramento de fornecedores</h4>
+      <p>Vigia contínua dos CNPJs do ERP: regime, regularidade, semáforo no pedido, bloqueio com alçada e alerta de ruptura antes da gôndola faltar.</p>
+      <span class="role">Bandeira da feira · assinatura recorrente</span>
+    </div>
+    <div>
+      <div class="lbl">Produto 3</div>
+      <h4>Contratos e acordos</h4>
+      <p>Ciclo completo com inteligência tributária: minutas por tipo e regime, importação de contrato de terceiro, score de risco, aprovação, assinatura e <em>gate</em> de pagamento.</p>
+      <span class="role">Retenção e expansão</span>
+    </div>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Dimensão</th><th>P1 Itens</th><th>P2 Fornecedores</th><th>P3 Contratos</th></tr></thead>
+    <tbody>
+      <tr><td>Urgência</td><td><span class="tag t-ok">Alta</span></td><td><span class="tag t-ok">Alta e vigente</span></td><td><span class="tag t-ok">Alta, crescente</span></td></tr>
+      <tr><td>Defensabilidade</td><td><span class="tag t-warn">Média — commoditizável</span></td><td><span class="tag t-ok">Alta</span></td><td><span class="tag t-ok">Alta no conteúdo</span></td></tr>
+      <tr><td>Prontidão</td><td><span class="tag t-ok">Protótipo pronto</span></td><td><span class="tag t-warn">A construir</span></td><td><span class="tag t-risk">Ciclo longo</span></td></tr>
+      <tr><td>Receita natural</td><td>Projeto + <em>success fee</em></td><td>Assinatura por carteira</td><td>Assinatura + implantação</td></tr>
+      <tr><td>Papel</td><td>Aquisição</td><td>Recorrência</td><td>Retenção</td></tr>
+    </tbody>
+  </table></div>
+
+  <details>
+    <summary>Produto 1 · o que já existe e o que falta</summary>
+    <div class="body">
+      <p><strong>Existe no protótipo:</strong> onboarding por CNPJ com busca automática, upload assíncrono com worker em fila, painel de percentual saneado e ganho por mês, base mestre compartilhada entre clientes, captura de lead, motor de regras com vigência e <em>push</em> de anomalias com nota explicativa.</p>
+      <p><strong>Falta:</strong> tratamento de itens de peso variável; migrar a fonte de classificação (hoje de terceiro) para base própria com conteúdo VOW; camada de curadoria humana; projeção futura e recuperação retroativa de cinco anos; book de entrega com embasamento legal; monitoramento contínuo.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Produto 2 · escopo funcional em seis módulos</summary>
+    <div class="body">
+      <ul>
+        <li><strong>M1 · Base.</strong> Sincronização do cadastro do ERP, enriquecimento por CNPJ, deduplicação por raiz, base mestre compartilhada.</li>
+        <li><strong>M2 · Verificação em três camadas.</strong> (1) fontes públicas disponíveis hoje; (2) <strong>evidência das próprias notas</strong> — o destaque obrigatório de IBS/CBS já entrega sinal antes de qualquer API; (3) consulta oficial de extinção, plugada quando o governo publicar. Varredura diária, mais checagem no pedido, no recebimento e a cada emissão em fornecimento continuado.</li>
+        <li><strong>M3 · Score 0–100 decomposto e auditável</strong>, com pesos calibrados pela VOW. Verde 80–100, amarelo 50–79, vermelho 0–49.</li>
+        <li><strong>M4 · Valor em risco e caixa.</strong> Crédito em risco, carrego, comparação RAD × aguardar extinção, comparador de custo líquido entre fornecedores.</li>
+        <li><strong>M5 · Alertas e continuidade.</strong> Bloqueio com motivo e alçada, cruzamento com cobertura de estoque, aviso ao próprio fornecedor.</li>
+        <li><strong>M6 · Log de diligência</strong> e relatório mensal de crédito preservado — o documento que renova o contrato.</li>
+      </ul>
+      <p class="muted"><strong>Fora de escopo:</strong> contratos (é o P3, produto separado — o P2 não gera nem avalia contrato), classificação de itens (é o P1, que alimenta a alíquota efetiva usada aqui), execução financeira do recolhimento.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Produto 2 · os seis ganhos para o varejo</summary>
+    <div class="body">
+      <div class="tw"><table>
+        <thead><tr><th style="width:24%">Ganho</th><th>Como se mede</th><th style="width:30%">Ordem de grandeza</th></tr></thead>
+        <tbody>
+          <tr><td><strong>A · Crédito preservado</strong></td><td>Compras × alíquota efetiva creditável × probabilidade de não extinção</td><td>Rede de R$ 300 mi: crédito de R$ 27 mi/ano. Perder 5% = R$ 1,35 mi — <strong>15% a 45% do lucro anual</strong> (margem do setor: 1% a 3%)</td></tr>
+          <tr><td><strong>B · Caixa</strong></td><td>Crédito mensal × dias até a extinção × custo de capital</td><td>R$ 2,25 mi/mês imobilizados por mês de atraso</td></tr>
+          <tr><td><strong>C · Custo líquido</strong></td><td>Preço da nota − crédito apropriável</td><td>Ver o alerta abaixo</td></tr>
+          <tr><td><strong>D · Ruptura evitada</strong></td><td>Dias de cobertura × giro × margem</td><td>Bloqueio sem alternativa = margem cheia perdida</td></tr>
+          <tr><td><strong>E · Conformidade</strong></td><td>CNPJs × frequência × tempo por consulta</td><td>1.000 fornecedores por semana ≈ 50 h — mais de um analista, num trabalho que expira em 7 dias</td></tr>
+          <tr><td><strong>F · Defesa documentada</strong></td><td>Log imutável de verificações</td><td>Diligência comprovada frente à responsabilidade solidária</td></tr>
+        </tbody>
+      </table></div>
+      <div class="rule"><p><strong>Cuidado com o argumento "4% contra 27,9%".</strong> Direcionalmente certo, numericamente exagerado — o preço do optante pela DAS já embute a carga dele a uma alíquota menor. Sobre o mesmo líquido ao fornecedor (R$ 94): o de crédito integral emite R$ 120,23 e devolve R$ 26,23 → custo líquido <strong>R$ 94,00</strong>; o da DAS cobra R$ 100 e devolve R$ 4 → custo líquido <strong>R$ 96,00</strong>. Vantagem de R$ 2: <strong>2,1% de desconto já empata</strong>. Todo mundo vai dizer "4% × 27,9%" no estande; a VOW mostra o custo líquido real por fornecedor e por item. Aritmética a validar com Juliano e William antes de virar material.</p></div>
+    </div>
+  </details>
+
+  <details>
+    <summary>Produto 3 · escopo e a ressalva do assinador</summary>
+    <div class="body">
+      <p>Minutas VOW por tipo (revenda direta, distribuidor, consignação, produtor rural, acordos comerciais, serviços, locação, marketplace) e por regime do fornecedor; importação de contrato imposto por grande fornecedor com extração de regras; score 0–100 com wizard de adequação; aprovação em alçadas fiscal e jurídica em paralelo; assinatura eletrônica; <em>gate</em> de pagamento — nenhum título pago sem contrato vinculado e fornecedor fora do vermelho; governança de vencimentos, renovações e reajustes.</p>
+      <div class="note"><p><strong>Ressalva:</strong> "assinador próprio" é promessa cara. Validade jurídica, carimbo de tempo e cadeia ICP-Brasil não são um sprint. Ou vira integração com assinador de mercado sob marca VOW, ou sai do MVP.</p></div>
+    </div>
+  </details>
+
+  <h3>O que nunca vira sistema</h3>
+  <p>Estrutura societária e holdings; logística e centros de distribuição, incluindo o fim de benefícios regionais; estratégia de compra, travada até a regulamentação; e o caso raro — item de peso variável, benefício estadual, operação atípica. Isso é conhecimento de setor, não software, e é o que sustenta o preço da consultoria.</p>
+</section>
+
+<!-- 4 -->
+<section id="raiox">
+  <div class="secnum">04 · O Raio-X do fornecedor</div>
+  <h2>Dois eixos, sete blocos</h2>
+  <p class="lead">Avaliar fornecedor na reforma responde a duas perguntas que não se confundem. Misturá-las num semáforo único é o erro mais comum — e o mais caro.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th style="width:22%">Eixo</th><th>Pergunta</th><th style="width:34%">Consequência se ruim</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Risco</strong></td><td>O débito dele vai ser extinto? Ele existe, opera e paga?</td><td>Crédito travado, responsabilidade solidária, nota inidônea</td></tr>
+      <tr><td><strong>Classe de crédito</strong></td><td>Quanto do imposto volta para mim quando compro dele?</td><td>Custo líquido maior — <strong>sem nenhuma irregularidade envolvida</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Crédito integral</th><th>Crédito limitado</th><th>Crédito quase nulo</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Risco baixo</strong></td><td><span class="tag t-ok">Preferencial</span></td><td>Aceitável com desconto compensatório</td><td>Só sem alternativa</td></tr>
+      <tr><td><strong>Risco médio</strong></td><td>Monitorar; exigir regularização</td><td><span class="tag t-warn">Renegociar ou substituir</span></td><td>Substituir</td></tr>
+      <tr><td><strong>Risco alto</strong></td><td>Bloqueio sugerido mesmo com bom crédito</td><td><span class="tag t-risk">Bloqueio</span></td><td><span class="tag t-risk">Bloqueio</span></td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>A leitura que importa:</strong> um fornecedor pode ser um problema sem ser irregular. Essa é a novidade da reforma e é exatamente o que o comprador ainda não sabe.</p>
+
+  <h3>Os sete blocos</h3>
+  <div class="steps">
+    <div><div class="n">1</div><div><h4>Identidade e existência</h4><p>Situação cadastral, data de abertura, capital, CNAE contra o que ele te vende, quadro societário, UF de origem. Empresa recém-aberta com volume alto e CNAE incompatível é o padrão clássico.</p></div></div>
+    <div><div class="n">2</div><div><h4>Regime tributário — o bloco que a reforma criou</h4><p>Lucro Real e Simples híbrido dão crédito integral; Simples na DAS, limitado; MEI, quase nada; rural, presumido. <strong>A opção pelo regime regular não é consultável por terceiros</strong> — ver o ponto cego abaixo.</p></div></div>
+    <div><div class="n">3</div><div><h4>Regularidade fiscal</h4><p>CND federal, CNDT, CRF do FGTS e listas restritivas estão disponíveis. Certidões estaduais são parciais (27 portais). SITFIS e Integra Contador exigem procuração. A consulta de extinção do débito de IBS/CBS <strong>não existe</strong>.</p></div></div>
+    <div><div class="n">4</div><div><h4>Comportamento documental — a camada que ninguém mais tem</h4><p>Destaque de IBS/CBS presente e consistente, cClassTrib coerente com o NCM, padrão de emissão e cancelamentos. O sinal mais forte do conjunto: <strong>divergência entre o regime declarado e o destaque na nota</strong>.</p></div></div>
+    <div><div class="n">5</div><div><h4>Materialidade e exposição</h4><p>Volume em 12 meses, itens fornecidos <strong>× classe tributária desses itens</strong>, cobertura de estoque, existência de alternativa homologada, prazo médio de pagamento. A exposição é proporcional ao imposto embutido, não ao volume.</p></div></div>
+    <div><div class="n">6</div><div><h4>Saúde e continuidade</h4><p>Protestos, recuperação judicial, tempo de relacionamento, reincidência, mudança recente de sócio ou endereço. Reincidência pesa mais que pendência isolada.</p></div></div>
+    <div><div class="n">7</div><div><h4>Sinais compostos — onde está o valor</h4><p>Nada disso se vê olhando um CNPJ por vez. É aqui que a consulta vira análise.</p></div></div>
+  </div>
+
+  <h4>Os oito sinais compostos</h4>
+  <ol>
+    <li><strong>Concentração escondida por sócio.</strong> Vários fornecedores, mesmo quadro societário. O comprador acha que tem três fontes e tem uma; um bloqueio derruba as três.</li>
+    <li><strong>Fornecedor crítico em risco.</strong> Volume alto, item sem alternativa, faixa amarela ou vermelha. É a lista de cinco nomes que o diretor precisa ver — não a de oitocentos.</li>
+    <li><strong>Divergência regime × nota.</strong> Declarou híbrido e não destaca por fora, ou o contrário.</li>
+    <li><strong>Mapa da janela do Simples.</strong> Quem optou, quem não optou, quem não respondeu. Gera três ações comerciais distintas.</li>
+    <li><strong>Exposição concentrada de crédito.</strong> Ranking por <em>imposto embutido</em>, não por faturamento — costuma ser uma lista bem diferente da curva ABC, e essa surpresa é uma ótima cena de demonstração.</li>
+    <li><strong>Suspeita de operação inidônea.</strong> CNAE incompatível, abertura recente, volume desproporcional ao capital, endereço compartilhado.</li>
+    <li><strong>Custo líquido enganoso.</strong> Melhor preço bruto com crédito limitado contra o segundo colocado com crédito integral, e o ponto de virada em percentual de desconto.</li>
+    <li><strong>Deriva silenciosa.</strong> Quem estava verde e escorregou de faixa sem ninguém perceber. O alerta é a mudança de estado, não o estado.</li>
+  </ol>
+
+  <div class="rule">
+    <p><strong>O ponto cego que vira oportunidade.</strong> A opção do Simples pelo regime regular abriu em 01/09/2026, fecha em 30/09, e <strong>só o próprio contribuinte consegue consultar</strong>. Nenhum concorrente resolve isso com API, porque API não existe.</p>
+    <p>Resolve-se com <strong>coleta declarada</strong>: o portal do fornecedor — que o Sistema 1 já prevê para o aviso de pendência — pede a declaração do regime e o comprovante; a plataforma guarda, data e revalida nas janelas de março e setembro. A partir de 2027 a nota confirma sozinha. Essa base de regimes declarados vira <strong>ativo proprietário da VOW</strong> e cresce a cada cliente, como a base mestre de itens.</p>
+  </div>
+
+  <h3>O que sai do Raio-X</h3>
+  <div class="tw"><table>
+    <thead><tr><th style="width:26%">Artefato</th><th style="width:20%">Para quem</th><th>Conteúdo</th></tr></thead>
+    <tbody>
+      <tr><td>Ficha do fornecedor</td><td>Comprador</td><td>Identidade, regime e classe de crédito, semáforo com motivo, itens, alternativas, histórico</td></tr>
+      <tr><td>Mapa da carteira</td><td>Diretoria e CFO</td><td>Matriz risco × classe de crédito, com o tamanho pela exposição de imposto</td></tr>
+      <tr><td>Ranking de exposição</td><td>Fiscal</td><td>Top 20 por imposto embutido em risco — não por volume</td></tr>
+      <tr><td>Fila de ação</td><td>Fiscal e comprador</td><td>Fato, causa, ação, com responsável e prazo obrigatórios</td></tr>
+      <tr><td>Mapa da janela</td><td>Comercial e compras</td><td>Quem optou pelo regime regular, quem não, quem falta responder</td></tr>
+    </tbody>
+  </table></div>
+  <p>O Raio-X é também <strong>o formato do diagnóstico gratuito</strong> que o deck promete. Entrega valor antes do contrato, não exige nenhuma promessa em reais — o número sai da base do próprio cliente — e o insumo é trivial: um extrato de fornecedores e doze meses de notas de entrada, que qualquer ERP exporta.</p>
+</section>
+
+<!-- 5 -->
+<section id="acordos">
+  <div class="secnum">05 · Acordos comerciais</div>
+  <h2>O acordo que está sendo negociado agora é o primeiro que roda sob a CBS</h2>
+  <p class="lead">O JBP de 2027 é negociado entre setembro e dezembro de 2026 e executado a partir de janeiro. Nenhuma das duas partes sabe ainda o tratamento tributário das linhas que está assinando — e a janela de correção não reabre depois de assinado.</p>
+
+  <h3>Por que essa é a melhor porta de entrada</h3>
+  <ul>
+    <li><strong>Tem data.</strong> Dá algo para vender nos próximos noventa dias, antes da feira.</li>
+    <li><strong>Tem dono e tem orçamento.</strong> O problema tributário do varejo não tem dono; o acordo comercial tem — o diretor comercial. E ele decide rápido.</li>
+    <li><strong>Fala a língua do cliente.</strong> "Reforma tributária" é assunto do contador. "Seu acordo de 2027" é assunto de quem manda.</li>
+  </ul>
+
+  <h3>A matriz por linha de acordo</h3>
+  <div class="tw"><table>
+    <thead><tr><th style="width:26%">Linha</th><th style="width:24%">Natureza sob a LC 214</th><th style="width:14%">Tributa?</th><th>Documento</th></tr></thead>
+    <tbody>
+      <tr><td>Desconto no preço, na própria nota</td><td>Redução da base</td><td><span class="tag t-ok">Não</span></td><td>Consta do documento da operação</td></tr>
+      <tr><td><strong>Bonificação em mercadoria na mesma nota</strong> ("dúzia de treze")</td><td>Não onerosa, com exceção aplicável</td><td><span class="tag t-ok">Não</span></td><td>Na nota, e desde que <strong>não dependa de evento posterior</strong></td></tr>
+      <tr><td><strong>Bonificação ou verba apurada depois</strong> (sell-out, meta, trimestre)</td><td>Não onerosa, sem a exceção</td><td><span class="tag t-risk">Sim</span></td><td>Documento próprio</td></tr>
+      <tr><td>Ponta de gôndola, espaço de exposição</td><td>Remuneração por utilidade econômica</td><td><span class="tag t-risk">Sim</span></td><td>Documento fiscal <strong>do varejista</strong></td></tr>
+      <tr><td>Retail media, impulsionamento, cessão de dados</td><td>Remuneração por utilidade econômica</td><td><span class="tag t-risk">Sim</span></td><td>Documento fiscal <strong>do varejista</strong></td></tr>
+      <tr><td>Rebate por volume refletido no preço</td><td>Desconto comercial</td><td><span class="tag t-ok">Reduz a base</span></td><td>Na nota</td></tr>
+      <tr><td>Recomposição de avaria ou defeito</td><td>Indenizatória</td><td><span class="tag t-ok">Não</span></td><td>Comprovação documentada</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="rule"><p><strong>O dispositivo que muda a cultura.</strong> O art. 5º da LC 214/2025 põe as operações não onerosas — bonificação incluída — no campo de incidência, e abre exceção no § 1º, I apenas quando ela <strong>consta do documento fiscal e não depende de evento posterior</strong>. O Decreto 12.955/26 define bonificação como "fornecimento a maior de bem ou serviço objeto da atividade do contribuinte em substituição a desconto no valor da operação". Traduzindo para o comprador: <strong>acabou o acerto retroativo.</strong> Aceitar a mercadoria com preço errado hoje e compensar com bonificação no mês que vem depende, por definição, de evento posterior — e vira operação tributada.</p></div>
+
+  <h3>A virada de posição negocial</h3>
+  <p>Quando o varejista cede gôndola, espaço ou mídia em troca de verba, ele está <strong>prestando um serviço</strong>. Sob a reforma, isso encadeia três consequências:</p>
+  <div class="steps">
+    <div><div class="n">1</div><div><p>O varejista emite documento fiscal e <strong>paga IBS/CBS sobre a verba recebida</strong>. Onde antes muitas dessas verbas circulavam como redução de custo, sem tributo, agora há incidência.</p></div></div>
+    <div><div class="n">2</div><div><p>A indústria, que paga a verba, <strong>toma crédito integral</strong> desse imposto.</p></div></div>
+    <div><div class="n">3</div><div><p>Logo, se a verba subir pelo valor do imposto, <strong>a indústria fica economicamente neutra</strong> — o que paga a mais, credita — <strong>e o varejista se mantém inteiro</strong>.</p></div></div>
+  </div>
+  <p><strong>Conclusão prática:</strong> a verba precisa ser recomposta pelo tributo no acordo de 2027, e essa recomposição não custa nada à indústria. É uma negociação em que existe resposta certa, e ela favorece o varejo — desde que o varejo saiba pedir. O contrário é o risco: cada real não recomposto vira imposto pago sobre uma receita que não era receita. Em redes onde a verba responde por perto de metade da última linha, o buraco tem a ordem de grandeza do lucro do ano. <strong>O tamanho exato sai do diagnóstico.</strong></p>
+  <p class="muted">Corolário: prestar serviço à indústria exige estrutura — CNAE compatível, emissão, apuração. Boa parte das redes vai descobrir isso em janeiro, na primeira campanha de retail media. Quem descobrir em outubro tem tempo.</p>
+</section>
+
+<!-- 6 -->
+<section id="ritual">
+  <div class="secnum">06 · O ritual anual de indiretos</div>
+  <h2>Não é um quarto produto. É o motivo pelo qual o cliente renova.</h2>
+  <p class="lead">Existe acordo anual para produto de revenda porque ali há verba, sell-out e disputa por gôndola. Nunca existiu para serviços, porque nunca houve nada em jogo além do preço. A reforma muda exatamente isso.</p>
+
+  <p>Facilities, frete, TI, marketing e locação passam a gerar crédito, e o crédito depende do regime do prestador e da existência de contrato. De repente o contrato de serviço tem as duas coisas que justificam um plano conjunto: <strong>dinheiro recuperável e uma contraparte que pode mudar de regime para te entregar mais</strong>.</p>
+
+  <div class="rule"><p><strong>O buraco que isso tapa.</strong> P1 é um projeto que termina, P2 é uma assinatura que o cliente esquece que tem, P3 é uma implantação. Nenhum dos três tem um momento anual em que alguém senta, olha um número e conclui que valeu — e assinatura sem esse momento churna no décimo terceiro mês. Um ritual com data no calendário, uma mesa e um número medido na base do cliente não churna, e ainda vende o ano seguinte sozinho.</p></div>
+
+  <h3>A mecânica</h3>
+  <div class="steps">
+    <div><div class="n">1</div><div><h4>Varrer</h4><p>Contas a pagar dos últimos doze meses cruzadas com a carteira. Todo CNPJ pago sem contrato vira alerta, priorizado por valor.</p></div></div>
+    <div><div class="n">2</div><div><h4>Classificar</h4><p>Cada prestador por classe de crédito e materialidade.</p></div></div>
+    <div><div class="n">3</div><div><h4>Calcular</h4><p>Custo líquido atual contra o potencial, prestador a prestador.</p></div></div>
+    <div><div class="n">4</div><div><h4>Separar em quatro ações</h4><p>Renegociar preço, migrar o regime, substituir, ou deixar como está.</p></div></div>
+    <div><div class="n">5</div><div><h4>Sentar</h4><p>Com os prioritários. Preço, prazo, SLA, regime e cláusulas da reforma na mesma folha.</p></div></div>
+    <div><div class="n">6</div><div><h4>Monitorar e reabrir</h4><p>Pelo P2, com reavaliação nas janelas de março e setembro — cadência que a lei já fixou.</p></div></div>
+  </div>
+
+  <p><strong>A frase que só existe nessa mesa:</strong> é a única negociação em que o varejista pode pagar mais e gastar menos. Se o prestador migra de regime, o crédito que volta cobre o aumento — o varejo pode até bancar parte do custo da migração e ainda sair positivo.</p>
+  <div class="note"><p><strong>Ressalva honesta:</strong> a zona de acordo é real mas estreita — alguns pontos, não vinte, como o cálculo de custo líquido já mostrou. Estreita demais para fazer de cabeça, o que é precisamente o argumento para a ferramenta existir. E o mercado de serviços é pulverizado, sem cultura de acordo anual: a venda é mais longa que a de revenda.</p></div>
+</section>
+
+<!-- 7 -->
+<section id="nomes">
+  <div class="secnum">07 · Nomes</div>
+  <h2>Nova rodada, por direção</h2>
+  <p class="lead">A rodada anterior girou toda em torno de três ideias — a mesa de negociação, o calendário e a descrição técnica — e nenhuma pegou. Estas são quatro direções deliberadamente diferentes.</p>
+
+  <h3>Antes: quatro critérios para decidir</h3>
+  <ol>
+    <li><strong>O comprador entende em um segundo?</strong> Se exige explicação, custa uma frase em toda reunião.</li>
+    <li><strong>Funciona falado?</strong> "Vamos fazer o ___ em março" precisa soar natural na boca de um diretor.</li>
+    <li><strong>É da VOW ou é de qualquer um?</strong> Nome descritivo não se defende.</li>
+    <li><strong>Sobrevive dito pelo fornecedor?</strong> Ele também vai usar a palavra.</li>
+  </ol>
+
+  <h3>Direção A · Vocabulário do próprio varejo</h3>
+  <p>Nomes emprestados do que o supermercado já faz. Vantagem: reconhecimento instantâneo, zero jargão importado.</p>
+  <div class="tw"><table>
+    <thead><tr><th style="width:26%">Nome</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Inventário de Fornecedores</strong></td><td>Todo supermercado faz inventário uma vez por ano: tem data, tem equipe, dói, e no fim você sabe o que realmente tem. Aplicar isso a fornecedores é novo e é entendido sem explicação nenhuma.</td></tr>
+      <tr><td><strong>Balanço de Cadeia</strong></td><td>"Balanço" carrega fechamento e prestação de contas. Mais formal, menos operacional.</td></tr>
+      <tr><td><strong>Curva C</strong></td><td>Provocação: a curva ABC ordena por volume; a reforma ordena por imposto embutido, e a lista é outra. Nome curto e memorável, mas exige a explicação da piada.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Direção B · Diagnóstico — e o símbolo já é de vocês</h3>
+  <p>O símbolo da marca é um caduceu. Uma família de nomes clínicos não seria empréstimo: seria coerência com um ativo que a VOW já tem. E "Raio-X" já pegou naturalmente na conversa.</p>
+  <div class="tw"><table>
+    <thead><tr><th style="width:26%">Nome</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Check-up de Cadeia</strong></td><td>Anual, preventivo, com laudo no fim. Encaixa perfeitamente num ritual de calendário e conversa com o Raio-X como exame pontual.</td></tr>
+      <tr><td><strong>Prontuário do Fornecedor</strong></td><td>Histórico acumulado por CNPJ, que é literalmente o que a base mestre é. Forte para o produto, fraco para o ritual.</td></tr>
+      <tr><td><strong>Laudo de Cadeia</strong></td><td>O entregável, não o processo. Sério, defensável em fiscalização.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><p>Se essa direção for escolhida, ela dá <strong>um sistema e não um nome</strong>: Raio-X é o exame de entrada e gratuito, Check-up é o ritual anual pago, Prontuário é o histórico dentro do produto, Laudo é o que se entrega. Quatro peças que se explicam sozinhas e reforçam umas às outras.</p></div>
+
+  <h3>Direção C · O que o cliente faz, não o que a VOW entrega</h3>
+  <p>Verbo no lugar de substantivo. Coloca o empresário como sujeito — que é o que a voz da marca pede.</p>
+  <div class="tw"><table>
+    <thead><tr><th style="width:26%">Nome</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Recompor</strong></td><td>Uma palavra. É exatamente o que acontece: a verba se recompõe, o cadastro se recompõe, a margem se recompõe. "Já recompomos a base?" funciona falado.</td></tr>
+      <tr><td><strong>Rever a Base</strong></td><td>Simples e claro, quase sem personalidade.</td></tr>
+      <tr><td><strong>Virada de Base</strong></td><td>Tem energia e conversa com "a virada" da reforma, que é como o setor já fala do 1º de janeiro.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Direção D · O estado final</h3>
+  <p>Nomear o resultado, não o processo. Vende bem, envelhece rápido se não entregar.</p>
+  <div class="tw"><table>
+    <thead><tr><th style="width:26%">Nome</th><th>Por quê</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Cadeia Limpa</strong></td><td>Direto e visual. Risco de soar a compliance genérico.</td></tr>
+      <tr><td><strong>Crédito Inteiro</strong></td><td>Nomeia a promessa exata: o crédito que chega inteiro no fim do mês. Curto, ownable, e o oposto — crédito pela metade — é a dor real.</td></tr>
+      <tr><td><strong>Base Sã</strong></td><td>Conversa com a direção clínica; enxuto e um pouco abstrato.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Recomendação</h3>
+  <p>Se for para escolher uma direção inteira e não um nome solto, a <strong>B (diagnóstico)</strong> é a mais forte, por três motivos: o caduceu já está na marca, "Raio-X" já entrou no vocabulário de vocês sem esforço, e ela produz um sistema de quatro nomes coerentes em vez de um nome isolado que depois briga com os outros.</p>
+  <p>Se for para escolher um nome único e imediato, <strong>Inventário de Fornecedores</strong> é o que menos precisa de explicação — e a analogia com o inventário anual carrega sozinha a ideia de ritual com data.</p>
+  <div class="note"><p><strong>Antes de imprimir:</strong> minha checagem cobriu web aberta, não o INPI. Vale consulta de marca na classe 35 antes de comprometer material. E se nenhuma destas servir, me diga o que incomodou — direção converge muito mais rápido que lista.</p></div>
+</section>
+
+<!-- 8 -->
+<section id="comercial">
+  <div class="secnum">08 · Estratégia comercial</div>
+  <h2>O funil, o calendário e o estande</h2>
+
+  <h3>O funil</h3>
+  <div class="steps">
+    <div><div class="n">1</div><div><h4>Acordo comercial · abridor</h4><p>Fala com o comercial, que tem orçamento e decide rápido. Não é módulo nem produto — é a primeira frase da conversa.</p></div></div>
+    <div><div class="n">2</div><div><h4>Raio-X gratuito · prova</h4><p>Entrega valor antes do contrato e mede na base do cliente, sem prometer número.</p></div></div>
+    <div><div class="n">3</div><div><h4>P2 Monitoramento · primeira recorrência</h4><p>A assinatura que sustenta o negócio.</p></div></div>
+    <div><div class="n">4</div><div><h4>P3 Contratos · expansão</h4><p>Onde o acordo comercial se resolve de fato, e onde o cliente fica dez anos.</p></div></div>
+  </div>
+  <p class="muted">Ajuste de vocabulário por porte: "JBP" é termo das grandes redes e da indústria de marca. Para regional e médio porte a mesma conversa se faz com "acordo comercial", "verba" e "contrato de fornecimento". Usar JBP com quem não usa soa a jargão emprestado.</p>
+
+  <h3>O calendário</h3>
+  <div class="tw"><table>
+    <thead><tr><th style="width:20%">Quando</th><th>O que</th><th style="width:34%">Por quê</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Set–dez/2026</strong></td><td>Oferta pontual de revisão do acordo de 2027 para 5–10 redes da base VOW. Fechar escopo dos produtos, decidir a fonte de classificação, construir o simulador da consulta de regularidade.</td><td>A janela contratual fecha em dezembro. É receita antes da feira, e produz os casos reais que o estande vai precisar.</td></tr>
+      <tr><td>Out–dez/2026</td><td>MVPs de P1 e P2 navegáveis; validação paralela em 1–2 clientes reais (sistema contra método tradicional).</td><td>Calibração e prova de qualidade antes de escalar.</td></tr>
+      <tr><td>Jan–fev/2027</td><td>Piloto pago com 1–3 clientes; pricing; formato no ERP (white label ou API com marca). Colher os primeiros efeitos práticos.</td><td>Prova social datada, do ano corrente.</td></tr>
+      <tr><td><strong>Mar–abr/2027</strong></td><td>Totem, material, treinamento comercial e funil pós-feira montado antes do estande existir.</td><td>O prospect chega tendo vivido o problema em janeiro. Lead de feira esfria em duas semanas.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="rule"><p><strong>O ponto estratégico:</strong> a oferta de outubro não depende de software. É consultoria com método, vendável já, que financia parte do build e gera os casos do estande. É o melhor uso possível dos próximos noventa dias.</p></div>
+
+  <h3>O estande</h3>
+  <p>Pergunta de abertura, no lugar de qualquer coisa sobre reforma:</p>
+  <div class="rule"><p class="serif" style="font-size:22px; margin:0">"Vocês já fecharam o acordo de 2027?"</p></div>
+  <p><strong>Sim</strong> → "Assinado com as regras de qual ano? A bonificação retroativa virou operação tributada e a verba de gôndola virou serviço que você emite nota. Dá para revisar antes de janeiro."<br>
+  <strong>Não</strong> → "Então dá tempo. Quer ver a matriz de como cada linha do acordo é tratada?"</p>
+  <p>Funciona porque o prospect responde sobre algo que ele conhece e controla, e a dor aparece na resposta dele, não na sua afirmação.</p>
+  <p class="muted">Métricas do estande: CNPJs capturados, simulações completadas, reuniões agendadas, pilotos assinados em 60 dias. Visitantes no estande não é métrica.</p>
+</section>
+
+<!-- 9 -->
+<section id="decisoes">
+  <div class="secnum">09 · Decisões e pendências</div>
+  <h2>O que está fechado e o que trava</h2>
+
+  <h3>Fechado</h3>
+  <ul>
+    <li>Três produtos para a feira, com papéis distintos no portfólio.</li>
+    <li>Dois níveis de cliente: só monitoramento, ou pacote com contratos.</li>
+    <li>Sem valores em reais em material comercial; sem argumento de velocidade.</li>
+    <li>Ordem de implantação: fornecedores primeiro (é a base), depois cobertura contratual, depois regularizar, depois operar.</li>
+    <li>Regra de ouro: nenhum título pago sem contrato vinculado e fornecedor fora do vermelho — <em>gate</em> no ERP, ligado após cerca de 30 dias de implantação.</li>
+    <li>Bloqueio de fornecedor sempre com sugestão e aprovação, nunca automático sem alçada.</li>
+    <li>Inteligência embarcada é da VOW, segmentável por ramo.</li>
+    <li>Validação paralela contra o método tradicional antes de escalar.</li>
+  </ul>
+
+  <h3>Pendências que travam decisão</h3>
+  <div class="tw"><table>
+    <thead><tr><th style="width:6%">#</th><th>Pendência</th><th style="width:24%">Quem</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Validar se diligência documentada sobre fornecedores conta para <strong>programa de conformidade</strong> — se sim, é o principal argumento de venda de todo o projeto</td><td>VOW · Juliano</td></tr>
+      <tr><td>2</td><td>Confirmar a tese de neutralidade da indústria na recomposição da verba</td><td>VOW · Juliano e William</td></tr>
+      <tr><td>3</td><td>Validar a aritmética de custo líquido (Simples na DAS × crédito integral)</td><td>VOW</td></tr>
+      <tr><td>4</td><td>Confirmar reduções de 30% e o regime de locação de imóveis — as fontes divergem</td><td>VOW</td></tr>
+      <tr><td>5</td><td>Definir os pesos dos sete blocos no score — é conteúdo VOW, não decisão técnica</td><td>VOW</td></tr>
+      <tr><td>6</td><td>Decidir a fonte de classificação: seguir com terceiro ou construir base própria</td><td>Bauer + VOW</td></tr>
+      <tr><td>7</td><td><strong>Governança da parceria</strong>: de quem é o IP do software, a base mestre de dados e a repartição de receita — resolver enquanto todos estão animados</td><td>Bauer + VOW</td></tr>
+      <tr><td>8</td><td>Escolher o nome do ritual anual e checar a marca no INPI</td><td>Bauer</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>O que mudar no material existente</h3>
+  <ol>
+    <li>Corrigir "2026 teste 1%" para CBS 0,9% + IBS 0,1%, e o <em>split payment</em> para obrigatório em 2028, opcional em 2027.</li>
+    <li>Incluir um slide de saldo credor e ressarcimento (30/60/180 dias) — é o maior argumento de caixa e está faltando.</li>
+    <li>Incluir a janela do Simples e o fato de não ser consultável por terceiros como razão de existir do Sistema 1.</li>
+    <li>Trocar "1.500 CNPJs" por dado do setor, para dimensionar o interlocutor.</li>
+    <li>Separar risco de classe de crédito em dois eixos explícitos no deck de Fornecedores.</li>
+    <li>Ancorar "não tem dono para isso" em constatação da VOW, ou virar pergunta ao público.</li>
+    <li>Rebaixar "assinador próprio" para integração sob marca VOW.</li>
+    <li>Mover o slide "o que ainda depende do governo" para logo depois do problema — desarma a objeção antes de ela nascer.</li>
+  </ol>
+</section>
+
+<!-- glossário -->
+<section id="glossario">
+  <div class="secnum">Referência</div>
+  <h2>Glossário</h2>
+  <dl>
+    <dt>Alíquota efetiva creditável</dt><dd>Alíquota média que a mercadoria comprada de fato gera de crédito, considerando cesta zero e reduções</dd>
+    <dt>Base mestre</dt><dd>Repositório compartilhado entre clientes com cada CNPJ e cada item já classificado</dd>
+    <dt>Bonificação</dt><dd>Fornecimento a maior de bem ou serviço em substituição a desconto no valor da operação (Decreto 12.955/26)</dd>
+    <dt>Carrego</dt><dd>Custo financeiro de manter capital imobilizado entre o desembolso e a recuperação do crédito</dd>
+    <dt>cClassTrib</dt><dd>Código de Classificação Tributária do item na NF-e; obrigatório desde 03/08/2026</dd>
+    <dt>CBS / IBS</dt><dd>Contribuição sobre Bens e Serviços (federal, substitui PIS/Cofins) e Imposto sobre Bens e Serviços (estadual e municipal, substitui ICMS/ISS)</dd>
+    <dt>Cesta Básica Nacional</dt><dd>Lista de alimentos com alíquota zero de IBS/CBS</dd>
+    <dt>Classe de crédito</dt><dd>Quanto do imposto pago na compra retorna como crédito, conforme o regime do fornecedor</dd>
+    <dt>CND / CNDT / CRF</dt><dd>Certidões de débitos federais, trabalhistas e de FGTS</dd>
+    <dt>Evento posterior</dt><dd>Condição futura (meta, sell-out, volume) que afasta a exceção do art. 5º e torna a bonificação tributada</dd>
+    <dt>Extinção do débito</dt><dd>Quitação do IBS/CBS pelo fornecedor — condição do crédito do comprador (art. 47)</dd>
+    <dt>FCA</dt><dd>Fato, Causa, Ação — formato do plano de ação com responsável e prazo</dd>
+    <dt>Gate de pagamento</dt><dd>Trava no ERP que retém título sem contrato vinculado ou com fornecedor irregular</dd>
+    <dt>JBP</dt><dd>Joint Business Plan — plano de negócios conjunto entre indústria e varejo, negociado anualmente</dd>
+    <dt>Materialidade</dt><dd>Peso do fornecedor na carteira de compras; pondera o risco</dd>
+    <dt>Programa de conformidade</dt><dd>Enquadramento que reduz o prazo de ressarcimento de saldo credor de 180 para 30 dias</dd>
+    <dt>RAD</dt><dd>Recolhimento pelo Adquirente: o comprador recolhe em nome do fornecedor e garante o próprio crédito</dd>
+    <dt>Regime regular de IBS/CBS</dt><dd>Opção do Simples de recolher IBS/CBS fora da guia única, gerando crédito integral ("híbrido")</dd>
+    <dt>Retail media</dt><dd>Venda de espaço publicitário do varejo (digital, loja, dados) à indústria</dd>
+    <dt>Ruptura</dt><dd>Falta do produto na gôndola</dd>
+    <dt>Saldo credor</dt><dd>Crédito acumulado por quem vende com alíquota zero ou reduzida e compra tributado</dd>
+    <dt>Sell-in / sell-out</dt><dd>Venda da indústria ao varejo / venda do varejo ao consumidor</dd>
+    <dt>Split payment</dt><dd>Separação e recolhimento do tributo na liquidação financeira da nota</dd>
+    <dt>Success fee</dt><dd>Remuneração percentual sobre o resultado obtido</dd>
+    <dt>White label</dt><dd>Produto fornecido para revenda com a marca de outra empresa</dd>
+  </dl>
+
+  <h3>Fontes</h3>
+  <ul class="srcs">
+    <li><a href="https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp214.htm">Lei Complementar 214/2025 — Planalto</a></li>
+    <li><a href="https://www.migalhas.com.br/depeso/461774/credito-de-ibs-e-cbs-a-nao-cumulatividade-que-depende-do-fornecedor">Crédito de IBS e CBS: a não cumulatividade que depende do fornecedor — Migalhas</a></li>
+    <li><a href="https://conjur.com.br/2026-mai-18/direito-ao-credito-de-ibs-e-cbs-no-contexto-da-reforma-tributaria-2/">Direito ao crédito de IBS e CBS no contexto da reforma tributária — ConJur</a></li>
+    <li><a href="https://www.migalhas.com.br/depeso/463074/a-bonificacao-no-ibs-e-na-cbs-a-excecao-do-art-5">A bonificação no IBS e na CBS: a exceção do art. 5º — Migalhas</a></li>
+    <li><a href="https://www.conjur.com.br/2026-mai-10/reforma-tributaria-e-verbas-comerciais-no-varejo-o-novo-risco-fiscal-que-exige-governanca-imediata/">Verbas comerciais no varejo: o novo risco fiscal — ConJur</a></li>
+    <li><a href="https://agenciagov.ebc.com.br/noticias/202609/empresas-do-simples-nacional-ja-podem-optar-pelo-recolhimento-de-ibs-e-cbs-fora-do-regime-unificado">Opção do Simples pelo regime regular de IBS/CBS — Agência Gov</a></li>
+    <li><a href="https://www.mixvale.com.br/2026/08/30/receita-federal-adia-obrigatoriedade-do-split-payment-da-reforma-tributaria-para-2028/">Receita adia obrigatoriedade do split payment para 2028 — Mix Vale</a></li>
+    <li><a href="https://pallottamartins.com.br/2025/09/30/ressarcimento-ibs-cbs-regras-prazos/">Ressarcimento de IBS e CBS: regras e prazos — Pallotta Martins</a></li>
+    <li><a href="https://planning.com.br/cesta-basica-aliquota-zero-varejo/">Cesta Básica Nacional e alíquota zero no varejo — Planning</a></li>
+    <li><a href="https://taxradar.app/blog/reforma-tributaria/reducao-60-ibs-cbs-lista-completa-anexos">Redução de 60% de IBS/CBS por anexo — Tax Radar</a></li>
+    <li><a href="https://fenacon.org.br/reforma-tributaria/comite-gestor-estima-aliquota-do-iva-em-2791-acima-do-teto-previsto-na-reforma-tributaria/">Comitê Gestor estima alíquota do IVA em 27,91% — FENACON</a></li>
+    <li><a href="https://centraldovarejo.com.br/varejo-alimentar-brasileiro-faturou-r-114-trilhao-em-2025-aponta-ranking-abras-2026/">Varejo alimentar faturou R$ 1,14 trilhão em 2025 — Ranking ABRAS 2026</a></li>
+    <li><a href="https://www.ey.com/pt_br/newsroom/2025/05/reforma-tributaria-empresas-solidariamente-responsaveis-pagamento-ibs-cbs">Responsabilidade solidária pelo pagamento do IBS e da CBS — EY</a></li>
+  </ul>
+</section>
+
+<footer class="wrap">
+  Documento de trabalho · Grupo VOW × Rodrigo Bauer · consolidado em 02/09/2026 a partir da reunião de 01/09, do pacote de identidade e narrativa, e de pesquisa sobre a LC 214/2025. Números em reais são munição interna e não vão para material comercial.
+</footer>
+</main>

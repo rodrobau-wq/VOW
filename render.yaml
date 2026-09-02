@@ -1,0 +1,43 @@
+# Blueprint do Render — https://render.com/docs/blueprint-spec
+# Deploy: New > Blueprint > aponte para github.com/rodrobau-wq/VOW
+services:
+  - type: web
+    name: vow-abras
+    runtime: node
+    plan: starter
+    region: oregon
+    branch: main
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+
+    # Leads gravam em arquivo. Sem disco o Render zera o conteúdo a cada
+    # redeploy — para uma feira de três dias isso é inaceitável, então o
+    # disco é parte do blueprint, não um extra. Exige plano pago.
+    disk:
+      name: vow-data
+      mountPath: /var/data
+      sizeGB: 1
+
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: LEADS_DB
+        value: /var/data/leads.json
+      - key: PUBLIC_BASE_URL
+        fromService:
+          type: web
+          name: vow-abras
+          property: host
+      # Definir no dashboard do Render (marcados como sync:false = não versionados)
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false
+      - key: MAIL_REPLY_TO
+        sync: false
+      - key: LEADS_USER
+        sync: false
+      - key: LEADS_PASSWORD
+        sync: false

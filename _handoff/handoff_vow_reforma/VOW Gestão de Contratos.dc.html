@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;1,8..60,300&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; height: 100%; font-family: "Manrope", system-ui, sans-serif; color: #16181A; background: #0E0F10; }
+  a { color: #8A6A28; text-decoration: none; }
+  a:hover { color: #B08A3E; }
+</style>
+</helmet>
+
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <section data-label="Capa" data-speaker-notes="Sistema 2. Não é repositório: é avaliador e orientador dentro do ciclo de compra, com aprovação e assinatura." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; font-family: 'Manrope', sans-serif">
+    <div style="display: flex; align-items: center; gap: 18px"><div style="width: 44px; height: 44px; border: 2px solid #B08A3E; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #B08A3E; font-weight: 800">V</div><div style="font-size: 22px; font-weight: 800">Grupo VOW</div></div>
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Sistema 2 · Gestão de contratos</div>
+      <div style="font-size: 124px; line-height: 0.95; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em">Nada se paga<br /><strong style="font-weight: 800">sem contrato.</strong></div>
+    </div>
+    <div style="font-size: 26px; color: #7A7F86">Jornada do produto · Setembro 2026</div>
+  </section>
+
+  <section data-label="O problema" data-speaker-notes="Contrato para tudo. Bonificação tributada, serviço gera crédito, fornecedor grande impõe o contrato dele, ERP não tem módulo decente." style="width: 1920px; height: 1080px; background: #F6F6F5; color: #16181A; padding: 120px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: center; font-family: 'Manrope', sans-serif">
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">O problema</div>
+      <div style="font-size: 88px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 40px">Quem não tiver contrato para tudo <strong style="font-weight: 800">vai para a guerra desarmado</strong></div>
+      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 36px; line-height: 1.4; color: #3F444A">O varejista sai de contratos só de revenda para contratos de serviço, verba, mídia, locação. E o ERP não tem módulo para isso.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 20px">
+      <div style="background: #fff; border-left: 8px solid #A32B23; padding: 32px 36px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 8px">Bonificação virou operação tributada</div><div style="font-size: 26px; line-height: 1.4; color: #5A6068">Verba sem nota e sem previsão contratual deixa de ser desconto e vira passivo.</div></div>
+      <div style="background: #fff; border-left: 8px solid #B4551F; padding: 32px 36px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 8px">Serviço passou a gerar crédito</div><div style="font-size: 26px; line-height: 1.4; color: #5A6068">Facilities, frete, TI, aluguel. Só com contrato, nota e prestador em regime regular.</div></div>
+      <div style="background: #fff; border-left: 8px solid #7A7F86; padding: 32px 36px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 8px">O fornecedor grande impõe o contrato dele</div><div style="font-size: 26px; line-height: 1.4; color: #5A6068">Sem cláusula de RAD, de emissão de nota, de split. Quem assina sem ler assume o risco.</div></div>
+    </div>
+  </section>
+
+  <section data-label="Matriz de verbas" data-speaker-notes="O conteúdo mais valioso do deck. Mostra em vinte segundos que a VOW sabe o tratamento de cada linha do acordo. O ponto de virada: bonificação que depende de evento posterior passa a ser tributada." style="width: 1920px; height: 1080px; background: #fff; color: #16181A; padding: 96px 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Acordo comercial · linha a linha</div>
+    <div style="font-size: 80px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 22px">Nem toda verba <strong style="font-weight: 800">é tratada igual</strong></div>
+    <div style="font-size: 28px; line-height: 1.45; color: #3F444A; margin-bottom: 44px; max-width: 52em">O art. 5º da LC 214 põe as operações não onerosas no campo de incidência e só abre exceção quando a vantagem consta do documento fiscal e não depende de evento posterior.</div>
+    <div style="display: grid; grid-template-columns: 1.4fr 1fr 0.7fr; gap: 1px; background: #DDDEE0; border: 2px solid #16181A; font-size: 25px">
+      <div style="background: #16181A; color: #fff; padding: 18px 24px; font-weight: 800">Linha do acordo</div>
+      <div style="background: #16181A; color: #fff; padding: 18px 24px; font-weight: 800">Natureza</div>
+      <div style="background: #16181A; color: #fff; padding: 18px 24px; font-weight: 800">Tributa?</div>
+
+      <div style="background: #fff; padding: 18px 24px">Desconto no preço, na própria nota</div>
+      <div style="background: #fff; padding: 18px 24px; color: #3F444A">Redução da base</div>
+      <div style="background: #EAF2ED; padding: 18px 24px; color: #2E7D5B; font-weight: 800">Não</div>
+
+      <div style="background: #fff; padding: 18px 24px"><strong>Bonificação na mesma nota</strong><div style="font-size: 21px; color: #7A7F86">a dúzia de treze</div></div>
+      <div style="background: #fff; padding: 18px 24px; color: #3F444A">Não onerosa, com exceção</div>
+      <div style="background: #EAF2ED; padding: 18px 24px; color: #2E7D5B; font-weight: 800">Não</div>
+
+      <div style="background: #fff; padding: 18px 24px"><strong>Bonificação apurada depois</strong><div style="font-size: 21px; color: #7A7F86">sell-out, meta, trimestre</div></div>
+      <div style="background: #fff; padding: 18px 24px; color: #3F444A">Não onerosa, sem exceção</div>
+      <div style="background: #F6E7E5; padding: 18px 24px; color: #A32B23; font-weight: 800">Sim</div>
+
+      <div style="background: #fff; padding: 18px 24px">Ponta de gôndola, espaço de exposição</div>
+      <div style="background: #fff; padding: 18px 24px; color: #3F444A">Remuneração por utilidade</div>
+      <div style="background: #F6E7E5; padding: 18px 24px; color: #A32B23; font-weight: 800">Sim</div>
+
+      <div style="background: #fff; padding: 18px 24px">Retail media, impulsionamento, dados</div>
+      <div style="background: #fff; padding: 18px 24px; color: #3F444A">Remuneração por utilidade</div>
+      <div style="background: #F6E7E5; padding: 18px 24px; color: #A32B23; font-weight: 800">Sim</div>
+
+      <div style="background: #fff; padding: 18px 24px">Rebate por volume refletido no preço</div>
+      <div style="background: #fff; padding: 18px 24px; color: #3F444A">Desconto comercial</div>
+      <div style="background: #EAF2ED; padding: 18px 24px; color: #2E7D5B; font-weight: 800">Reduz base</div>
+
+      <div style="background: #fff; padding: 18px 24px">Recomposição de avaria ou defeito</div>
+      <div style="background: #fff; padding: 18px 24px; color: #3F444A">Indenizatória</div>
+      <div style="background: #EAF2ED; padding: 18px 24px; color: #2E7D5B; font-weight: 800">Não</div>
+    </div>
+    <div style="margin-top: 34px; border-left: 6px solid #B08A3E; background: #F6F6F5; padding: 22px 32px; font-size: 29px; line-height: 1.4"><strong>Acabou o acerto retroativo.</strong> Aceitar a mercadoria com preço errado hoje e compensar com bonificação no mês que vem depende, por definição, de evento posterior — e vira operação tributada.</div>
+  </section>
+
+  <section data-label="Tipos" data-speaker-notes="Oito tipos de contrato do varejo, cada um com cláusulas próprias. Financeiros ficam com a consultoria." style="width: 1920px; height: 1080px; background: #F6F6F5; color: #16181A; padding: 96px 120px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 28px">Minutas VOW</div>
+    <div style="font-size: 76px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 48px">Oito tipos de contrato, <strong style="font-weight: 800">oito conjuntos de cláusulas</strong></div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; gap: 16px; flex: 1; min-height: 0">
+      <div style="background: #fff; padding: 28px 30px"><div style="font-size: 30px; font-weight: 800; margin-bottom: 8px">Revenda direta</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">NCM e cClassTrib por item, devolução com estorno, ST em transição.</div></div>
+      <div style="background: #fff; padding: 28px 30px"><div style="font-size: 30px; font-weight: 800; margin-bottom: 8px">Distribuidor / atacado</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">O regime dele define o crédito, não o da indústria. Rastreio de origem.</div></div>
+      <div style="background: #fff; padding: 28px 30px"><div style="font-size: 30px; font-weight: 800; margin-bottom: 8px">Consignação</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">Nota só na venda ao consumidor. Crédito casado com o fato gerador.</div></div>
+      <div style="background: #fff; padding: 28px 30px"><div style="font-size: 30px; font-weight: 800; margin-bottom: 8px">Produtor rural / cooperativa</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">Crédito presumido. Ato cooperativo identificado por documento.</div></div>
+      <div style="background: #fff; padding: 28px 30px"><div style="font-size: 30px; font-weight: 800; margin-bottom: 8px">Acordos comerciais</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">Bonificação, verba, rebate, ponta de gôndola, retail media: nota e previsão contratual.</div></div>
+      <div style="background: #fff; padding: 28px 30px"><div style="font-size: 30px; font-weight: 800; margin-bottom: 8px">Serviços</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">Frete, TI, facilities, marketing. NFS-e nacional, retenções, SLA.</div></div>
+      <div style="background: #fff; padding: 28px 30px"><div style="font-size: 30px; font-weight: 800; margin-bottom: 8px">Locação / ocupação</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">Lojas, CD, sublocação. Regime específico de imóveis; locador PF × PJ.</div></div>
+      <div style="background: #fff; padding: 28px 30px"><div style="font-size: 30px; font-weight: 800; margin-bottom: 8px">Marketplace / delivery</div><div style="font-size: 24px; line-height: 1.4; color: #5A6068">Comissão como serviço; responsabilidade da plataforma digital.</div></div>
+    </div>
+    <div style="font-size: 25px; color: #5A6068; margin-top: 32px; line-height: 1.4">Empréstimos, antecipação de recebíveis e adquirência são inventariados, mas têm regime específico: ficam com a consultoria.</div>
+  </section>
+
+  <section data-label="E-procurement" data-speaker-notes="O ciclo completo. O sistema de contratos governa do meio ao fim; o sistema de fornecedores valida antes." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 96px 120px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 28px">E-procurement de ponta a ponta</div>
+    <div style="font-size: 76px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 56px">Um ciclo de compra <strong style="font-weight: 800">com o imposto dentro</strong></div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; gap: 16px; flex: 1; min-height: 0">
+      <div style="background: #1D2024; border-top: 6px solid #7A7F86; padding: 28px 30px; display: flex; flex-direction: column"><div style="font-size: 26px; color: #7A7F86; margin-bottom: 10px; font-weight: 700">1 · ERP</div><div style="font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px">Demanda</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Loja ou CD pede. Categoria, volume, prazo.</div></div>
+      <div style="background: #1D2024; border-top: 6px solid #B08A3E; padding: 28px 30px; display: flex; flex-direction: column"><div style="font-size: 26px; color: #B08A3E; margin-bottom: 10px; font-weight: 700">2 · Sistema 1</div><div style="font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px">Fornecedor validado</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Só entra na cotação quem está regular e classificado.</div></div>
+      <div style="background: #1D2024; border-top: 6px solid #B08A3E; padding: 28px 30px; display: flex; flex-direction: column"><div style="font-size: 26px; color: #B08A3E; margin-bottom: 10px; font-weight: 700">3 · Sistema 2</div><div style="font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px">Cotação</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Propostas comparadas pelo custo líquido de crédito, não pelo bruto.</div></div>
+      <div style="background: #1D2024; border-top: 6px solid #B08A3E; padding: 28px 30px; display: flex; flex-direction: column"><div style="font-size: 26px; color: #B08A3E; margin-bottom: 10px; font-weight: 700">4 · Sistema 2</div><div style="font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px">Contrato</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Minuta VOW pelo tipo e pelo regime. Score e cláusulas da reforma.</div></div>
+      <div style="background: #1D2024; border-top: 6px solid #B08A3E; padding: 28px 30px; display: flex; flex-direction: column"><div style="font-size: 26px; color: #B08A3E; margin-bottom: 10px; font-weight: 700">5 · Sistema 2</div><div style="font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px">Aprovação e assinatura</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Alçadas fiscal e jurídica. Assinatura eletrônica das partes.</div></div>
+      <div style="background: #1D2024; border-top: 6px solid #7A7F86; padding: 28px 30px; display: flex; flex-direction: column"><div style="font-size: 26px; color: #7A7F86; margin-bottom: 10px; font-weight: 700">6 · ERP + Sistema 1</div><div style="font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px">Pedido e nota</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Pedido só com contrato vigente. Nota conferida contra regime e cláusula.</div></div>
+      <div style="background: #1D2024; border-top: 6px solid #B08A3E; padding: 28px 30px; display: flex; flex-direction: column"><div style="font-size: 26px; color: #B08A3E; margin-bottom: 10px; font-weight: 700">7 · Sistema 2 + ERP</div><div style="font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px">Pagamento</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Gate: sem contrato ou fornecedor irregular, não paga. Segregação ou RAD.</div></div>
+      <div style="background: #B08A3E; color: #16181A; border-top: 6px solid #B08A3E; padding: 28px 30px; display: flex; flex-direction: column"><div style="font-size: 26px; margin-bottom: 10px; font-weight: 700; opacity: .75">8 · Ambos</div><div style="font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px">Governança</div><div style="font-size: 24px; line-height: 1.4">Vencimentos, renovação, monitoramento diário, trilha de auditoria.</div></div>
+    </div>
+  </section>
+
+  <section data-label="Jornada" data-speaker-notes="As seis etapas do sistema de contratos, na ordem de implantação." style="width: 1920px; height: 1080px; background: #fff; color: #16181A; padding: 96px 120px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 28px">A jornada</div>
+    <div style="font-size: 76px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 20px">Do que já existe <strong style="font-weight: 800">ao que falta</strong></div>
+    <div style="font-size: 28px; color: #5A6068; margin-bottom: 44px; line-height: 1.4">O regime e a regularidade do fornecedor vêm do Sistema 1. O contrato nasce já sabendo com quem está falando.</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 16px; flex: 1; min-height: 0">
+      <div style="border: 2px solid #16181A; padding: 28px 32px; display: flex; gap: 22px"><div style="font-size: 48px; font-weight: 800; color: #B08A3E; line-height: 1">1</div><div><div style="font-size: 32px; font-weight: 800; margin-bottom: 8px; line-height: 1.15">Cobertura</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">Contas a pagar dos últimos 12 meses cruzado com a carteira. Todo CNPJ pago sem contrato vira alerta, priorizado por valor.</div></div></div>
+      <div style="border: 2px solid #16181A; padding: 28px 32px; display: flex; gap: 22px"><div style="font-size: 48px; font-weight: 800; color: #B08A3E; line-height: 1">2</div><div><div style="font-size: 32px; font-weight: 800; margin-bottom: 8px; line-height: 1.15">Minuta ou avaliação</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">Novo: minuta VOW por tipo, categoria, regime e meio de pagamento. Imposto pelo fornecedor: score 0–100 e aditivo.</div></div></div>
+      <div style="border: 2px solid #16181A; padding: 28px 32px; display: flex; gap: 22px"><div style="font-size: 48px; font-weight: 800; color: #B08A3E; line-height: 1">3</div><div><div style="font-size: 32px; font-weight: 800; margin-bottom: 8px; line-height: 1.15">Cotação</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">RFP com propostas comparadas pelo custo líquido de crédito. Fornecedor vermelho é inelegível. O vencedor sai com minuta.</div></div></div>
+      <div style="border: 2px solid #16181A; padding: 28px 32px; display: flex; gap: 22px"><div style="font-size: 48px; font-weight: 800; color: #B08A3E; line-height: 1">4</div><div><div style="font-size: 32px; font-weight: 800; margin-bottom: 8px; line-height: 1.15">Aprovação em alçadas</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">Fiscal e jurídico em paralelo, com as cláusulas marcadas. Ressalva volta ao comprador. Alçada por valor e tipo.</div></div></div>
+      <div style="border: 2px solid #16181A; padding: 28px 32px; display: flex; gap: 22px"><div style="font-size: 48px; font-weight: 800; color: #B08A3E; line-height: 1">5</div><div><div style="font-size: 32px; font-weight: 800; margin-bottom: 8px; line-height: 1.15">Assinatura eletrônica</div><div style="font-size: 24px; line-height: 1.4; color: #3F444A">Integração com assinador de mercado, sob a marca VOW. O fornecedor assina pelo portal. Contrato vigente vai ao ERP vinculado ao CNPJ.</div></div></div>
+      <div style="background: #16181A; color: #fff; padding: 28px 32px; display: flex; gap: 22px"><div style="font-size: 48px; font-weight: 800; color: #B08A3E; line-height: 1">6</div><div><div style="font-size: 32px; font-weight: 800; margin-bottom: 8px; line-height: 1.15">Gate e governança</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Título sem contrato ou fornecedor irregular fica retido. Vencimentos, renovações, reajustes e RAD monitorados. Trilha de auditoria.</div></div></div>
+    </div>
+  </section>
+
+  <section data-label="Fechamento" data-speaker-notes="Repositório é commodity. O valor é o conteúdo VOW dentro do fluxo." style="width: 1920px; height: 1080px; background: #B08A3E; color: #16181A; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; opacity: .7">Sistema 2 · Gestão de contratos</div>
+    <div>
+      <div style="font-size: 120px; line-height: 0.98; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 48px">Repositório é commodity. <strong style="font-weight: 800">Cláusula certa é conhecimento.</strong></div>
+      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 40px; line-height: 1.4; max-width: 30em">O que a VOW entrega não é onde guardar o contrato. É o avaliador que diz o que falta, a minuta que resolve e o gate que impede o problema de voltar.</div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end"><div style="font-size: 36px; font-weight: 800">Diagnóstico gratuito na sua base</div><div style="font-size: 26px; opacity: .8">grupovow.com.br</div></div>
+  </section>
+
+</x-import>
+</x-dc>
+</body>
+</html>

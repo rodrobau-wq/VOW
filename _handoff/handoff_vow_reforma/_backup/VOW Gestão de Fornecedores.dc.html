@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;1,8..60,300&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; height: 100%; font-family: "Manrope", system-ui, sans-serif; color: #16181A; background: #0E0F10; }
+  a { color: #8A6A28; text-decoration: none; }
+  a:hover { color: #B08A3E; }
+</style>
+</helmet>
+
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <section data-label="Capa" data-speaker-notes="Sistema 1. Entrada: cadastro do ERP como está. Saída: semáforo por CNPJ integrado ao pedido, à nota e ao pagamento." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; font-family: 'Manrope', sans-serif">
+    <div style="display: flex; align-items: center; gap: 18px"><div style="width: 44px; height: 44px; border: 2px solid #B08A3E; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #B08A3E; font-weight: 800">V</div><div style="font-size: 22px; font-weight: 800">Grupo VOW</div></div>
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Sistema 1 · Gestão de fornecedores</div>
+      <div style="font-size: 124px; line-height: 0.95; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em">Todo CNPJ do seu ERP,<br /><strong style="font-weight: 800">verificado todo dia.</strong></div>
+    </div>
+    <div style="font-size: 26px; color: #7A7F86">Jornada do produto · Setembro 2026</div>
+  </section>
+
+  <section data-label="O problema" data-speaker-notes="Por que existe. Crédito condicionado à regularidade do fornecedor; bloqueio surpresa vira ruptura; volume inviável à mão." style="width: 1920px; height: 1080px; background: #F6F6F5; color: #16181A; padding: 120px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: center; font-family: 'Manrope', sans-serif">
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">O problema</div>
+      <div style="font-size: 88px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 40px">Seu crédito depende <strong style="font-weight: 800">de quem você não controla</strong></div>
+      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 36px; line-height: 1.4; color: #3F444A">O IBS/CBS da nota só vira crédito depois que o fornecedor paga o imposto dele. E a regularidade dele muda sem aviso.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 20px">
+      <div style="background: #fff; border-left: 8px solid #A32B23; padding: 32px 36px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 8px">Fornecedor irregular = crédito travado</div><div style="font-size: 26px; line-height: 1.4; color: #5A6068">No seu balanço, não no dele. Sem saber, você já está exposto.</div></div>
+      <div style="background: #fff; border-left: 8px solid #B4551F; padding: 32px 36px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 8px">Bloqueio surpresa = ruptura</div><div style="font-size: 26px; line-height: 1.4; color: #5A6068">Estoque de poucas semanas. Descobrir o problema no pedido é descobrir tarde.</div></div>
+      <div style="background: #fff; border-left: 8px solid #7A7F86; padding: 32px 36px"><div style="font-size: 34px; font-weight: 800; margin-bottom: 8px">Centenas ou milhares de CNPJs</div><div style="font-size: 26px; line-height: 1.4; color: #5A6068">Consultar um por um na Receita, todo dia, não é trabalho humano.</div></div>
+    </div>
+  </section>
+
+  <section data-label="Jornada" data-speaker-notes="As cinco etapas do sistema, em ordem. Da sincronização ao aviso ao fornecedor." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 96px 120px; box-sizing: border-box; display: flex; flex-direction: column; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 28px">A jornada</div>
+    <div style="font-size: 76px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 20px">Do cadastro como está <strong style="font-weight: 800">ao semáforo no pedido</strong></div>
+    <div style="font-size: 28px; color: #A8ADB3; margin-bottom: 48px; line-height: 1.4">Cinco etapas. As duas primeiras acontecem uma vez, na implantação; as outras três rodam todo dia.</div>
+    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; flex: 1; min-height: 0; border-top: 1px solid #3F444A">
+      <div style="padding: 32px 28px 0 0; border-right: 1px solid #3F444A"><div style="font-size: 56px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 18px">1</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px; line-height: 1.15">Sincronizar e deduplicar</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Cadastro do ERP via API. CNPJs repetidos entre sistemas mesclados; inválidos devolvidos ao ERP.</div></div>
+      <div style="padding: 32px 28px 0; border-right: 1px solid #3F444A"><div style="font-size: 56px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 18px">2</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px; line-height: 1.15">Enriquecer e classificar</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Receita, Simples, CND, listas restritivas. O regime define a classe de crédito: integral, limitado ou nenhum.</div></div>
+      <div style="padding: 32px 28px 0; border-right: 1px solid #3F444A"><div style="font-size: 56px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 18px">3</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px; line-height: 1.15">Monitorar e alertar</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Varredura diária, mais no pedido e na entrada da nota. Semáforo verde, amarelo, vermelho. Bloqueio sugerido, com aprovação.</div></div>
+      <div style="padding: 32px 28px 0; border-right: 1px solid #3F444A"><div style="font-size: 56px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 18px">4</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px; line-height: 1.15">Evitar a ruptura</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Vermelho cruzado com a projeção de compra: alternativa homologada antes de faltar na gôndola. Plano de ação com responsável e prazo.</div></div>
+      <div style="padding: 32px 0 0 28px"><div style="font-size: 56px; font-weight: 800; color: #B08A3E; line-height: 1; margin-bottom: 18px">5</div><div style="font-size: 32px; font-weight: 800; margin-bottom: 12px; line-height: 1.15">Avisar o fornecedor</div><div style="font-size: 24px; line-height: 1.4; color: #A8ADB3">Ele recebe a pendência e o prazo antes do bloqueio. Regulariza ou pede ajuda à VOW. O semáforo volta para o ERP.</div></div>
+    </div>
+  </section>
+
+  <section data-label="Semáforo" data-speaker-notes="O que cada cor significa e o que acontece no ERP. Bloqueio nunca é automático por padrão: sugestão mais aprovação." style="width: 1920px; height: 1080px; background: #fff; color: #16181A; padding: 120px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1.2fr; gap: 96px; align-items: center; font-family: 'Manrope', sans-serif">
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">O que o comprador vê</div>
+      <div style="font-size: 88px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 40px">Três cores, <strong style="font-weight: 800">dentro do pedido</strong></div>
+      <div style="font-size: 30px; line-height: 1.45; color: #3F444A">O semáforo e a classe de crédito voltam para o cadastro do ERP. Quem compra não precisa abrir outro sistema.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 20px">
+      <div style="background: #F6F6F5; padding: 36px 40px; display: grid; grid-template-columns: 28px 1fr; gap: 28px; align-items: start"><span style="width: 28px; height: 28px; border-radius: 50%; background: #2E7D5B; margin-top: 8px"></span><div><div style="font-size: 36px; font-weight: 800; margin-bottom: 8px">Verde · regular</div><div style="font-size: 26px; line-height: 1.4; color: #5A6068">Cadastro ativo, certidões válidas, regime identificado. Pedido liberado; classe de crédito informada.</div></div></div>
+      <div style="background: #F6F6F5; padding: 36px 40px; display: grid; grid-template-columns: 28px 1fr; gap: 28px; align-items: start"><span style="width: 28px; height: 28px; border-radius: 50%; background: #B4551F; margin-top: 8px"></span><div><div style="font-size: 36px; font-weight: 800; margin-bottom: 8px">Amarelo · atenção</div><div style="font-size: 26px; line-height: 1.4; color: #5A6068">Certidão vencendo, crédito limitado, divergência na nota. Pedido liberado com aviso; fornecedor notificado.</div></div></div>
+      <div style="background: #F6F6F5; padding: 36px 40px; display: grid; grid-template-columns: 28px 1fr; gap: 28px; align-items: start"><span style="width: 28px; height: 28px; border-radius: 50%; background: #A32B23; margin-top: 8px"></span><div><div style="font-size: 36px; font-weight: 800; margin-bottom: 8px">Vermelho · irregular</div><div style="font-size: 26px; line-height: 1.4; color: #5A6068">CND positiva, cadastro suspenso, lista restritiva. Bloqueio sugerido para aprovação; alerta de ruptura aberto; alternativas listadas.</div></div></div>
+    </div>
+  </section>
+
+  <section data-label="Ruptura" data-speaker-notes="O diferencial: cruzar o vermelho com a projeção de compra do ERP. Alerta antes do pedido, com alternativa e plano de ação." style="width: 1920px; height: 1080px; background: #16181A; color: #fff; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Antes de faltar na gôndola</div>
+    <div style="font-size: 88px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 64px">“Este item precisa ser pedido em X dias <strong style="font-weight: 800">e o fornecedor está em vermelho.”</strong></div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px">
+      <div style="border-top: 4px solid #B08A3E; padding-top: 28px"><div style="font-size: 36px; font-weight: 800; margin-bottom: 12px">Cruzamento</div><div style="font-size: 26px; line-height: 1.4; color: #A8ADB3">Semáforo vermelho × projeção de pedidos do ERP × cobertura de estoque. O alerta nasce do dado que o cliente já tem.</div></div>
+      <div style="border-top: 4px solid #B08A3E; padding-top: 28px"><div style="font-size: 36px; font-weight: 800; margin-bottom: 12px">Alternativa</div><div style="font-size: 26px; line-height: 1.4; color: #A8ADB3">Fornecedores da mesma categoria, já homologados e em verde, ordenados pela classe de crédito. Volume redirecionado com um clique.</div></div>
+      <div style="border-top: 4px solid #B08A3E; padding-top: 28px"><div style="font-size: 36px; font-weight: 800; margin-bottom: 12px">Plano de ação</div><div style="font-size: 26px; line-height: 1.4; color: #A8ADB3">Fato, causa, ação. Responsável e prazo obrigatórios. Acompanhado até fechar, com trilha de auditoria.</div></div>
+    </div>
+  </section>
+
+  <section data-label="Fornecedor" data-speaker-notes="O aviso ao fornecedor gera regularização e demanda espontânea para a consultoria VOW." style="width: 1920px; height: 1080px; background: #F6F6F5; color: #16181A; padding: 120px; box-sizing: border-box; display: grid; grid-template-columns: 1fr 1fr; gap: 96px; align-items: center; font-family: 'Manrope', sans-serif">
+    <div>
+      <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">Do outro lado</div>
+      <div style="font-size: 88px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 40px">O fornecedor <strong style="font-weight: 800">sabe antes de ser bloqueado</strong></div>
+      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 36px; line-height: 1.4; color: #3F444A">Aviso eletrônico com a pendência, o motivo e o prazo. Ele regulariza, envia o documento pelo portal ou pede ajuda à VOW.</div>
+    </div>
+    <div style="background: #16181A; color: #fff; padding: 56px 60px">
+      <div style="font-size: 24px; letter-spacing: 0.14em; text-transform: uppercase; color: #B08A3E; margin-bottom: 28px">Por que isso importa</div>
+      <div style="display: flex; flex-direction: column; gap: 24px; font-size: 28px; line-height: 1.4">
+        <div style="display: grid; grid-template-columns: 52px 1fr; gap: 16px"><span style="color: #B08A3E; font-weight: 800">01</span><span>O varejista não vira fiscal do fornecedor. O sistema avisa; o fornecedor resolve.</span></div>
+        <div style="display: grid; grid-template-columns: 52px 1fr; gap: 16px"><span style="color: #B08A3E; font-weight: 800">02</span><span>Menos bloqueios efetivos: a maioria regulariza quando sabe.</span></div>
+        <div style="display: grid; grid-template-columns: 52px 1fr; gap: 16px"><span style="color: #B08A3E; font-weight: 800">03</span><span>O fornecedor pode autorizar a consulta detalhada da situação fiscal dele, o que a lei exige para dados do e-CAC.</span></div>
+        <div style="display: grid; grid-template-columns: 52px 1fr; gap: 16px"><span style="color: #B08A3E; font-weight: 800">04</span><span>Quem precisa de ajuda encontra a consultoria VOW no mesmo aviso.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="Limites" data-speaker-notes="Ser transparente sobre a dependência do governo e o que fica com a consultoria." style="width: 1920px; height: 1080px; background: #fff; color: #16181A; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; color: #B08A3E; margin-bottom: 36px">O que dizemos com clareza</div>
+    <div style="font-size: 88px; line-height: 1; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 64px">O que o sistema faz hoje <strong style="font-weight: 800">e o que ainda depende do governo</strong></div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px">
+      <div style="border: 2px solid #16181A; padding: 44px 48px"><div style="font-size: 26px; letter-spacing: 0.14em; text-transform: uppercase; color: #2E7D5B; font-weight: 800; margin-bottom: 20px">Já funciona</div><div style="display: flex; flex-direction: column; gap: 14px; font-size: 27px; line-height: 1.4; color: #3F444A"><div>Situação cadastral, regime, Simples, certidões federais, listas restritivas.</div><div>Leitura do IBS/CBS destacado na nota recebida, obrigatório desde agosto de 2026.</div><div>Semáforo, bloqueio com aprovação, alerta de ruptura, aviso ao fornecedor.</div></div></div>
+      <div style="border: 2px solid #DDDEE0; background: #F6F6F5; padding: 44px 48px"><div style="font-size: 26px; letter-spacing: 0.14em; text-transform: uppercase; color: #B4551F; font-weight: 800; margin-bottom: 20px">Ainda não existe</div><div style="display: flex; flex-direction: column; gap: 14px; font-size: 27px; line-height: 1.4; color: #3F444A"><div>Consulta pública de extinção do débito de IBS/CBS por documento. Prevista, não publicada.</div><div>Confirmação de split payment pelo sistema bancário. Sem data.</div><div>Enquanto isso: ambiente simulado para o fluxo, e o RAD como saída segura para garantir o crédito.</div></div></div>
+    </div>
+  </section>
+
+  <section data-label="Fechamento" data-speaker-notes="Saída do sistema 1 alimenta o sistema 2." style="width: 1920px; height: 1080px; background: #B08A3E; color: #16181A; padding: 120px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; font-family: 'Manrope', sans-serif">
+    <div style="font-size: 24px; letter-spacing: 0.24em; text-transform: uppercase; opacity: .7">Sistema 1 · Gestão de fornecedores</div>
+    <div>
+      <div style="font-size: 120px; line-height: 0.98; font-weight: 300; text-transform: uppercase; letter-spacing: -0.03em; margin-bottom: 48px">Fornecedor validado <strong style="font-weight: 800">é a base de tudo.</strong></div>
+      <div style="font-family: 'Source Serif 4', Georgia, serif; font-size: 40px; line-height: 1.4; max-width: 30em">Regime e regularidade de cada CNPJ alimentam a cotação, o contrato e o pagamento. É por aqui que a implantação começa.</div>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: flex-end"><div style="font-size: 36px; font-weight: 800">Próximo: Sistema 2 · Gestão de contratos</div><div style="font-size: 26px; opacity: .8">grupovow.com.br</div></div>
+  </section>
+
+</x-import>
+</x-dc>
+</body>
+</html>

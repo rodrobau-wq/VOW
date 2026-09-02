@@ -1,0 +1,453 @@
+<title>Simulador de Verbas VOW</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;500;700;800&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&display=swap">
+<style>
+  :root{
+    --ink:#16181A; --storm:#3F444A; --concrete:#C9C9C7; --gold:#B08A3E;
+    --surface:#FFFFFF; --canvas:#F6F6F5; --subtle:#EAEBEA; --border:#DDDEE0; --muted:#7A7F86;
+    --ok:#2E7D5B; --warn:#B4551F; --risk:#A32B23; --info:#35607F;
+    --risk-bg:#F6E3E1; --ok-bg:#E7F0EB; --gold-bg:#F5EFE2; --info-bg:#E4EDF3;
+    --bar-tax:#A32B23; --bar-free:#C9C9C7; --field:#FFFFFF; --col-hoje:#EAEBEA;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ink:#F1F1F0; --storm:#B7BCC2; --concrete:#4A4E53; --gold:#D2AC63;
+      --surface:#24272B; --canvas:#16181A; --subtle:#2C3035; --border:#383C41; --muted:#9AA0A7;
+      --ok:#6FBF97; --warn:#DE9260; --risk:#E08279; --info:#7FAECB;
+      --risk-bg:#331E1C; --ok-bg:#1B2E25; --gold-bg:#2E2716; --info-bg:#1B2A33;
+      --bar-tax:#C4574A; --bar-free:#4A4E53; --field:#1C1F22; --col-hoje:#2C3035;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#F1F1F0; --storm:#B7BCC2; --concrete:#4A4E53; --gold:#D2AC63;
+    --surface:#24272B; --canvas:#16181A; --subtle:#2C3035; --border:#383C41; --muted:#9AA0A7;
+    --ok:#6FBF97; --warn:#DE9260; --risk:#E08279; --info:#7FAECB;
+    --risk-bg:#331E1C; --ok-bg:#1B2E25; --gold-bg:#2E2716; --info-bg:#1B2A33;
+    --bar-tax:#C4574A; --bar-free:#4A4E53; --field:#1C1F22; --col-hoje:#2C3035;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--canvas);color:var(--ink);font-family:Manrope,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.6;font-variant-numeric:tabular-nums}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  header{background:var(--ink);color:#F1F1F0;padding:40px 0 34px;border-bottom:3px solid var(--gold)}
+  .mk{display:flex;align-items:center;gap:11px;margin-bottom:26px}
+  .mk .g{width:30px;height:30px;border:1.5px solid var(--gold);color:var(--gold);display:grid;place-items:center;font-weight:800;font-size:14px}
+  .mk .w{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--concrete);font-weight:500}
+  h1{margin:0;text-transform:uppercase;line-height:1.02;letter-spacing:-.015em}
+  h1 .a{display:block;font-weight:300;font-size:clamp(26px,5vw,46px)}
+  h1 .b{display:block;font-weight:800;font-size:clamp(26px,5vw,46px);color:var(--gold)}
+  header p{margin:20px 0 0;max-width:62ch;color:var(--concrete);font-family:"Source Serif 4",Georgia,serif;font-weight:300;font-size:17.5px;line-height:1.55}
+
+  main{padding:28px 0 60px}
+  .panel{background:var(--surface);border:1px solid var(--border);padding:24px 26px;margin-bottom:18px}
+  .panel>h2{margin:0 0 4px;font-size:18px;font-weight:800;letter-spacing:-.015em}
+  .panel>.hint{margin:0 0 18px;font-size:13.5px;color:var(--muted);max-width:74ch}
+  .eyebrow{font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+
+  .cols{display:grid;grid-template-columns:1fr;gap:18px}
+  @media(min-width:940px){.cols{grid-template-columns:330px 1fr;align-items:start}}
+
+  .field{margin-bottom:15px}
+  .field label{display:block;font-size:12px;font-weight:700;margin-bottom:5px}
+  .field .sub{font-size:11.5px;color:var(--muted);font-weight:500;margin-bottom:6px}
+  .inputrow{display:flex;align-items:center;gap:8px}
+  .inputrow .pre{font-size:13px;color:var(--muted);font-weight:700;min-width:22px}
+  input[type=number]{width:100%;padding:9px 11px;border:1px solid var(--border);background:var(--field);color:var(--ink);font-family:inherit;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;border-radius:0}
+  input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+  input[type=range]{width:100%;accent-color:var(--gold);margin:0}
+  .subhead{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:22px 0 12px;padding-top:16px;border-top:1px solid var(--border)}
+
+  .mixrow{display:grid;grid-template-columns:1fr 60px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--border)}
+  .mixrow:first-of-type{border-top:0}
+  .mixrow .nm{font-size:13px;font-weight:700;line-height:1.25}
+  .tg{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;display:inline-block;padding:1px 6px;margin-top:3px}
+  .tg.s{background:var(--risk-bg);color:var(--risk)}
+  .tg.n{background:var(--ok-bg);color:var(--ok)}
+  .tg.d{background:var(--gold-bg);color:var(--gold)}
+  .mixrow input{text-align:right;padding:6px 8px;font-size:14px}
+  .mixsum{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;padding-top:11px;border-top:2px solid var(--ink);margin-top:6px}
+  .mixsum.bad{color:var(--risk)}
+
+  /* --- comparativo três cenários --- */
+  .scen{display:grid;grid-template-columns:1fr;gap:1px;background:var(--border);border:1px solid var(--border)}
+  @media(min-width:760px){.scen{grid-template-columns:repeat(3,1fr)}}
+  .sc{background:var(--surface);padding:20px 22px;display:flex;flex-direction:column}
+  .sc.hoje{background:var(--col-hoje)}
+  .sc.ruim{border-top:4px solid var(--risk)}
+  .sc.bom{border-top:4px solid var(--gold)}
+  .sc .cap{font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+  .sc .ttl{font-size:16px;font-weight:800;margin-bottom:16px;line-height:1.25;letter-spacing:-.01em}
+  .sc dl{margin:0;display:flex;flex-direction:column;gap:9px;font-size:13.5px}
+  .sc .ln{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .sc .ln span:first-child{color:var(--muted)}
+  .sc .ln span:last-child{font-weight:700;white-space:nowrap}
+  .sc .big{margin-top:auto;padding-top:16px;border-top:1px solid var(--border)}
+  .sc .big .k{font-size:10.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .sc .big .v{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  .sc .big .d{font-size:12.5px;margin-top:5px;line-height:1.35;color:var(--muted)}
+  .v-risk{color:var(--risk)} .v-ok{color:var(--ok)} .v-neutral{color:var(--ink)}
+
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin:18px 0}
+  .tile{background:var(--surface);padding:17px 19px}
+  .tile .lb{font-size:10.5px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;line-height:1.3}
+  .tile .vl{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  .tile .nt{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.35}
+  .tile.hero{background:var(--ink)}
+  .tile.hero .lb{color:var(--gold)}
+  .tile.hero .vl{color:#F1F1F0;font-size:29px}
+  .tile.hero .nt{color:var(--concrete)}
+
+  .bar{padding:10px 0;border-top:1px solid var(--border)}
+  .bar:first-child{border-top:0}
+  .bar .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:5px}
+  .bar .nm{font-size:13.5px;font-weight:700}
+  .bar .vl{font-size:13.5px;font-weight:800;white-space:nowrap}
+  .bar .track{height:13px;background:var(--subtle);position:relative;overflow:hidden}
+  .bar .fill{height:100%;position:absolute;left:0;top:0}
+  .bar .meta{font-size:11.5px;color:var(--muted);margin-top:4px}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;font-weight:700;margin:12px 0 4px;padding-bottom:11px;border-bottom:1px solid var(--border)}
+  .legend span{display:flex;align-items:center;gap:7px}
+  .legend i{width:13px;height:13px;display:inline-block}
+
+  .flow{display:grid;grid-template-columns:1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin:16px 0}
+  @media(min-width:700px){.flow{grid-template-columns:repeat(4,1fr)}}
+  .fs{background:var(--surface);padding:16px 18px}
+  .fs .n{font-size:11px;font-weight:800;color:var(--gold);letter-spacing:.1em;margin-bottom:6px}
+  .fs .t{font-size:14px;font-weight:800;margin-bottom:5px;line-height:1.25}
+  .fs .d{font-size:12.5px;color:var(--muted);line-height:1.4}
+
+  .tw{overflow-x:auto;margin:14px 0;border:1px solid var(--border);background:var(--surface)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:580px}
+  th{font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;text-align:left;color:var(--muted);background:var(--subtle);padding:9px 13px}
+  td{padding:10px 13px;border-top:1px solid var(--border);vertical-align:top;line-height:1.45}
+  .rule{border-left:3px solid var(--gold);background:var(--gold-bg);padding:14px 18px;margin:16px 0;font-size:14px;line-height:1.55}
+  .rule p{margin:0}.rule p+p{margin-top:9px}
+  .note{border:1px solid var(--border);background:var(--surface);padding:14px 18px;margin:16px 0;font-size:13.5px;color:var(--storm)}
+  .note p{margin:0}.note p+p{margin-top:8px}
+  footer{border-top:1px solid var(--border);padding:18px 0 40px;color:var(--muted);font-size:12.5px}
+  h3{font-size:15.5px;font-weight:800;margin:24px 0 6px}
+  p{margin:0 0 12px;max-width:74ch}
+  ul{padding-left:19px;margin:10px 0}li{margin:5px 0;max-width:74ch}
+  li::marker{color:var(--gold)}
+</style>
+
+<header>
+  <div class="wrap">
+    <div class="mk"><div class="g">V</div><div class="w">Grupo VOW · Reforma tributária no varejo</div></div>
+    <h1><span class="a">Simulador de</span><span class="b">verbas comerciais</span></h1>
+    <p>O que o acordo com a indústria rende hoje, o que renderia depois da reforma sem mexer em nada, e o que acontece se a verba for recomposta. Com o efeito de cada cenário no caixa.</p>
+  </div>
+</header>
+
+<main class="wrap">
+
+<div class="cols">
+  <!-- ENTRADAS -->
+  <div>
+    <div class="panel">
+      <div class="eyebrow">Seus dados</div>
+      <h2>Base de cálculo</h2>
+      <p class="hint">Valores de exemplo — troque pelos seus.</p>
+
+      <div class="field">
+        <label for="fat">Faturamento bruto anual</label>
+        <div class="inputrow"><span class="pre">R$</span><input type="number" id="fat" value="300000000" min="0" step="1000000"></div>
+      </div>
+      <div class="field">
+        <label for="vpct">Verba total recebida da indústria</label>
+        <div class="sub">Como % do faturamento — <span id="vlbl">3,0%</span></div>
+        <input type="range" id="vpct" min="0" max="10" step="0.1" value="3">
+      </div>
+      <div class="field">
+        <label for="aliq">Alíquota de IBS + CBS</label>
+        <div class="sub">Trava de 26,5%; Comitê Gestor estimou 27,91% — <span id="albl">26,5%</span></div>
+        <input type="range" id="aliq" min="15" max="32" step="0.1" value="26.5">
+      </div>
+      <div class="field">
+        <label for="marg">Margem líquida da rede</label>
+        <div class="sub">Para comparar com o lucro — <span id="mlbl">2,0%</span></div>
+        <input type="range" id="marg" min="0.5" max="8" step="0.1" value="2">
+      </div>
+
+      <div class="subhead">Situação de hoje</div>
+      <div class="field">
+        <label for="hoje">Quanto da sua verba já é tributada hoje</label>
+        <div class="sub">O tratamento atual é disputado — parte das redes trata como redução de custo, parte como receita. Confirme com o seu fiscal. — <span id="hlbl">0%</span></div>
+        <input type="range" id="hoje" min="0" max="100" step="5" value="0">
+      </div>
+
+      <div class="subhead">Caixa</div>
+      <div class="field">
+        <label for="dreceb">Prazo para receber a verba</label>
+        <div class="sub">Dias entre emitir e receber da indústria — <span id="drlbl">45 dias</span></div>
+        <input type="range" id="dreceb" min="0" max="120" step="5" value="45">
+      </div>
+      <div class="field">
+        <label for="dtrib">Prazo para recolher o tributo</label>
+        <div class="sub">Dias entre emitir e recolher — premissa, confirme a regra vigente — <span id="dtlbl">25 dias</span></div>
+        <input type="range" id="dtrib" min="0" max="90" step="5" value="25">
+      </div>
+      <div class="field">
+        <label for="cc">Custo de capital anual</label>
+        <div class="sub">Para precificar o capital parado — <span id="cclbl">14,0%</span></div>
+        <input type="range" id="cc" min="0" max="30" step="0.5" value="14">
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="eyebrow">Composição</div>
+      <h2>Mix do acordo</h2>
+      <p class="hint">Quanto de cada linha, em % da verba total.</p>
+      <div id="mix"></div>
+      <div class="mixsum" id="mixsum"><span>Soma</span><span id="mixtot">100%</span></div>
+    </div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div>
+    <div class="panel">
+      <div class="eyebrow">O antes e o depois</div>
+      <h2>Três cenários, não dois</h2>
+      <p class="hint">O terceiro é o que importa: existe uma saída, e ela não custa nada à indústria. Todos os valores são anuais.</p>
+
+      <div class="scen">
+        <div class="sc hoje">
+          <div class="cap">Cenário 1</div>
+          <div class="ttl">Hoje</div>
+          <dl>
+            <div class="ln"><span>Verba negociada</span><span id="h-verba">—</span></div>
+            <div class="ln"><span>Tributo sobre a verba</span><span id="h-trib">—</span></div>
+            <div class="ln"><span>Custo para a indústria</span><span id="h-ind">—</span></div>
+          </dl>
+          <div class="big"><div class="k">Fica com o varejo</div><div class="v v-neutral" id="h-liq">—</div><div class="d">A referência de comparação.</div></div>
+        </div>
+
+        <div class="sc ruim">
+          <div class="cap">Cenário 2</div>
+          <div class="ttl">Depois, sem mexer no acordo</div>
+          <dl>
+            <div class="ln"><span>Verba negociada</span><span id="a-verba">—</span></div>
+            <div class="ln"><span>Tributo sobre a verba</span><span id="a-trib">—</span></div>
+            <div class="ln"><span>Custo para a indústria</span><span id="a-ind">—</span></div>
+          </dl>
+          <div class="big"><div class="k">Fica com o varejo</div><div class="v v-risk" id="a-liq">—</div><div class="d" id="a-delta">—</div></div>
+        </div>
+
+        <div class="sc bom">
+          <div class="cap">Cenário 3</div>
+          <div class="ttl">Depois, com a verba recomposta</div>
+          <dl>
+            <div class="ln"><span>Verba negociada</span><span id="b-verba">—</span></div>
+            <div class="ln"><span>Tributo sobre a verba</span><span id="b-trib">—</span></div>
+            <div class="ln"><span>Custo para a indústria</span><span id="b-ind">—</span></div>
+          </dl>
+          <div class="big"><div class="k">Fica com o varejo</div><div class="v v-ok" id="b-liq">—</div><div class="d" id="b-delta">—</div></div>
+        </div>
+      </div>
+
+      <div class="rule"><p><strong>Leia a linha "custo para a indústria".</strong> No cenário 3 a verba sobe, mas a indústria credita integralmente o imposto que paga — o custo líquido dela é o mesmo dos outros dois cenários. É por isso que a recomposição é uma negociação com resposta certa: não se está pedindo dinheiro a mais, está se pedindo que o tributo novo não saia do seu bolso.</p></div>
+    </div>
+
+    <div class="panel">
+      <div class="eyebrow">Impacto no caixa</div>
+      <h2>O que muda no fluxo, além do resultado</h2>
+      <p class="hint">Hoje boa parte da verba circula como abatimento em conta a pagar — não há entrada de caixa nem tributo a recolher. Depois, ela vira nota emitida pelo varejo: aparece um recebível, e aparece um tributo a pagar antes de o recebível entrar.</p>
+
+      <div class="flow">
+        <div class="fs"><div class="n">HOJE</div><div class="t">Abatimento</div><div class="d">A verba desconta o que você deve ao fornecedor. Sem nota sua, sem recolhimento, sem descasamento.</div></div>
+        <div class="fs"><div class="n">DEPOIS · 1</div><div class="t">Você emite a nota</div><div class="d">O serviço prestado à indústria vira documento fiscal seu, com IBS/CBS destacado.</div></div>
+        <div class="fs"><div class="n">DEPOIS · 2</div><div class="t">O tributo vence</div><div class="d">Você recolhe sobre a nota emitida — normalmente antes de a indústria pagar.</div></div>
+        <div class="fs"><div class="n">DEPOIS · 3</div><div class="t">A verba entra</div><div class="d">O recebível cai no prazo negociado. Entre o passo 2 e este, o caixa é seu.</div></div>
+      </div>
+
+      <div class="tiles">
+        <div class="tile"><div class="lb">Tributo a recolher por mês</div><div class="vl" id="c-mes">—</div><div class="nt">Passa a existir no seu fluxo mensal.</div></div>
+        <div class="tile"><div class="lb">Defasagem entre recolher e receber</div><div class="vl" id="c-gap">—</div><div class="nt" id="c-gapnota">—</div></div>
+        <div class="tile"><div class="lb">Capital de giro imobilizado</div><div class="vl" id="c-giro">—</div><div class="nt">Valor médio parado financiando o tributo.</div></div>
+        <div class="tile hero"><div class="lb">Custo anual desse carrego</div><div class="vl" id="c-carrego">—</div><div class="nt">Existe nos cenários 2 e 3 — a recomposição resolve o resultado, não o descasamento.</div></div>
+      </div>
+
+      <div class="note"><p><strong>Este é o ponto que passa despercebido.</strong> A recomposição da verba conserta o resultado, mas não conserta o caixa: mesmo recebendo o valor cheio, você recolhe o tributo antes de a indústria pagar. Por isso o prazo de pagamento da verba também é item de negociação no acordo de 2027 — e não só o valor.</p></div>
+    </div>
+
+    <div class="panel">
+      <div class="eyebrow">Linha a linha</div>
+      <h2>Onde está o dinheiro exposto</h2>
+      <p class="hint">Barra cheia = valor anual da linha. A parte escura é o que passa a ser tributado.</p>
+      <div class="legend">
+        <span><i style="background:var(--bar-tax)"></i> Tributada</span>
+        <span><i style="background:var(--bar-free)"></i> Não tributada</span>
+        <span style="color:var(--muted);font-weight:500">Cada linha traz o rótulo escrito — a cor não decide sozinha.</span>
+      </div>
+      <div id="bars"></div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="eyebrow">A regra por trás da conta</div>
+  <h2>O que muda em cada linha do acordo</h2>
+  <p>O art. 5º da LC 214/2025 traz as operações não onerosas para o campo de incidência e só abre exceção quando a vantagem <strong>consta do documento fiscal e não depende de evento posterior</strong>. O Decreto 12.955/26 define bonificação como fornecimento a maior de bem ou serviço em substituição a desconto no valor da operação.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th style="width:26%">Linha do acordo</th><th style="width:25%">Por que</th><th style="width:13%">Depois</th><th>O que fazer no acordo de 2027</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Marketing e propaganda cooperada</strong><br><span style="color:var(--muted)">encarte, mídia, ativação</span></td><td>Há contrapartida: o varejo veicula. É serviço.</td><td><strong style="color:var(--risk)">Tributa</strong></td><td>Recompor e emitir documento próprio. Verificar CNAE.</td></tr>
+      <tr><td><strong>Retail media e dados</strong></td><td>Remuneração por utilidade econômica.</td><td><strong style="color:var(--risk)">Tributa</strong></td><td>Idem. Linha que mais cresce e a que menos gente sabe faturar.</td></tr>
+      <tr><td><strong>Ponta de gôndola e espaço</strong></td><td>Cessão de espaço mediante remuneração.</td><td><strong style="color:var(--risk)">Tributa</strong></td><td>Recompor, com previsão contratual explícita.</td></tr>
+      <tr><td><strong>Inauguração e enxoval</strong></td><td>Se há contrapartida de exposição, é serviço.</td><td><strong style="color:var(--risk)">Tributa</strong></td><td>Separar a ativação do desconto de abertura — tratamentos diferentes.</td></tr>
+      <tr><td><strong>Verba logística</strong><br><span style="color:var(--muted)">entrega em CD, paletização</span></td><td>O varejo presta a distribuição às lojas.</td><td><strong style="color:var(--risk)">Tributa</strong></td><td>Recompor e documentar como serviço logístico.</td></tr>
+      <tr><td><strong>Crescimento e performance</strong></td><td>Não há serviço — é ajuste de preço. A forma decide.</td><td><strong style="color:var(--warn)">Depende</strong></td><td>Na nota reduz base; apurada depois tributa. <strong>Migrar para a nota.</strong></td></tr>
+      <tr><td><strong>Sell-in</strong><br><span style="color:var(--muted)">verba na compra, na nota</span></td><td>Desconto incondicional na própria operação.</td><td><strong style="color:var(--ok)">Não tributa</strong></td><td>Preservar. É a forma mais eficiente.</td></tr>
+      <tr><td><strong>Sell-out</strong><br><span style="color:var(--muted)">apurado pela venda ao consumidor</span></td><td><strong>Depende de evento posterior por construção.</strong></td><td><strong style="color:var(--risk)">Tributa</strong></td><td>Recompor, e rever quanto do acordo precisa mesmo ser sell-out.</td></tr>
+      <tr><td><strong>Bonificação na mesma nota</strong><br><span style="color:var(--muted)">a dúzia de treze</span></td><td>Consta do documento, sem evento posterior.</td><td><strong style="color:var(--ok)">Não tributa</strong></td><td>Preservar. É a única bonificação que segue limpa.</td></tr>
+      <tr><td><strong>Bonificação apurada depois</strong></td><td>Não onerosa, sem a exceção.</td><td><strong style="color:var(--risk)">Tributa</strong></td><td>Acabou o acerto retroativo. Migrar para desconto na nota.</td></tr>
+      <tr><td><strong>Avaria e quebra</strong></td><td>Indenizatória — recompõe perda, não remunera.</td><td><strong style="color:var(--ok)">Não tributa</strong></td><td>Documentar a perda. Sem documento, vira receita.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="rule"><p><strong>A virada que ninguém está olhando: sell-in contra sell-out.</strong> O mercado vem migrando de sell-in para sell-out porque sell-out mede o que realmente vendeu. Só que sell-out é, por definição, apuração sobre evento posterior — exatamente a estrutura que a reforma tributa. Modernização comercial e eficiência tributária apontam para lados opostos, e isso vai ter que ser negociado acordo por acordo.</p></div>
+
+  <h3>As fórmulas</h3>
+  <ul>
+    <li><strong>Tributo depois</strong> = base tributável × alíquota ÷ (1 + alíquota), quando o valor pago não muda — o imposto sai de dentro da verba.</li>
+    <li><strong>Recomposição</strong> = base tributável × alíquota. É quanto a verba precisa subir. A indústria credita esse valor.</li>
+    <li><strong>Carrego de caixa</strong> = tributo mensal × dias de defasagem ÷ 30 × custo de capital.</li>
+    <li>A alíquota é calculada por fora. Com 26,5%, a perda sem recomposição é <strong>20,95% de cada real tributável</strong>.</li>
+  </ul>
+
+  <div class="note">
+    <p><strong>A validar com o time fiscal da VOW:</strong> o tratamento da verba de inauguração sem contrapartida de exposição; o limite entre verba de crescimento como desconto e como bonificação; a estrutura societária necessária para o varejo faturar retail media; e o prazo legal de recolhimento, usado aqui como premissa ajustável.</p>
+    <p>Base normativa: LC 214/2025 (arts. 5º, 27, 47 e 48) e Decreto 12.955/26.</p>
+  </div>
+</div>
+</main>
+
+<footer class="wrap">Grupo VOW · protótipo para validação interna · setembro de 2026. Estimativa sobre premissas declaradas pelo usuário; não constitui apuração fiscal nem promessa de resultado.</footer>
+
+<script>
+(function(){
+  var LINHAS=[
+    {id:"mkt", nome:"Marketing",   sub:"encarte, tabloide, ação de loja", pct:16, trib:1,   tag:"Tributada"},
+    {id:"camp",nome:"Campanha",    sub:"ativação e promoção conjunta",    pct:9,  trib:1,   tag:"Tributada"},
+    {id:"kit", nome:"Mídia Kit",   sub:"retail media",                    pct:8,  trib:1,   tag:"Tributada"},
+    {id:"crm", nome:"CRM",         sub:"base de clientes e dados",        pct:4,  trib:1,   tag:"Tributada"},
+    {id:"ecom",nome:"Ecommerce",   sub:"marketplace, delivery, app",      pct:3,  trib:1,   tag:"Tributada"},
+    {id:"log", nome:"Logística",   sub:"entrega em CD, paletização",      pct:12, trib:1,   tag:"Tributada"},
+    {id:"fid", nome:"Fidelidade",  sub:"clube, pontos, patrocínio",       pct:4,  trib:1,   tag:"Tributada"},
+    {id:"cres",nome:"Crescimento", sub:"meta de volume",                  pct:12, trib:0.5, tag:"Depende da forma"},
+    {id:"inau",nome:"Inauguração", sub:"enxoval e ativação de abertura",  pct:4,  trib:0.5, tag:"Depende da forma"},
+    {id:"per", nome:"Perecíveis",  sub:"quebra e rebaixa",                pct:7,  trib:0.5, tag:"Depende do documento"},
+    {id:"tro", nome:"Troca",       sub:"devolução e recompra",            pct:6,  trib:0.5, tag:"Depende do documento"},
+    {id:"com", nome:"Comercial",   sub:"desconto e bonificação na nota",  pct:15, trib:0,   tag:"Não tributada"}
+  ];
+  var brl=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
+  function pc(n,d){d=(d===undefined)?1:d;return n.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d})+"%";}
+  function $(i){return document.getElementById(i);}
+
+  var mix=$("mix");
+  LINHAS.forEach(function(l){
+    var cls=l.trib===1?"s":(l.trib===0?"n":"d");
+    var r=document.createElement("div");
+    r.className="mixrow";
+    r.innerHTML='<div><div class="nm">'+l.nome+'</div><div style="font-size:11.5px;color:var(--muted);line-height:1.25">'+l.sub+'</div><span class="tg '+cls+'">'+l.tag+'</span></div>'+
+      '<input type="number" id="mix-'+l.id+'" value="'+l.pct+'" min="0" max="100" step="1" aria-label="'+l.nome+'">';
+    mix.appendChild(r);
+  });
+
+  function calc(){
+    var fat=Math.max(0,parseFloat($("fat").value)||0);
+    var vp=parseFloat($("vpct").value)||0;
+    var t=(parseFloat($("aliq").value)||0)/100;
+    var m=(parseFloat($("marg").value)||0)/100;
+    var h=(parseFloat($("hoje").value)||0)/100;
+    var dr=parseFloat($("dreceb").value)||0;
+    var dt=parseFloat($("dtrib").value)||0;
+    var cc=(parseFloat($("cc").value)||0)/100;
+
+    $("vlbl").textContent=pc(vp); $("albl").textContent=pc(t*100);
+    $("mlbl").textContent=pc(m*100); $("hlbl").textContent=pc(h*100,0);
+    $("drlbl").textContent=dr+" dias"; $("dtlbl").textContent=dt+" dias";
+    $("cclbl").textContent=pc(cc*100);
+
+    var verba=fat*vp/100;
+    var soma=0; LINHAS.forEach(function(l){soma+=Math.max(0,parseFloat($("mix-"+l.id).value)||0);});
+    $("mixtot").textContent=pc(soma,0);
+    $("mixsum").className="mixsum"+(Math.abs(soma-100)>0.5?" bad":"");
+    var base=soma>0?soma:100;
+
+    var tribBase=0,maxVal=0,linhas=[];
+    LINHAS.forEach(function(l){
+      var share=Math.max(0,parseFloat($("mix-"+l.id).value)||0)/base;
+      var valor=verba*share, tv=valor*l.trib;
+      tribBase+=tv; if(valor>maxVal)maxVal=valor;
+      linhas.push({nome:l.nome,sub:l.sub,tag:l.tag,valor:valor,trib:l.trib,tribVal:tv});
+    });
+
+    // Cenário 1 — hoje
+    var baseHoje=verba*h;
+    var tribHoje=baseHoje*t/(1+t);
+    var liqHoje=verba-tribHoje;
+    // Cenário 2 — depois, mesmo valor pago
+    var tribDepois=tribBase*t/(1+t);
+    var liqDepois=verba-tribDepois;
+    // Cenário 3 — depois, recomposta
+    var recomp=tribBase*t;
+    var liqRecomp=verba;
+    var tribRecomp=recomp;
+
+    var lucro=fat*m;
+    var perda=tribDepois-tribHoje;
+
+    $("h-verba").textContent=brl.format(verba);
+    $("h-trib").textContent=tribHoje>0?"− "+brl.format(tribHoje):brl.format(0);
+    $("h-ind").textContent=brl.format(verba);
+    $("h-liq").textContent=brl.format(liqHoje);
+
+    $("a-verba").textContent=brl.format(verba);
+    $("a-trib").textContent="− "+brl.format(tribDepois);
+    $("a-ind").textContent=brl.format(verba);
+    $("a-liq").textContent=brl.format(liqDepois);
+    $("a-delta").textContent= perda>0
+      ? "− "+brl.format(perda)+" contra hoje"+(lucro>0?" · "+pc(perda/lucro*100,0)+" do lucro anual":"")
+      : "sem diferença contra hoje";
+
+    $("b-verba").textContent=brl.format(verba+recomp);
+    $("b-trib").textContent="− "+brl.format(tribRecomp);
+    $("b-ind").textContent=brl.format(verba);
+    $("b-liq").textContent=brl.format(liqRecomp);
+    $("b-delta").textContent= tribHoje>0
+      ? "+ "+brl.format(liqRecomp-liqHoje)+" contra hoje · a indústria credita a diferença"
+      : "mesmo resultado de hoje · a indústria credita a diferença";
+
+    // caixa
+    var tribMes=(tribBase*t)/12;
+    var gap=Math.max(0,dr-dt);
+    var giro=tribMes*gap/30;
+    var carrego=giro*cc;
+    $("c-mes").textContent=brl.format(tribMes);
+    $("c-gap").textContent=gap+" dias";
+    $("c-gapnota").textContent= gap>0
+      ? "Você recolhe "+gap+" dias antes de receber."
+      : "Você recebe antes de recolher — sem descasamento nesta premissa.";
+    $("c-giro").textContent=brl.format(giro);
+    $("c-carrego").textContent=brl.format(carrego);
+
+    var out="";
+    linhas.forEach(function(l){
+      var w=maxVal>0?(l.valor/maxVal*100):0;
+      var wt=l.valor>0?(l.tribVal/l.valor*100):0;
+      var meta=l.trib===1?"Tributada integralmente":l.trib===0?"Fora do campo de incidência":"Metade tributável nesta simulação — a forma e o documento decidem";
+      out+='<div class="bar"><div class="top"><span class="nm">'+l.nome+' <span style="font-weight:500;color:var(--muted)">· '+l.sub+'</span></span><span class="vl">'+brl.format(l.valor)+'</span></div>'+
+        '<div class="track" role="img" aria-label="'+l.nome+': '+brl.format(l.valor)+', '+l.tag+'">'+
+        '<div class="fill" style="width:'+w.toFixed(2)+'%;background:var(--bar-free)"></div>'+
+        '<div class="fill" style="width:'+(w*wt/100).toFixed(2)+'%;background:var(--bar-tax)"></div></div>'+
+        '<div class="meta">'+l.tag+' · '+meta+'</div></div>';
+    });
+    $("bars").innerHTML=out;
+  }
+
+  ["fat","vpct","aliq","marg","hoje","dreceb","dtrib","cc"].forEach(function(i){$(i).addEventListener("input",calc);});
+  LINHAS.forEach(function(l){$("mix-"+l.id).addEventListener("input",calc);});
+  calc();
+})();
+</script>
