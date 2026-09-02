@@ -109,6 +109,79 @@ export function comCrm(lead) {
   }
 }
 
+/**
+ * Reconstitui a jornada do lead a partir do log append-only.
+ *
+ * O lead só guarda a fase atual. O caminho até ela — quando entrou em cada
+ * uma e quanto tempo ficou — está nas interações, que nunca são apagadas.
+ * É por isso que aquele log ser append-only não é preciosismo: é o que
+ * permite responder "onde esse negócio travou".
+ */
+export function jornada(lead, interacoes = []) {
+  const marcos = interacoes
+    .filter((i) => i.para)
+    .map((i) => ({ estagio: i.para, em: i.criadoEm, autor: i.autor }))
+    .sort((a, b) => String(a.em).localeCompare(String(b.em)))
+
+  // Lead capturado antes desta versão não tem o marco inicial gravado.
+  if (!marcos.length || marcos[0].estagio !== 'capturado') {
+    marcos.unshift({ estagio: 'capturado', em: lead.criadoEm, autor: null, inferido: true })
+  }
+
+  const atual = estagio(lead.estagio).id
+  const passos = ESTAGIOS.filter((e) => !e.final || e.id === atual)
+
+  let anterior = null
+  const trilha = passos.map((e) => {
+    const marco = marcos.find((m) => m.estagio === e.id)
+    const seguinte = marco && marcos.find((m) => String(m.em) > String(marco.em))
+    const fim = seguinte ? ts(seguinte.em) : (marco ? agora() : null)
+    const passo = {
+      id: e.id, nome: e.nome, n: e.n, dica: e.dica,
+      alcancado: Boolean(marco),
+      em: marco?.em || null,
+      inferido: marco?.inferido === true,
+      atual: e.id === atual,
+      // Dias parados nesta fase. Na fase atual, conta até agora.
+      dias: marco ? Math.floor((fim - ts(marco.em)) / DIA) : null,
+      esperaDesde: anterior,
+    }
+    if (marco) anterior = marco.em
+    return passo
+  })
+
+  const alcancados = trilha.filter((p) => p.alcancado)
+  return {
+    trilha,
+    // Quanto tempo desde a captura, e quantas fases já venceu.
+    diasTotais: Math.floor((agora() - ts(lead.criadoEm)) / DIA),
+    fasesVencidas: Math.max(0, alcancados.length - 1),
+    // A fase onde mais tempo se passou é onde o negócio está travando.
+    maiorEspera: alcancados.reduce((a, b) => (b.dias ?? 0) > (a?.dias ?? -1) ? b : a, null),
+  }
+}
+
+/**
+ * Conversão de uma fase para a seguinte: de tudo que já passou por aqui,
+ * quanto seguiu adiante. Sem isso o funil mostra pilhas e não mostra onde
+ * elas param de andar.
+ */
+function conversoes(leads) {
+  const ordem = [...ABERTOS, 'fechado']
+  const indice = Object.fromEntries(ordem.map((id, i) => [id, i]))
+  // Um lead perdido ainda passou pelas fases anteriores à saída dele.
+  const alcance = (l) => {
+    const e = estagio(l.estagio)
+    if (e.id === 'perdido') return indice[l.estagioAnterior] ?? 0
+    return indice[e.id] ?? 0
+  }
+  return ABERTOS.map((id, i) => {
+    const chegaram = leads.filter((l) => alcance(l) >= i).length
+    const passaram = leads.filter((l) => alcance(l) > i).length
+    return { de: id, chegaram, passaram, taxa: chegaram ? Math.round((passaram / chegaram) * 100) : null }
+  })
+}
+
 /** O funil: uma coluna por fase aberta, ordenada por quem espera há mais tempo. */
 export function montarPipeline(leads) {
   const vivos = leads.map(comCrm).filter((l) => !estagio(l.estagio).final)
@@ -128,6 +201,7 @@ export function montarPipeline(leads) {
   })
   return {
     colunas,
+    conversoes: conversoes(leads.map(comCrm)),
     totalAbertos: vivos.length,
     previsaoPonderada: round(vivos.reduce((s, l) => s + l.previsao, 0)),
     valorEmJogoTotal: round(vivos.reduce((s, l) => s + l.valorEmJogo, 0)),

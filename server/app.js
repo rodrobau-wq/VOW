@@ -15,10 +15,11 @@ import { lerLeads, atualizarLead, gravarLead, porCapturaId } from '../leads-db.j
 import { temPostgres } from '../db.js'
 import { protegido } from '../basic-auth.js'
 import { diagnosticar, PREMISSAS } from '../motor.js'
+import { montarProjeto, resumo, ehStatusEtapa } from '../projeto.js'
 import { enviarEmail, emailAcesso } from '../email.js'
 import {
   ESTAGIOS, MOTIVOS_PERDA, TIPOS_INTERACAO, SLA_PRIMEIRO_CONTATO_H,
-  comCrm, ehEstagio, ehMotivo, estagio, montarPipeline, montarResultado, montarHoje,
+  comCrm, ehEstagio, ehMotivo, estagio, montarPipeline, montarResultado, montarHoje, jornada,
 } from '../crm.js'
 
 import { montarPainel, CLASSES_CREDITO, RISCOS, CALENDARIO } from '../painel.js'
@@ -424,7 +425,9 @@ export async function capturar(b, usuario) {
 
   const nota = String(b.nota || '').trim()
   if (nota) await registrar(id, usuario.nome, nota.slice(0, 2000), 'nota')
-  await registrar(id, usuario.nome, `Capturado no ${lead.origem === 'abras' ? 'estande' : 'site'} por ${usuario.nome}`)
+  await registrar(id, usuario.nome,
+    `Capturado no ${lead.origem === 'abras' ? 'estande' : 'site'} por ${usuario.nome}`,
+    'sistema', { para: 'capturado' })
   return comCrm(lead)
 }
 
@@ -444,15 +447,25 @@ app.get('/api/app/crm/leads/:id', async (req, res, next) => {
     const interacoes = await store.listar('interacao', null, (i) => i.leadId === lead.id)
     res.json({
       lead: comCrm(lead),
+      // A jornada lê as interações em ordem crescente; a linha do tempo, ao
+      // contrário. Calcula antes de inverter.
+      jornada: jornada(lead, [...interacoes].sort((a, b) => a.criadoEm.localeCompare(b.criadoEm))),
       // Mais recente primeiro: é o que a pessoa quer ler ao abrir.
       interacoes: interacoes.sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)),
     })
   } catch (e) { next(e) }
 })
 
-/** Toda mudança de fase deixa rastro na linha do tempo. */
-async function registrar(leadId, autor, texto, tipo = 'sistema') {
-  return store.inserir('interacao', { leadId, tipo, autor, texto })
+/**
+ * Toda mudança de fase deixa rastro na linha do tempo.
+ *
+ * `de` e `para` vão em campos próprios, não só embutidos no texto: é assim
+ * que a jornada do lead pode ser reconstituída depois. Ler a frase de volta
+ * com expressão regular seria frágil e quebraria na primeira vez que alguém
+ * mudasse a redação.
+ */
+async function registrar(leadId, autor, texto, tipo = 'sistema', extra = {}) {
+  return store.inserir('interacao', { leadId, tipo, autor, texto, ...extra })
 }
 
 app.patch('/api/app/crm/leads/:id', async (req, res, next) => {
@@ -465,6 +478,7 @@ app.patch('/api/app/crm/leads/:id', async (req, res, next) => {
     const mudancas = {}
     const autor = req.usuario.nome
     const notas = []
+    let transicao = null
 
     if (b.estagio !== undefined) {
       if (!ehEstagio(b.estagio)) return res.status(400).json({ erro: 'fase desconhecida' })
@@ -492,6 +506,7 @@ app.patch('/api/app/crm/leads/:id', async (req, res, next) => {
         if (b.estagio !== 'capturado' && !atual.primeiroContatoEm) {
           mudancas.primeiroContatoEm = new Date().toISOString()
         }
+        transicao = { de: atual.estagio || 'capturado', para: b.estagio }
         notas.push(`Fase: ${estagio(atual.estagio).nome} → ${estagio(b.estagio).nome}`)
       }
     }
@@ -527,7 +542,16 @@ app.patch('/api/app/crm/leads/:id', async (req, res, next) => {
     }
 
     const salvo = await atualizarLead(req.params.id, mudancas)
-    for (const n of notas) await registrar(req.params.id, autor, n)
+
+    // Fechar não é o fim: é o começo da entrega. O projeto nasce junto para
+    // ninguém precisar lembrar de criá-lo depois.
+    if (mudancas.estagio === 'fechado') await abrirProjeto(salvo, autor)
+
+    for (const n of notas) {
+      // Só a linha da mudança de fase carrega de/para; as outras são notas.
+      const eFase = transicao && n.startsWith('Fase:')
+      await registrar(req.params.id, autor, n, 'sistema', eFase ? transicao : {})
+    }
     res.json(comCrm(salvo))
   } catch (e) { next(e) }
 })
@@ -666,10 +690,90 @@ app.get('/api/app/dados/:qual.json', soVow, async (req, res, next) => {
   } catch (e) { next(e) }
 })
 
+/* ======================================================================
+ * Projetos — o que começa quando a jornada comercial termina.
+ * ====================================================================== */
+
+app.get('/api/app/projetos', async (_req, res, next) => {
+  try {
+    const projetos = await store.listar('projeto')
+    res.json(projetos
+      .map((p) => ({ ...p, resumo: resumo(p) }))
+      .sort((a, b) => String(b.iniciadoEm).localeCompare(String(a.iniciadoEm))))
+  } catch (e) { next(e) }
+})
+
+app.get('/api/app/projetos/:id', async (req, res, next) => {
+  try {
+    const p = await store.porId('projeto', req.params.id)
+    if (!p) return res.status(404).json({ erro: 'projeto não encontrado' })
+    const lead = (await lerLeads()).find((l) => l.id === p.leadId) || null
+    res.json({ projeto: p, resumo: resumo(p), lead: lead ? comCrm(lead) : null })
+  } catch (e) { next(e) }
+})
+
+/** Cria o projeto de um lead fechado. Um por lead. */
+async function abrirProjeto(lead, autor) {
+  const existente = await store.achar('projeto', (p) => p.leadId === lead.id)
+  if (existente) return existente
+  const projeto = await store.inserir('projeto', montarProjeto(lead, { responsavel: lead.responsavel || autor }))
+  await registrar(lead.id, autor, `Projeto de entrega aberto: ${projeto.etapas.length} etapas`)
+  return projeto
+}
+
+app.post('/api/app/crm/leads/:id/projeto', async (req, res, next) => {
+  try {
+    const lead = (await lerLeads()).find((l) => l.id === req.params.id)
+    if (!lead) return res.status(404).json({ erro: 'lead não encontrado' })
+    if (lead.estagio !== 'fechado') {
+      return res.status(409).json({ erro: 'O projeto começa quando o negócio fecha.' })
+    }
+    res.json(await abrirProjeto(lead, req.usuario.nome))
+  } catch (e) { next(e) }
+})
+
+/**
+ * Atualiza uma etapa. Responsável, prazo e objetivo são editáveis: o padrão
+ * é ponto de partida, não decisão tomada.
+ */
+app.patch('/api/app/projetos/:id/etapas/:etapaId', async (req, res, next) => {
+  try {
+    const projeto = await store.porId('projeto', req.params.id)
+    if (!projeto) return res.status(404).json({ erro: 'projeto não encontrado' })
+    const etapa = projeto.etapas.find((e) => e.id === req.params.etapaId)
+    if (!etapa) return res.status(404).json({ erro: 'etapa não encontrada' })
+
+    const b = req.body || {}
+    if (b.status !== undefined) {
+      if (!ehStatusEtapa(b.status)) return res.status(400).json({ erro: 'situação inválida' })
+      etapa.status = b.status
+      etapa.concluidaEm = b.status === 'concluída' ? new Date().toISOString() : null
+    }
+    if (b.responsavel !== undefined) etapa.responsavel = String(b.responsavel || '').slice(0, 120) || null
+    if (b.prazo !== undefined) etapa.prazo = String(b.prazo || '').slice(0, 10) || null
+    if (b.objetivo !== undefined) {
+      const v = Number(b.objetivo)
+      if (!Number.isFinite(v) || v < 0) return res.status(400).json({ erro: 'objetivo inválido' })
+      etapa.objetivo = v
+    }
+
+    // Projeto com todas as etapas fechadas está entregue.
+    const todasFeitas = projeto.etapas.every((e) => e.status === 'concluída')
+    const salvo = await store.atualizar('projeto', projeto.id, {
+      etapas: projeto.etapas,
+      status: todasFeitas ? 'entregue' : 'em andamento',
+      entregueEm: todasFeitas ? new Date().toISOString() : null,
+    })
+    res.json({ projeto: salvo, resumo: resumo(salvo) })
+  } catch (e) { next(e) }
+})
+
 /* ------------------------------------------------------------ telas CRM */
 app.get('/app/capturar', tela('capturar'))
 app.get('/app/feira', tela('feira'))
 app.get('/app/dados', tela('dados'))
+app.get('/app/projetos', tela('projetos'))
+app.get('/app/projetos/:id', tela('projeto'))
 app.get('/app/pipeline', tela('pipeline'))
 app.get('/app/hoje', tela('hoje'))
 app.get('/app/resultado', tela('resultado'))

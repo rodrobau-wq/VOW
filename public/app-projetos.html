@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Projetos · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  main{padding:24px 28px 60px;max-width:1100px;margin:0 auto}
+  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--gold)}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 24px;max-width:72ch}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:22px}
+  .k{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:18px}
+  .k .r{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .k .v{font-family:var(--serif);font-size:30px;line-height:1;margin-top:7px;font-variant-numeric:tabular-nums}
+  .k.risco .v{color:var(--risk)}
+  .k .p{font-size:12.5px;color:var(--faint);margin-top:5px}
+  .lista{display:flex;flex-direction:column;gap:12px}
+  .proj{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+        padding:22px 24px;text-decoration:none;color:inherit;display:block}
+  .proj:hover{border-color:var(--gold-edge)}
+  .proj .topo{display:flex;justify-content:space-between;gap:16px;align-items:baseline;flex-wrap:wrap}
+  .proj h2{font-size:24px;margin:0}
+  .proj .prods{font-size:12.5px;color:var(--faint);margin-top:3px}
+  .proj .num{font-family:var(--serif);font-size:24px;font-variant-numeric:tabular-nums}
+  .barra{height:8px;border-radius:4px;background:var(--bg-deep);margin:14px 0 10px;overflow:hidden;display:flex}
+  .barra i{display:block;height:100%;background:var(--ok)}
+  .linha{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+  .linha b{color:var(--ink);font-weight:500}
+  .linha .alerta{color:var(--risk);font-weight:500}
+  .vazio{padding:60px 24px;text-align:center;color:var(--faint);background:var(--surface);
+         border:1px solid var(--line);border-radius:var(--r-lg);line-height:1.6}
+</style>
+</head>
+<body class="paper">
+<main>
+  <h1>Os <em>projetos</em></h1>
+  <p class="sub">A jornada comercial termina no contrato assinado. O que começa aqui é
+  entregar o que foi vendido — com responsável, prazo e objetivo em cada etapa.</p>
+  <div id="tudo" style="color:var(--faint)">Carregando…</div>
+</main>
+
+<script type="module">
+import { montarNav, esc, brl, brlCurto, dataBr } from '/app-nav.js'
+await montarNav('/app/projetos')
+
+const projetos = await (await fetch('/api/app/projetos')).json()
+const $ = (id) => document.getElementById(id)
+
+if (!projetos.length) {
+  $('tudo').innerHTML = `<div class="vazio">Nenhum projeto ainda.<br>
+    O primeiro nasce sozinho quando um negócio for marcado como <b>Fechado</b> no funil.</div>`
+} else {
+  const soma = (f) => projetos.reduce((s, p) => s + f(p), 0)
+  const atrasadas = soma((p) => p.resumo.atrasadas)
+  $('tudo').innerHTML = `
+    <div class="kpis">
+      <div class="k"><div class="r">Em andamento</div>
+        <div class="v">${projetos.filter((p) => p.status !== 'entregue').length}</div>
+        <div class="p">de ${projetos.length} projetos</div></div>
+      <div class="k"><div class="r">A destravar</div>
+        <div class="v">${brlCurto(soma((p) => p.resumo.objetivoTotal))}</div>
+        <div class="p">objetivo somado das etapas</div></div>
+      <div class="k"><div class="r">Já entregue</div>
+        <div class="v">${brlCurto(soma((p) => p.resumo.entregue))}</div>
+        <div class="p">de etapas concluídas</div></div>
+      <div class="k ${atrasadas ? 'risco' : ''}"><div class="r">Etapas atrasadas</div>
+        <div class="v">${atrasadas}</div>
+        <div class="p">${atrasadas ? brlCurto(soma((p) => p.resumo.emRisco)) + ' em risco' : 'nenhuma fora do prazo'}</div></div>
+    </div>
+
+    <div class="lista">
+      ${projetos.map((p) => `
+        <a class="proj" href="/app/projetos/${p.id}">
+          <div class="topo">
+            <div><h2>${esc(p.nome)}</h2>
+              <div class="prods">${p.produtos.map((x) => x === 'revenda' ? 'Verbas com a indústria' : 'Serviços e indiretos').join(' · ')}</div></div>
+            <div class="num">${brlCurto(p.resumo.objetivoTotal)}</div>
+          </div>
+          <div class="barra"><i style="width:${p.resumo.progresso}%"></i></div>
+          <div class="linha">
+            <span><b>${p.resumo.concluidas}</b> de ${p.resumo.total} etapas</span>
+            ${p.resumo.proxima ? `<span>Próxima: <b>${esc(p.resumo.proxima.nome)}</b> até ${dataBr(p.resumo.proxima.prazo)}</span>` : '<span>Entregue</span>'}
+            ${p.resumo.atrasadas ? `<span class="alerta">${p.resumo.atrasadas} atrasada(s)</span>` : ''}
+            ${p.resumo.semResponsavel ? `<span class="alerta">${p.resumo.semResponsavel} sem responsável</span>` : ''}
+          </div>
+        </a>`).join('')}
+    </div>`
+}
+</script>
+</body>
+</html>

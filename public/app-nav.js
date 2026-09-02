@@ -4,17 +4,23 @@
  * Fica num módulo só porque cinco telas usam. Foi exatamente repetindo isto
  * inline que os tokens divergiram em três paletas antes — não repete de novo.
  */
-// Só o CRM da feira. Os três sistemas ficam fora da barra enquanto o foco é
-// a ABRAS — o que não se usa todo dia vira ruído entre o consultor e a tela
-// que ele abre vinte vezes por dia.
+/**
+ * A barra conta a jornada do lead, não uma lista de telas.
+ *
+ * Da esquerda para a direita é a ordem em que o trabalho acontece: o que
+ * precisa de você agora, capturar quem chega, mover no quadro, a carteira
+ * inteira, e o que fechou. `Base` fica separada porque não é etapa de
+ * trabalho — é onde se confere o dado.
+ */
 const ABAS = [
-  { href: '/app/feira',     rotulo: 'Feira' },
-  { href: '/app/hoje',      rotulo: 'Hoje' },
-  { href: '/app/capturar',  rotulo: 'Capturar' },
-  { href: '/app/pipeline',  rotulo: 'Funil' },
-  { href: '/app/leads',     rotulo: 'Carteira' },
-  { href: '/app/resultado', rotulo: 'Resultado' },
-  { href: '/app/dados',     rotulo: 'Base' },
+  { href: '/app/hoje',      rotulo: 'Agora',     grupo: 'O dia' },
+  { href: '/app/feira',     rotulo: 'Feira',     grupo: 'O dia' },
+  { href: '/app/capturar',  rotulo: 'Capturar',  grupo: 'A jornada' },
+  { href: '/app/pipeline',  rotulo: 'Jornada',   grupo: 'A jornada' },
+  { href: '/app/leads',     rotulo: 'Carteira',  grupo: 'A jornada' },
+  { href: '/app/resultado', rotulo: 'Resultado', grupo: 'O fecho' },
+  { href: '/app/projetos',  rotulo: 'Projetos',  grupo: 'A entrega' },
+  { href: '/app/dados',     rotulo: 'Base',      grupo: 'A entrega' },
 ]
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]))
@@ -29,7 +35,12 @@ export async function montarNav(atual) {
       <span><span class="nome">VOW</span><span class="sob">Plataforma</span></span>
     </a>
     <nav class="abas">
-      ${ABAS.map((a) => `<a href="${a.href}" class="${a.href === atual ? 'on' : ''}">${a.rotulo}</a>`).join('')}
+      ${ABAS.map((a, i) => {
+        // Separador entre grupos: marca a mudança de momento sem gastar linha.
+        const abre = i > 0 && ABAS[i - 1].grupo !== a.grupo ? '<span class="sep" aria-hidden="true"></span>' : ''
+        return `${abre}<a href="${a.href}" class="${a.href === atual ? 'on' : ''}"
+                   title="${a.grupo}">${a.rotulo}</a>`
+      }).join('')}
     </nav>
     <div class="sp"></div>
     <div class="quem"><b>${esc(ctx.usuario.nome)}</b>${esc(ctx.usuario.papel)}</div>

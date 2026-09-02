@@ -25,10 +25,12 @@ const APPEND_ONLY = new Set(['verificacao', 'interacao'])
 /** Coleções que não pertencem a uma rede: são o cadastro da própria
  *  plataforma. `interacao` entra aqui porque acompanha lead, e lead é da
  *  VOW — só vira rede depois de fechar. */
-const GLOBAIS = new Set(['rede', 'usuario', 'interacao'])
+// `projeto` acompanha o lead, e lead é da VOW até virar cliente.
+const GLOBAIS = new Set(['rede', 'usuario', 'interacao', 'projeto'])
 
 const COLECOES = new Set([
   'rede', 'usuario', 'fornecedor', 'verificacao', 'item', 'contrato', 'excecao', 'interacao',
+  'projeto',
 ])
 
 function checa(colecao) {

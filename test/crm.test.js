@@ -158,3 +158,59 @@ test('cada fase aberta tem dica e critério de saída', () => {
     assert.ok(e.saida, `${e.id} sem critério de saída`)
   }
 })
+
+test('a jornada é reconstituída do log, não do lead', async () => {
+  const { jornada } = await import('../crm.js')
+  const l = { id: 'L', criadoEm: atras(10), estagio: 'qualificado', diagnosticos: [] }
+  const log = [
+    { criadoEm: atras(10), para: 'capturado' },
+    { criadoEm: atras(7), de: 'capturado', para: 'abordado' },
+    { criadoEm: atras(2), de: 'abordado', para: 'qualificado' },
+  ]
+  const j = jornada(l, log)
+  assert.equal(j.diasTotais, 10)
+  assert.equal(j.fasesVencidas, 2)
+
+  const passo = (id) => j.trilha.find((p) => p.id === id)
+  assert.equal(passo('capturado').dias, 3)   // 10 → 7
+  assert.equal(passo('abordado').dias, 5)    // 7 → 2
+  assert.equal(passo('qualificado').atual, true)
+  assert.equal(passo('reuniao').alcancado, false)
+  // Onde mais tempo se passou é onde o negócio está travando.
+  assert.equal(j.maiorEspera.id, 'abordado')
+})
+
+test('lead antigo, sem marco gravado, ganha o início inferido', async () => {
+  const { jornada } = await import('../crm.js')
+  const j = jornada({ id: 'X', criadoEm: atras(4), estagio: 'capturado', diagnosticos: [] }, [])
+  const inicio = j.trilha[0]
+  assert.equal(inicio.alcancado, true)
+  // Marcado como estimado: a tela precisa poder dizer que a data é inferida.
+  assert.equal(inicio.inferido, true)
+  assert.equal(j.fasesVencidas, 0)
+})
+
+test('conversão mostra quanto seguiu adiante de cada fase', () => {
+  const p = montarPipeline([
+    lead({ estagio: 'capturado' }),
+    lead({ estagio: 'capturado' }),
+    lead({ estagio: 'abordado' }),
+    lead({ estagio: 'proposta', honorario: 1000 }),
+  ])
+  const c = (id) => p.conversoes.find((x) => x.de === id)
+  // Quatro chegaram em capturado; dois seguiram adiante.
+  assert.equal(c('capturado').chegaram, 4)
+  assert.equal(c('capturado').passaram, 2)
+  assert.equal(c('capturado').taxa, 50)
+  // De abordado, só um seguiu.
+  assert.equal(c('abordado').chegaram, 2)
+  assert.equal(c('abordado').taxa, 50)
+  // Quem está em Proposta passou por Levantamento: o funil conta alcance
+  // acumulado, não a pilha parada em cada coluna.
+  assert.equal(c('levantamento').chegaram, 1)
+  assert.equal(c('levantamento').taxa, 100)
+  // Ninguém fechou ainda: da proposta não saiu nada.
+  assert.equal(c('proposta').taxa, 0)
+  // Sem nenhum lead, não há taxa — e nula não é zero.
+  assert.equal(montarPipeline([]).conversoes[0].taxa, null)
+})

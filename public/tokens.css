@@ -232,3 +232,5 @@ body.paper .chip[aria-pressed="true"]{color:var(--surface)}
 .senha-campo .olho:hover{color:var(--gold)}
 .senha-campo .olho svg{width:20px;height:20px;fill:none;stroke:currentColor;
   stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+.appbar .abas .sep{width:1px;height:18px;background:var(--line-2);margin:0 8px;align-self:center;flex:0 0 auto}
