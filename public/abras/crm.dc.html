@@ -47,6 +47,14 @@
 
   <main class="app-main" style="flex: 1; width: 100%; box-sizing: border-box">
 
+    <!-- Sem isto a demonstração aparecia por um instante e era substituída
+         pelos dados reais na frente de quem estava olhando. -->
+    <sc-if value="{{ carregando }}" hint-placeholder-val="{{ false }}">
+      <section style="max-width: 960px">
+        <div class="eyebrow">Carregando a carteira</div>
+      </section>
+    </sc-if>
+
     <!-- AGORA -->
     <sc-if value="{{ ehHoje }}" hint-placeholder-val="{{ true }}">
       <section data-screen-label="Leads" style="animation: up .3s ease both; max-width: 960px">
@@ -429,7 +437,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;telaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hoje&quot;,&quot;carteira&quot;,&quot;resultado&quot;,&quot;potencial&quot;,&quot;qr&quot;,&quot;equipe&quot;],&quot;default&quot;:&quot;hoje&quot;,&quot;tsType&quot;:&quot;'hoje'|'carteira'|'resultado'|'potencial'|'qr'|'equipe'&quot;,&quot;section&quot;:&quot;Demonstração&quot;}}">
 class Component extends DCLogic {
-  state = { real: false, C: null, leads: [], interacoes: [], usuarios: [], tela: 'hoje', leadId: null, de: 'carteira', busca: '', origem: '', sel: {}, periodo: 30, form: null, msg: '', msgCor: 'var(--risco)', novoTexto: '', novoTipo: 'nota', novoU: { nome: '', email: '', papel: 'vendedor' }, msgU: '', msgUCor: 'var(--ok)', Q: null, qr: null, qrForm: '', qrMsg: '', qrMsgCor: 'var(--ok)', qrCopiado: false, M: null, ranking: null, ptRevenda: 3, ptIndiretos: 8, ptCorte: 300e6, ptUf: '', ptOrdem: 'total', ptBusca: '' };
+  state = { real: false, carregando: true, C: null, leads: [], interacoes: [], usuarios: [], tela: 'hoje', leadId: null, de: 'carteira', busca: '', origem: '', sel: {}, periodo: 30, form: null, msg: '', msgCor: 'var(--risco)', novoTexto: '', novoTipo: 'nota', novoU: { nome: '', email: '', papel: 'vendedor' }, msgU: '', msgUCor: 'var(--ok)', Q: null, qr: null, qrForm: '', qrMsg: '', qrMsgCor: 'var(--ok)', qrCopiado: false, M: null, ranking: null, ptRevenda: 3, ptIndiretos: 8, ptCorte: 300e6, ptUf: '', ptOrdem: 'total', ptBusca: '' };
   BASE = 'https://vow-abras.onrender.com';
   MAPA_URL = '/abras/mapa-potencial.html';
   PAPEIS = { deus: { nome: 'Dono da plataforma', cls: 'ok', desc: 'Acesso total. Único que não pode ser desativado nem rebaixado.', fixo: true }, vow: { nome: 'Administrador', cls: 'info', desc: 'Vê a carteira inteira, convida e desativa pessoas, exclui leads e cadastra redes.' }, vendedor: { nome: 'Vendedor', cls: 'off', desc: 'Trabalha as oportunidades: muda fase, registra histórico, propõe honorário. Não exclui nem administra.' } };
@@ -440,24 +448,34 @@ class Component extends DCLogic {
    * que a demonstração inteira. Se qualquer uma das quatro chamadas falhar,
    * a tela continua sendo o protótipo e continua dizendo isso.
    */
-  async carregarReal() {
+  async carregarReal({ D, euId }) {
+    // Um limite curto: no editor do Design não há servidor, e a demonstração
+    // não pode ficar esperando um `fetch` que nunca responde.
+    const pega = (u) => fetch(u, { signal: AbortSignal.timeout(4000) })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(String(r.status))));
     try {
       const [ctx, leads, interacoes, usuarios] = await Promise.all([
-        fetch('/api/app/contexto').then(r => r.ok ? r.json() : Promise.reject()),
-        fetch('/api/app/crm/leads').then(r => r.ok ? r.json() : Promise.reject()),
-        fetch('/api/app/crm/interacoes').then(r => r.ok ? r.json() : Promise.reject()),
-        fetch('/api/app/usuarios').then(r => r.ok ? r.json() : Promise.reject()),
+        pega('/api/app/contexto'), pega('/api/app/crm/leads'),
+        pega('/api/app/crm/interacoes'), pega('/api/app/usuarios'),
       ]);
       const eu = usuarios.find(u => u.email === ctx.usuario.email);
-      this.setState({ real: true, leads, interacoes, usuarios, euId: eu ? eu.id : null });
-    } catch (e) { /* sem servidor: segue a demonstração, e o selo continua lá */ }
+      this.setState({ real: true, carregando: false, leads, interacoes, usuarios, euId: eu ? eu.id : null });
+    } catch (e) {
+      // Sem servidor: a demonstração entra agora, e o selo entra com ela.
+      this.setState({ carregando: false, leads: D.LEADS, interacoes: D.INTERACOES, usuarios: D.USUARIOS, euId });
+    }
     // O QR é independente: vale ler mesmo que o resto tenha falhado.
     try {
-      const r = await fetch('/api/app/qr');
-      if (!r.ok) return;
+      const r = await fetch('/api/app/qr', { signal: AbortSignal.timeout(4000) });
+      if (!r.ok) throw new Error(String(r.status));
       const d = await r.json();
       this.setState({ qr: { codigo: d.codigo, url: d.url, criadoEm: d.criadoEm, leituras: d.leituras || [] }, qrForm: d.url || '' });
-    } catch (e) {}
+    } catch (e) {
+      // Havendo banco, "não consegui ler o QR" é zero leituras, não as 66 da
+      // demonstração — foi assim que um destino nunca cadastrado apareceu
+      // como se estivesse no ar.
+      if (this.state.real) this.setState({ qr: { codigo: 'abras', url: null, criadoEm: null, leituras: [] }, qrForm: '' });
+    }
   }
 
   /** Relê a carteira depois de uma escrita, para a tela não mentir. */
@@ -477,11 +495,11 @@ class Component extends DCLogic {
       let qr = { ...D.QR }; try { const salvo = JSON.parse(localStorage.getItem('vow.qr') || 'null'); if (salvo && salvo.url) qr = { ...qr, ...salvo }; } catch (e) {}
       // Quem entrou pelo login da landing (vow.sessao) é quem aparece logado; senão, o admin da demonstração.
       let euId = 'u01'; try { const ss = JSON.parse(localStorage.getItem('vow.sessao') || 'null'); const u = ss && D.USUARIOS.find(x => x.email === ss.email); if (u) euId = u.id; } catch (e) {}
-      this.setState({ C, Q, leads: D.LEADS, interacoes: D.INTERACOES, usuarios: D.USUARIOS, euId, qr, qrForm: qr.url || '', tela: this.props.telaInicial ?? 'hoje' });
-      // A demonstração acima é o que o editor do Claude Design mostra, onde
-      // não há servidor. Havendo um, ela é substituída pelo banco antes de
-      // qualquer clique — e o selo "dados de demonstração" some junto.
-      this.carregarReal();
+      this.setState({ C, Q, carregando: true, qr, qrForm: qr.url || '', tela: this.props.telaInicial ?? 'hoje' });
+      // A demonstração é o plano B, não o estado inicial: mostrá-la antes de
+      // saber se há banco fazia a carteira inventada piscar na tela e ser
+      // trocada pela real na frente de quem estava olhando.
+      this.carregarReal({ D, euId });
     });
     // Ranking ABRAS 2026 + motor: só a aba Potencial usa, mas carregar cedo evita a tela em branco.
     import('/motor.js').then(M => this.setState({ M }));
@@ -546,11 +564,16 @@ class Component extends DCLogic {
     const out = {
       // O selo é o contrário de `real`: some no instante em que o banco entra.
       ehDemo: !s.real,
-      eu: { nome: eu.nome, papelNome: this.PAPEIS[eu.papel]?.nome || eu.papel }, ehEquipe: tela === 'equipe', ehQr: tela === 'qr', ehPotencial: tela === 'potencial', pt: { carregando: true, linhas: [], share: [] }, qrDias: [], qrForm: s.qrForm, qrMsg: s.qrMsg, qrMsgCor: s.qrMsgCor, equipe: [], papeisOpc: [], novoU: s.novoU, msgU: s.msgU, msgUCor: s.msgUCor,
+      eu: { nome: eu.nome, papelNome: this.PAPEIS[eu.papel]?.nome || eu.papel }, ehEquipe: !s.carregando && tela === 'equipe', ehQr: !s.carregando && tela === 'qr', ehPotencial: !s.carregando && tela === 'potencial', pt: { carregando: true, linhas: [], share: [] }, qrDias: [], qrForm: s.qrForm, qrMsg: s.qrMsg, qrMsgCor: s.qrMsgCor, equipe: [], papeisOpc: [], novoU: s.novoU, msgU: s.msgU, msgUCor: s.msgUCor,
       abas: ABAS.map(([id, rotulo, grupo], i) => ({ rotulo, grupo, sep: i > 0 && ABAS[i - 1][2] !== grupo, cls: (tela === id || (tela === 'lead' && s.de === id)) ? 'on' : '', ir: (e) => { e.preventDefault(); this.ir(id); } })),
       irJornada: (e) => { e.preventDefault(); this.ir('carteira'); },
       sair: () => { try { localStorage.removeItem('vow.sessao'); } catch (e) {} window.location.href = '/'; },
-      ehHoje: tela === 'hoje', ehPipeline: tela === 'pipeline', ehCarteira: tela === 'carteira', ehResultado: tela === 'resultado', ehLead: tela === 'lead',
+      carregando: s.carregando,
+      // Uma condição só desliga todas as abas: enquanto não se sabe de onde
+      // vêm os dados, não existe tela certa para desenhar.
+      ehHoje: !s.carregando && tela === 'hoje', ehPipeline: !s.carregando && tela === 'pipeline',
+      ehCarteira: !s.carregando && tela === 'carteira', ehResultado: !s.carregando && tela === 'resultado',
+      ehLead: !s.carregando && tela === 'lead',
       grupos: [], colunas: [], carteira: [], motivos: [], origens: [], pipe: {}, res: {}, busca: s.busca, msg: s.msg, msgCor: s.msgCor,
     };
     if (!C) return out;
