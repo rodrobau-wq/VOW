@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="/abras/">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="/tokens.css" />
+<link rel="icon" href="/icone.svg" />
+<style>
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font-family: var(--fonte); }
+  a { color: var(--ink); } a:hover { color: var(--muted); }
+  input, select, textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--surface); color: var(--ink); font: 400 14px/1.4 var(--fonte); outline: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--ink); }
+  input::placeholder, textarea::placeholder { color: var(--storm); }
+  textarea { resize: vertical; min-height: 72px; }
+  input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--preto); padding: 0; }
+  @keyframes up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+
+<div data-screen-label="CRM" style="min-height: 100vh; display: flex; flex-direction: column">
+
+  <header class="appbar">
+    <a href="#" onClick="{{ irJornada }}" class="marca">
+      <span class="caduceu" aria-hidden="true"></span>
+      <span><span class="nome">GRUPO VOW</span><span class="sob">Plataforma · CRM</span></span>
+    </a>
+    <nav class="abas" style="display: flex; gap: 2px; align-items: center">
+      <sc-for list="{{ abas }}" as="a" hint-placeholder-count="4">
+        <sc-if value="{{ a.sep }}" hint-placeholder-val="{{ false }}"><span class="sep" aria-hidden="true"></span></sc-if>
+        <a href="#" class="{{ a.cls }}" title="{{ a.grupo }}" onClick="{{ a.ir }}">{{ a.rotulo }}</a>
+      </sc-for>
+    </nav>
+    <div class="sp"></div>
+    <span class="tag off">Dados de demonstração</span>
+    <div class="quem"><b>{{ eu.nome }}</b>{{ eu.papelNome }}</div>
+    <button class="sair" type="button" onClick="{{ sair }}">Sair</button>
+  </header>
+
+  <main class="app-main" style="flex: 1; width: 100%; box-sizing: border-box">
+
+    <!-- AGORA -->
+    <sc-if value="{{ ehHoje }}" hint-placeholder-val="{{ true }}">
+      <section data-screen-label="Leads" style="animation: up .3s ease both; max-width: 960px">
+        <div class="eyebrow" style="margin-bottom: 14px">Formulários preenchidos</div>
+        <div class="num" style="font-size: clamp(64px, 12vw, 128px); line-height: .9">{{ fp.total }}</div>
+        <p style="color: var(--muted); font-size: 15px; margin: 14px 0 24px; max-width: 62ch">{{ fp.legenda }}</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px">
+          <sc-for list="{{ fp.tiles }}" as="t" hint-placeholder-count="4">
+            <div class="kpi {{ t.cls }}"><div class="eyebrow">{{ t.l }}</div><div class="num" style="font-size: 30px; margin-top: 8px">{{ t.v }}</div><div class="fine" style="margin-top: 6px">{{ t.n }}</div></div>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- CARTEIRA -->
+    <sc-if value="{{ ehCarteira }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Carteira" style="animation: up .3s ease both">
+        <h1 style="font-size: 38px; font-weight: 600; line-height: 1.1; margin: 0 0 6px">A <span style="font-weight: 300">carteira</span></h1>
+        <p style="color: var(--muted); font-size: 15px; margin: 0 0 22px; max-width: 78ch">Todo lead capturado, em qualquer fase, com o detalhe de cada um. Toque no nome para abrir a oportunidade: fase, honorário, próxima ação e histórico.</p>
+        <div style="display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-bottom: 16px">
+          <input type="search" placeholder="Buscar por nome, rede ou e-mail…" value="{{ busca }}" onInput="{{ setBusca }}" style="width: 260px; height: 36px; padding: 0 14px" />
+          <sc-for list="{{ chipsOrigem }}" as="c" hint-placeholder-count="3"><button class="chip" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}">{{ c.label }}</button></sc-for>
+          <sc-if value="{{ temSel }}" hint-placeholder-val="{{ false }}"><button class="chip" style="border-color: var(--risco); color: var(--risco)" onClick="{{ excluirSel }}">{{ excluirTxt }}</button></sc-if>
+          <button class="btn sm" style="margin-left: auto" onClick="{{ exportar }}">Exportar CSV</button>
+        </div>
+        <div style="background: var(--surface); border: 1px solid var(--line); overflow-x: auto">
+          <table class="tabela" style="min-width: 900px">
+            <thead><tr><th style="width: 36px"><input type="checkbox" aria-label="Selecionar todos" checked="{{ todosSel }}" onChange="{{ toggleTodos }}" /></th><th>Lead</th><th>Rede</th><th>Fase</th><th class="valor">Valor em jogo</th><th class="valor">Honorário</th><th>Responsável</th><th>Parado</th></tr></thead>
+            <tbody>
+              <sc-for list="{{ carteira }}" as="l" hint-placeholder-count="8">
+                <tr>
+                  <td><input type="checkbox" checked="{{ l.sel }}" onChange="{{ l.toggleSel }}" aria-label="Selecionar" /></td>
+                  <td><a href="#" onClick="{{ l.abrir }}" style="font-weight: 500; text-decoration: none">{{ l.nome }}</a><div style="font-size: 12px; color: var(--muted); margin-top: 2px">{{ l.email }}{{ l.origemTxt }}</div></td>
+                  <td>{{ l.empresa }}</td>
+                  <td><span class="tag {{ l.faseCls }}">{{ l.estagioNome }}</span></td>
+                  <td class="valor">{{ l.jogo }}</td>
+                  <td class="valor">{{ l.hon }}</td>
+                  <td>{{ l.resp }}</td>
+                  <td><span class="{{ l.paradoCls }}">{{ l.parado }}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <sc-if value="{{ carteiraVazia }}" hint-placeholder-val="{{ false }}"><div style="padding: 56px; text-align: center; color: var(--muted)">Nenhum lead com esse filtro.</div></sc-if>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- RESULTADO -->
+    <sc-if value="{{ ehResultado }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Resultado" style="animation: up .3s ease both; max-width: 1180px">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 22px">
+          <div><h1 style="font-size: 38px; font-weight: 600; line-height: 1.1; margin: 0 0 6px">O que <span style="font-weight: 300">fechou</span> e o que caiu</h1><p style="color: var(--muted); font-size: 15px; margin: 0">A tela da reunião de pipeline.</p></div>
+          <div style="display: flex; gap: 6px">
+            <sc-for list="{{ chipsPeriodo }}" as="c" hint-placeholder-count="3"><button class="chip" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}">{{ c.label }}</button></sc-for>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 13px; margin-bottom: 20px">
+          <div class="kpi on"><div class="eyebrow">Fechados</div><div class="num" style="font-size: 34px; margin-top: 8px; color: var(--ok)">{{ res.fechados }}</div><div class="fine" style="margin-top: 6px">{{ res.receita }} em honorários</div></div>
+          <div class="kpi"><div class="eyebrow">Perdidos</div><div class="num" style="font-size: 34px; margin-top: 8px; color: var(--risco)">{{ res.perdidos }}</div><div class="fine" style="margin-top: 6px">{{ res.perdidaTxt }}</div></div>
+          <div class="kpi"><div class="eyebrow">Taxa de fechamento</div><div class="num" style="font-size: 34px; margin-top: 8px">{{ res.taxa }}</div><div class="fine" style="margin-top: 6px">{{ res.taxaTxt }}</div></div>
+          <div class="kpi"><div class="eyebrow">Ciclo médio</div><div class="num" style="font-size: 34px; margin-top: 8px">{{ res.ciclo }}</div><div class="fine" style="margin-top: 6px">{{ res.cicloTxt }}</div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1.3fr .7fr; gap: 16px; align-items: start">
+          <div class="card">
+            <h2 style="font-size: 22px; font-weight: 500; margin: 0 0 6px">Por que se perde</h2>
+            <p style="font-size: 13.5px; color: var(--muted); margin: 0 0 16px">Lista fixa, escolhida no momento da perda. É a única leitura que sobra de um negócio que não fechou.</p>
+            <sc-for list="{{ motivos }}" as="m" hint-placeholder-count="6">
+              <div style="padding: 13px 0; border-bottom: 1px solid var(--line)">
+                <div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline"><span style="font-size: 14.5px; font-weight: 500">{{ m.rotulo }}</span><span class="num" style="font-size: 21px">{{ m.total }}</span></div>
+                <div style="height: 6px; background: var(--bg-deep); margin: 8px 0 7px; overflow: hidden"><div style="height: 100%; background: var(--piano); width: {{ m.w }}"></div></div>
+                <div style="font-size: 12.5px; color: var(--muted); line-height: 1.5">{{ m.acao }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div class="card">
+            <h2 style="font-size: 22px; font-weight: 500; margin: 0 0 6px">Por origem</h2>
+            <p style="font-size: 13.5px; color: var(--muted); margin: 0 0 16px">Se a feira converte diferente do site, o investimento muda.</p>
+            <sc-for list="{{ origens }}" as="o" hint-placeholder-count="2">
+              <div style="display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--dim)"><span>{{ o.nome }}</span><b class="tnum" style="color: var(--ink); font-weight: 500">{{ o.txt }}</b></div>
+            </sc-for>
+            <p class="fine" style="margin-top: 16px">A receita mostrada é o honorário da VOW, nunca a soma dos diagnósticos. O valor em jogo é a exposição do cliente e serve para priorizar atendimento — misturar os dois multiplicaria a previsão por dezenas.</p>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- EQUIPE -->
+    <sc-if value="{{ ehEquipe }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Equipe" style="animation: up .3s ease both; max-width: 1180px">
+        <h1 style="font-size: 38px; font-weight: 600; line-height: 1.1; margin: 0 0 6px">A <span style="font-weight: 300">equipe</span></h1>
+        <p style="color: var(--muted); font-size: 15px; margin: 0 0 22px">Quem entra na plataforma e o que pode fazer. O convite vai por e-mail com um link de acesso; a pessoa define a própria senha.</p>
+        <div style="display: grid; grid-template-columns: 1.4fr .9fr; gap: 16px; align-items: start">
+          <div style="background: var(--surface); border: 1px solid var(--line); overflow-x: auto">
+            <table class="tabela" style="min-width: 680px">
+              <thead><tr><th>Usuário</th><th>Papel</th><th>Acesso</th><th class="valor">Oportunidades</th><th style="width: 1%"></th></tr></thead>
+              <tbody>
+                <sc-for list="{{ equipe }}" as="u" hint-placeholder-count="4">
+                  <tr>
+                    <td><div style="font-weight: 500">{{ u.nome }}</div><div style="font-size: 12px; color: var(--muted); margin-top: 2px">{{ u.email }}</div></td>
+                    <td><span class="tag {{ u.papelCls }}">{{ u.papelNome }}</span></td>
+                    <td><span class="tag {{ u.acessoCls }}">{{ u.acesso }}</span><div style="font-size: 12px; color: var(--muted); margin-top: 4px">{{ u.ultimo }}</div></td>
+                    <td class="valor">{{ u.carteira }}</td>
+                    <td style="white-space: nowrap"><div style="display: flex; gap: 6px; justify-content: flex-end">
+                      <sc-if value="{{ u.pendente }}" hint-placeholder-val="{{ false }}"><button class="btn ghost sm" onClick="{{ u.reenviar }}">Reenviar convite</button></sc-if>
+                      <sc-if value="{{ u.podeAlternar }}" hint-placeholder-val="{{ true }}"><button class="btn ghost sm" onClick="{{ u.alternar }}">{{ u.alternarTxt }}</button></sc-if>
+                      <sc-if value="{{ u.souEu }}" hint-placeholder-val="{{ false }}"><span class="fine" style="align-self: center">você</span></sc-if>
+                    </div></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h2 style="font-size: 22px; font-weight: 500; margin: 0 0 6px">Convidar</h2>
+            <p style="font-size: 13.5px; color: var(--muted); margin: 0 0 8px">Sem senha aqui: o link de acesso chega no e-mail da pessoa e vale por 24 h.</p>
+            <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Nome</label>
+            <input value="{{ novoU.nome }}" onInput="{{ setNovoU.nome }}" placeholder="Nome e sobrenome" />
+            <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">E-mail</label>
+            <input type="email" value="{{ novoU.email }}" onInput="{{ setNovoU.email }}" placeholder="nome@grupovow.com.br" />
+            <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Papel</label>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <sc-for list="{{ papeisOpc }}" as="p" hint-placeholder-count="2">
+                <button onClick="{{ p.pick }}" aria-pressed="{{ p.on }}" style="text-align: left; padding: 12px 14px; border: 1px solid {{ p.borda }}; background: {{ p.bg }}; cursor: pointer; font-family: inherit; color: var(--ink); border-radius: 4px">
+                  <div style="font-size: 14px; font-weight: 500">{{ p.nome }}</div>
+                  <div style="font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45">{{ p.desc }}</div>
+                </button>
+              </sc-for>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center; margin-top: 16px; flex-wrap: wrap">
+              <button class="btn" onClick="{{ convidar }}">Enviar convite</button>
+              <span style="font-size: 13.5px; min-height: 19px; color: {{ msgUCor }}">{{ msgU }}</span>
+            </div>
+            <p class="fine" style="margin-top: 16px">Desativar não apaga: o histórico que a pessoa registrou continua na carteira, com o nome dela. Nesta demonstração o e-mail não é disparado.</p>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- POTENCIAL (RANKING ABRAS) -->
+    <sc-if value="{{ ehPotencial }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Potencial" style="animation: up .3s ease both">
+        <h1 style="font-size: 38px; font-weight: 600; line-height: 1.1; margin: 0 0 6px">Potencial da <span style="font-weight: 300">feira</span></h1>
+        <p style="color: var(--muted); font-size: 15px; margin: 0 0 22px; max-width: 78ch">As redes do Ranking ABRAS 2026 passadas pelo mesmo motor do diagnóstico. O faturamento é público; o que a rede tem de verba e de indiretos não é, então entra como premissa — mude os dois percentuais e a lista se reordena.</p>
+
+        <div class="card" style="margin-bottom: 16px">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px"><label style="font-size: 13.5px; color: var(--muted)">Verba sobre o faturamento</label><span class="num" style="font-size: 24px">{{ pt.pctRevendaTxt }}</span></div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{ pt.chipsRevenda }}" as="c" hint-placeholder-count="5"><button class="chip" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}">{{ c.label }}</button></sc-for></div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px"><label style="font-size: 13.5px; color: var(--muted)">Gasto com serviços e indiretos</label><span class="num" style="font-size: 24px">{{ pt.pctIndiretosTxt }}</span></div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{ pt.chipsIndiretos }}" as="c" hint-placeholder-count="5"><button class="chip" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}">{{ c.label }}</button></sc-for></div>
+            </div>
+            <div>
+              <div style="margin-bottom: 10px"><label style="font-size: 13.5px; color: var(--muted)">Corte de porte</label></div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap"><sc-for list="{{ pt.chipsCorte }}" as="c" hint-placeholder-count="4"><button class="chip" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}">{{ c.label }}</button></sc-for></div>
+            </div>
+            <div>
+              <div style="margin-bottom: 10px"><label style="font-size: 13.5px; color: var(--muted)">Estado</label></div>
+              <select value="{{ pt.uf }}" onChange="{{ pt.setUf }}"><sc-for list="{{ pt.ufs }}" as="u" hint-placeholder-count="8"><option value="{{ u.v }}">{{ u.t }}</option></sc-for></select>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 22px">
+          <div class="kpi"><div class="eyebrow">Redes no corte</div><div class="num" style="font-size: 30px; margin-top: 8px">{{ pt.nRedes }}</div><div class="fine" style="margin-top: 6px">{{ pt.nRedesTxt }}</div></div>
+          <div class="kpi"><div class="eyebrow">Faturamento somado</div><div class="num" style="font-size: 30px; margin-top: 8px">{{ pt.fatTotal }}</div><div class="fine" style="margin-top: 6px">ano-base 2025, declarado à ABRAS</div></div>
+          <div class="kpi on"><div class="eyebrow">Perda em verbas · ano</div><div class="num" style="font-size: 30px; margin-top: 8px; color: var(--risco)">{{ pt.perdaTotal }}</div><div class="fine" style="margin-top: 6px">se o acordo com a indústria não for recomposto</div></div>
+          <div class="kpi on"><div class="eyebrow">Crédito em indiretos · ano</div><div class="num" style="font-size: 30px; margin-top: 8px; color: var(--ok)">{{ pt.ganhoTotal }}</div><div class="fine" style="margin-top: 6px">o que passa a voltar com a carteira revisada</div></div>
+        </div>
+
+        <div style="border-top: 1px solid var(--line); padding-top: 26px; margin-bottom: 26px">
+          <h2 style="font-size: 26px; font-weight: 500; margin: 0 0 6px">Quanto do setor <span style="font-weight: 300">passou no estande</span></h2>
+          <p style="color: var(--muted); font-size: 14.5px; margin: 0 0 18px; max-width: 78ch">Compara o faturamento das redes que preencheram o diagnóstico com o do ranking inteiro e com o consumo do varejo alimentar em 2025.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px">
+            <sc-for list="{{ pt.share }}" as="k" hint-placeholder-count="4">
+              <div class="kpi {{ k.cls }}"><div class="eyebrow">{{ k.l }}</div><div class="num" style="font-size: 30px; margin-top: 8px">{{ k.v }}</div><div class="fine" style="margin-top: 6px">{{ k.n }}</div></div>
+            </sc-for>
+          </div>
+          <div style="margin-top: 16px">
+            <div style="height: 10px; background: var(--bg-deep); overflow: hidden"><div style="height: 100%; background: var(--ink); width: {{ pt.shareBarra }}"></div></div>
+            <div style="display: flex; justify-content: space-between; gap: 12px; margin-top: 8px" class="fine"><span>{{ pt.shareRot }}</span><span>Ranking ABRAS 2026 · {{ pt.rankingTotal }}</span></div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 9px; flex-wrap: wrap; align-items: center; margin-bottom: 14px">
+          <input type="search" placeholder="Buscar razão social…" value="{{ pt.busca }}" onInput="{{ pt.setBusca }}" style="width: 280px; height: 36px; padding: 0 14px" />
+          <sc-for list="{{ pt.chipsOrdem }}" as="c" hint-placeholder-count="3"><button class="chip" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}">{{ c.label }}</button></sc-for>
+          <span class="fine" style="margin-left: auto">{{ pt.mostrando }}</span>
+        </div>
+
+        <div style="background: var(--surface); border: 1px solid var(--line); overflow-x: auto">
+          <table class="tabela" style="min-width: 940px">
+            <thead><tr><th style="width: 56px">#</th><th>Rede</th><th>UF</th><th class="valor">Faturamento</th><th class="valor">Perda em verbas</th><th class="valor">Crédito em indiretos</th><th class="valor">Em jogo</th></tr></thead>
+            <tbody>
+              <sc-for list="{{ pt.linhas }}" as="r" hint-placeholder-count="12">
+                <tr>
+                  <td class="tnum" style="color: var(--muted)">{{ r.pos }}</td>
+                  <td><div style="font-weight: 500">{{ r.razao }}</div><div style="font-size: 12px; color: var(--muted); margin-top: 2px">{{ r.mov }}</div></td>
+                  <td>{{ r.uf }}</td>
+                  <td class="valor">{{ r.fat }}</td>
+                  <td class="valor" style="color: var(--risco)">{{ r.perda }}</td>
+                  <td class="valor" style="color: var(--ok)">{{ r.ganho }}</td>
+                  <td class="valor" style="font-weight: 500">{{ r.total }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <sc-if value="{{ pt.carregando }}" hint-placeholder-val="{{ true }}"><div style="padding: 48px; text-align: center; color: var(--muted)">Carregando o ranking…</div></sc-if>
+          <sc-if value="{{ pt.vazio }}" hint-placeholder-val="{{ false }}"><div style="padding: 48px; text-align: center; color: var(--muted)">Nenhuma rede nesse corte.</div></sc-if>
+        </div>
+
+        <div class="rule" style="margin-top: 18px"><p>Estimativa, não apuração: o faturamento vem do Ranking ABRAS 2026 (ano-base 2025) e os dois percentuais são premissas que você escolheu acima. A aritmética é a do diagnóstico — mix padrão do varejo por família, alíquota de referência {{ pt.aliquota }} — e continua em validação pelo time fiscal. O número de cada rede depende do inventário dela. Não usar em material comercial.</p></div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px"><button class="btn ghost sm" onClick="{{ pt.exportar }}">Exportar CSV do corte</button><a class="btn sm" href="{{ pt.mapaHref }}">Abrir o mapa por estado</a></div>
+      </section>
+    </sc-if>
+
+    <!-- QR DA LANDING -->
+    <sc-if value="{{ ehQr }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="QR" style="animation: up .3s ease both; max-width: 1180px">
+        <h1 style="font-size: 38px; font-weight: 600; line-height: 1.1; margin: 0 0 6px">O <span style="font-weight: 300">QR</span> do estande</h1>
+        <p style="color: var(--muted); font-size: 15px; margin: 0 0 22px; max-width: 70ch">Cadastre o endereço do site e o QR fica liberado na landing. Cada leitura passa pelo nosso endereço curto antes de chegar lá — é assim que se conta.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 16px; align-items: start">
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <div class="card">
+              <h2 style="font-size: 22px; font-weight: 500; margin: 0 0 6px">Endereço do site</h2>
+              <p style="font-size: 13.5px; color: var(--muted); margin: 0 0 14px">Para onde o QR leva. Salvar já regenera o código.</p>
+              <input type="url" inputMode="url" placeholder="https://vow-abras.onrender.com" value="{{ qrForm }}" onInput="{{ setQrForm }}" onKeyDown="{{ qrEnter }}" />
+              <div style="display: flex; gap: 12px; align-items: center; margin-top: 14px; flex-wrap: wrap">
+                <button class="btn" onClick="{{ qrSalvar }}">{{ qrSalvarTxt }}</button>
+                <span style="font-size: 13.5px; min-height: 19px; color: {{ qrMsgCor }}">{{ qrMsg }}</span>
+              </div>
+            </div>
+            <sc-if value="{{ qrAtivo }}" hint-placeholder-val="{{ true }}">
+              <div class="card" style="display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center">
+                <svg viewBox="{{ qrViewBox }}" width="240" height="240" shape-rendering="crispEdges" role="img" aria-label="QR code da landing" style="display: block; background: var(--branco); padding: 12px; box-sizing: border-box; border: 1px solid var(--line)"><path d="{{ qrD }}" fill="#000000"></path></svg>
+                <div>
+                  <div class="eyebrow">Endereço curto no QR</div>
+                  <div class="tnum" style="font-size: 15px; font-weight: 500; margin-top: 6px">{{ qrCurto }}</div>
+                  <div class="fine" style="margin-top: 4px">redireciona para {{ qrUrl }}</div>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center">
+                  <button class="btn ghost sm" onClick="{{ qrBaixarSvg }}">Baixar SVG</button>
+                  <button class="btn ghost sm" onClick="{{ qrBaixarPng }}">Baixar PNG</button>
+                  <button class="btn ghost sm" onClick="{{ qrCopiar }}">{{ qrCopiarTxt }}</button>
+                </div>
+                <p class="fine" style="margin: 0">Imprima com no mínimo 4 cm de lado e margem branca em volta. Preto sobre branco, sem recolorir.</p>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px">
+              <div class="kpi on"><div class="eyebrow">Leituras</div><div class="num" style="font-size: 34px; margin-top: 8px">{{ qrTotal }}</div><div class="fine" style="margin-top: 6px">{{ qrDesde }}</div></div>
+              <div class="kpi"><div class="eyebrow">Hoje</div><div class="num" style="font-size: 34px; margin-top: 8px">{{ qrHoje }}</div><div class="fine" style="margin-top: 6px">{{ qrUltima }}</div></div>
+              <div class="kpi"><div class="eyebrow">Viraram lead</div><div class="num" style="font-size: 34px; margin-top: 8px">{{ qrLeads }}</div><div class="fine" style="margin-top: 6px">{{ qrConv }}</div></div>
+            </div>
+            <div class="card">
+              <h2 style="font-size: 22px; font-weight: 500; margin: 0 0 6px">Leituras por dia</h2>
+              <p style="font-size: 13.5px; color: var(--muted); margin: 0 0 18px">Últimos sete dias. Se o número cai no meio da feira, o QR saiu de vista.</p>
+              <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; height: 140px">
+                <sc-for list="{{ qrDias }}" as="d" hint-placeholder-count="7">
+                  <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%">
+                    <span class="tnum" style="font-size: 12px; color: var(--dim)">{{ d.n }}</span>
+                    <div style="width: 100%; height: {{ d.h }}; background: {{ d.bg }}; min-height: 2px"></div>
+                    <span class="fine">{{ d.rot }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); flex-wrap: wrap">
+                <span class="fine">Lead que entra pelo QR chega marcado como origem <b style="color: var(--ink); font-weight: 500">QR</b> na carteira.</span>
+                <button class="btn text sm" onClick="{{ qrSimular }}">Registrar leitura de teste</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- FICHA DO LEAD -->
+    <sc-if value="{{ ehLead }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Oportunidade" style="animation: up .3s ease both; max-width: 1180px">
+        <a href="#" onClick="{{ voltar }}" style="font-size: 13.5px; color: var(--muted); text-decoration: none">← {{ voltarTxt }}</a>
+        <div style="margin: 14px 0 22px">
+          <h1 style="font-size: 38px; font-weight: 600; line-height: 1.1; margin: 0 0 6px">{{ ld.empresa }}</h1>
+          <p style="color: var(--muted); font-size: 15px; margin: 0">{{ ld.contato }}</p>
+        </div>
+
+        <div class="card" style="margin-bottom: 16px; overflow-x: auto">
+          <div style="display: flex; min-width: 640px">
+            <sc-for list="{{ trilha }}" as="p" hint-placeholder-count="6">
+              <div style="flex: 1; position: relative; padding-top: 26px; text-align: center">
+                <span style="position: absolute; top: 9px; left: {{ p.linhaL }}; right: {{ p.linhaR }}; height: 2px; background: {{ p.linhaBg }}"></span>
+                <span style="position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; border-radius: 50%; background: {{ p.bolaBg }}; border: 2px solid {{ p.bolaBorda }}; box-shadow: {{ p.bolaSombra }}"></span>
+                <div style="font-size: 12.5px; line-height: 1.3; color: {{ p.nmCor }}; font-weight: {{ p.nmPeso }}">{{ p.nome }}</div>
+                <div style="font-size: 11px; color: var(--muted); margin-top: 3px">{{ p.qdo }}</div>
+                <div style="font-size: 11px; margin-top: 1px; color: {{ p.durCor }}; font-weight: {{ p.durPeso }}">{{ p.dur }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; gap: 18px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted)">
+            <span><b style="color: var(--ink); font-weight: 500">{{ jor.diasTotais }}</b> dias desde a captura</span>
+            <span><b style="color: var(--ink); font-weight: 500">{{ jor.fasesVencidas }}</b> {{ jor.fasesTxt }}</span>
+            <sc-if value="{{ jor.temTrava }}" hint-placeholder-val="{{ false }}"><span>Mais tempo parado em <b style="color: var(--ink); font-weight: 500">{{ jor.travaNome }}</b>: {{ jor.travaDias }} dias</span></sc-if>
+            <sc-if value="{{ jor.inferido }}" hint-placeholder-val="{{ false }}"><span style="color: var(--storm)">~ data estimada: lead anterior ao registro de jornada</span></sc-if>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; align-items: start">
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <div class="card">
+              <h2 style="font-size: 22px; font-weight: 500; margin: 0 0 14px">Fase</h2>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px">
+                <sc-for list="{{ fases }}" as="f" hint-placeholder-count="8"><button class="chip" aria-pressed="{{ f.on }}" style="background: {{ f.bg }}; border-color: {{ f.borda }}; color: {{ f.cor }}" onClick="{{ f.pick }}">{{ f.nome }}</button></sc-for>
+              </div>
+              <p style="font-size: 12.5px; color: var(--muted); margin: 10px 0 0; line-height: 1.5">{{ faseSaida }} <sc-if value="{{ ld.foraDoSla }}" hint-placeholder-val="{{ false }}"><b style="color: var(--risco); font-weight: 500">Fora do prazo de primeiro contato.</b></sc-if> Nesta fase {{ ld.parado }}.</p>
+              <sc-if value="{{ formPerda }}" hint-placeholder-val="{{ false }}">
+                <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Motivo da perda</label>
+                <select value="{{ form.motivoPerda }}" onChange="{{ setForm.motivoPerda }}">
+                  <option value="">Escolha…</option>
+                  <sc-for list="{{ motivosRef }}" as="m" hint-placeholder-count="6"><option value="{{ m.id }}">{{ m.rotulo }}</option></sc-for>
+                </select>
+                <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Detalhe (opcional)</label>
+                <input value="{{ form.motivoDetalhe }}" onInput="{{ setForm.motivoDetalhe }}" placeholder="Qual concorrente, ou a data de retomada" />
+              </sc-if>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+                <div><label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Responsável</label><input value="{{ form.responsavel }}" onInput="{{ setForm.responsavel }}" placeholder="Quem atende" /></div>
+                <div><label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Probabilidade (%)</label><input type="number" min="0" max="100" step="5" value="{{ form.probabilidade }}" onInput="{{ setForm.probabilidade }}" /></div>
+              </div>
+              <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Honorário proposto — a receita da VOW</label>
+              <input type="number" min="0" step="1000" value="{{ form.honorario }}" onInput="{{ setForm.honorario }}" placeholder="Só a partir da proposta" />
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+                <div><label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Próxima ação</label><input value="{{ form.acao }}" onInput="{{ setForm.acao }}" placeholder="Ligar para o CFO" /></div>
+                <div><label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Quando</label><input type="date" value="{{ form.quando }}" onInput="{{ setForm.quando }}" /></div>
+              </div>
+              <div style="display: flex; gap: 12px; align-items: center; margin-top: 16px; flex-wrap: wrap">
+                <button class="btn" onClick="{{ salvar }}">Salvar</button>
+                <span style="font-size: 13.5px; min-height: 19px; color: {{ msgCor }}">{{ msg }}</span>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2 style="font-size: 22px; font-weight: 500; margin: 0 0 14px">Histórico</h2>
+              <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 0 0 6px">Registrar o que aconteceu</label>
+              <textarea value="{{ novoTexto }}" onInput="{{ setNovoTexto }}" placeholder="Ligou, falou com o diretor comercial, pediu proposta até sexta"></textarea>
+              <div style="display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-top: 10px; align-items: center">
+                <select value="{{ novoTipo }}" onChange="{{ setNovoTipo }}"><sc-for list="{{ tiposRef }}" as="t" hint-placeholder-count="5"><option value="{{ t }}">{{ t }}</option></sc-for></select>
+                <button class="btn" onClick="{{ registrar }}">Registrar</button>
+              </div>
+              <p class="fine" style="margin-top: 12px">O histórico não pode ser editado nem apagado. Ele existe para reconstruir o que foi combinado com o cliente — e um registro editável não serve para isso.</p>
+              <div style="margin-top: 18px; display: flex; flex-direction: column">
+                <sc-if value="{{ semHistorico }}" hint-placeholder-val="{{ false }}"><div style="font-size: 14px; color: var(--muted)">Nada registrado ainda.</div></sc-if>
+                <sc-for list="{{ tempo }}" as="i" hint-placeholder-count="3">
+                  <div style="padding: 14px 0 14px 20px; border-left: 2px solid var(--line); position: relative; margin-left: 4px">
+                    <span style="position: absolute; left: -5px; top: 20px; width: 8px; height: 8px; border-radius: 50%; background: {{ i.ponto }}"></span>
+                    <div style="display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; margin-bottom: 4px"><span class="eyebrow" style="color: var(--ink)">{{ i.tipo }}</span><span style="font-size: 12px; color: var(--muted)">{{ i.qdo }}</span></div>
+                    <div style="font-size: 14px; color: var(--dim); line-height: 1.55">{{ i.texto }}</div>
+                    <div style="font-size: 12px; color: var(--muted); margin-top: 3px">{{ i.autor }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px">
+              <div class="kpi"><div class="eyebrow">Valor em jogo</div><div class="num" style="font-size: 28px; margin-top: 8px; color: var(--risco)">{{ ld.jogo }}</div><div class="fine" style="margin-top: 6px">Exposição do cliente, do diagnóstico que ele simulou. Prioriza — não é receita.</div></div>
+              <div class="kpi"><div class="eyebrow">Previsão</div><div class="num" style="font-size: 28px; margin-top: 8px; color: var(--ok)">{{ ld.previsao }}</div><div class="fine" style="margin-top: 6px">{{ ld.previsaoTxt }}</div></div>
+            </div>
+            <sc-for list="{{ linhas }}" as="l" hint-placeholder-count="7">
+              <div style="display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--dim)"><span>{{ l.a }}</span><b class="tnum" style="color: var(--ink); font-weight: 500; text-align: right">{{ l.b }}</b></div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;telaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hoje&quot;,&quot;carteira&quot;,&quot;resultado&quot;,&quot;potencial&quot;,&quot;qr&quot;,&quot;equipe&quot;],&quot;default&quot;:&quot;hoje&quot;,&quot;tsType&quot;:&quot;'hoje'|'carteira'|'resultado'|'potencial'|'qr'|'equipe'&quot;,&quot;section&quot;:&quot;Demonstração&quot;}}">
+class Component extends DCLogic {
+  state = { C: null, leads: [], interacoes: [], usuarios: [], tela: 'hoje', leadId: null, de: 'carteira', busca: '', origem: '', sel: {}, periodo: 30, form: null, msg: '', msgCor: 'var(--risco)', novoTexto: '', novoTipo: 'nota', novoU: { nome: '', email: '', papel: 'vendedor' }, msgU: '', msgUCor: 'var(--ok)', Q: null, qr: null, qrForm: '', qrMsg: '', qrMsgCor: 'var(--ok)', qrCopiado: false, M: null, ranking: null, ptRevenda: 3, ptIndiretos: 8, ptCorte: 300e6, ptUf: '', ptOrdem: 'total', ptBusca: '' };
+  BASE = 'https://vow-abras.onrender.com';
+  MAPA_URL = '/abras/mapa-potencial.html';
+  PAPEIS = { deus: { nome: 'Dono da plataforma', cls: 'ok', desc: 'Acesso total. Único que não pode ser desativado nem rebaixado.', fixo: true }, vow: { nome: 'Administrador', cls: 'info', desc: 'Vê a carteira inteira, convida e desativa pessoas, exclui leads e cadastra redes.' }, vendedor: { nome: 'Vendedor', cls: 'off', desc: 'Trabalha as oportunidades: muda fase, registra histórico, propõe honorário. Não exclui nem administra.' } };
+  componentDidMount() {
+    Promise.all([import('/crm.js'), import('/abras/crm-demo.js'), import('/qr.js')]).then(([C, D, Q]) => {
+      let qr = { ...D.QR }; try { const salvo = JSON.parse(localStorage.getItem('vow.qr') || 'null'); if (salvo && salvo.url) qr = { ...qr, ...salvo }; } catch (e) {}
+      // Quem entrou pelo login da landing (vow.sessao) é quem aparece logado; senão, o admin da demonstração.
+      let euId = 'u01'; try { const ss = JSON.parse(localStorage.getItem('vow.sessao') || 'null'); const u = ss && D.USUARIOS.find(x => x.email === ss.email); if (u) euId = u.id; } catch (e) {}
+      this.setState({ C, Q, leads: D.LEADS, interacoes: D.INTERACOES, usuarios: D.USUARIOS, euId, qr, qrForm: qr.url || '', tela: this.props.telaInicial ?? 'hoje' });
+    });
+    // Ranking ABRAS 2026 + motor: só a aba Potencial usa, mas carregar cedo evita a tela em branco.
+    import('/motor.js').then(M => this.setState({ M }));
+    fetch('/abras/ranking-abras-2026.csv').then(r => r.text()).then(t => {
+      const ranking = t.split('\n').slice(1).map(l => l.match(/^(\d+);(Nova|\d+);"?(.*?)"?;([A-Z]{2});(\d+)$/)).filter(Boolean)
+        .map(m => ({ pos: +m[1], ant: m[2], razao: m[3], uf: m[4], fat: +m[5] }));
+      this.setState({ ranking });
+    }).catch(() => this.setState({ ranking: [] }));
+  }
+  ir(tela, extra = {}) { this.setState({ tela, msg: '', ...extra }); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} }
+  abrir(id) { const l = this.state.leads.find(x => x.id === id); const est = this.state.C.estagio(l.estagio);
+    this.setState({ form: { estagio: est.id, motivoPerda: l.motivoPerda || '', motivoDetalhe: l.motivoDetalhe || '', responsavel: l.responsavel || '', probabilidade: Math.round((l.probabilidade ?? est.prob) * 100), honorario: l.honorario ?? '', acao: l.proximaAcao?.texto || '', quando: l.proximaAcao?.quando || '' } });
+    this.ir('lead', { leadId: id, de: this.state.tela === 'lead' ? this.state.de : this.state.tela }); }
+  brl(v) { return 'R$ ' + Math.round(v || 0).toLocaleString('pt-BR'); }
+  brlCurto(v) { const a = Math.abs(v || 0); if (a >= 1e9) return 'R$ ' + (v / 1e9).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' bi'; if (a >= 1e6) return 'R$ ' + (v / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mi'; if (a >= 1e3) return 'R$ ' + Math.round(a / 1e3).toLocaleString('pt-BR') + ' mil'; return this.brl(v); }
+  dataBr(iso) { return iso ? iso.slice(0, 10).split('-').reverse().join('/') : '—'; }
+  quando(iso) { if (!iso) return '—'; const d = new Date(iso); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
+  parado(d) { return d === 0 ? 'hoje' : d === 1 ? 'há 1 dia' : `há ${d} dias`; }
+  registrarSis(leadId, texto, extra = {}) { return { id: 'i' + Date.now() + Math.random(), leadId, tipo: 'sistema', autor: (this.state.usuarios.find(u => u.id === (this.state.euId || 'u01')) || {}).nome || 'Bruno Lima', texto, criadoEm: new Date().toISOString(), ...extra }; }
+  salvar() {
+    const { C, leads, form, leadId } = this.state; const atual = leads.find(l => l.id === leadId); const est = C.estagio(form.estagio);
+    const hon = form.honorario === '' ? null : Number(form.honorario);
+    if (form.estagio === 'fechado' && !(hon > 0)) return this.setState({ msg: 'Informe o honorário antes de marcar como fechado.', msgCor: 'var(--risco)' });
+    if (form.estagio === 'perdido' && !C.ehMotivo(form.motivoPerda)) return this.setState({ msg: 'Escolha o motivo da perda.', msgCor: 'var(--risco)' });
+    const agora = new Date().toISOString(), novo = { ...atual, responsavel: form.responsavel.trim() || null, probabilidade: Number(form.probabilidade) / 100, honorario: hon, proximaAcao: form.acao.trim() ? { texto: form.acao.trim(), quando: form.quando } : null };
+    const inter = [];
+    if (form.estagio !== atual.estagio) {
+      Object.assign(novo, { estagio: form.estagio, estagioDesde: agora, estagioAnterior: atual.estagio });
+      if (est.final) novo.fechadoEm = agora;
+      if (form.estagio !== 'capturado' && !atual.primeiroContatoEm) novo.primeiroContatoEm = agora;
+      inter.push(this.registrarSis(leadId, `Fase: ${C.estagio(atual.estagio).nome} → ${est.nome}`, { de: atual.estagio, para: form.estagio }));
+    }
+    if (form.estagio === 'perdido') Object.assign(novo, { motivoPerda: form.motivoPerda, motivoDetalhe: form.motivoDetalhe.trim() });
+    if (hon !== atual.honorario && hon) inter.push(this.registrarSis(leadId, `Honorário: ${this.brl(hon)}`));
+    this.setState(s => ({ leads: s.leads.map(l => l.id === leadId ? novo : l), interacoes: [...s.interacoes, ...inter], msg: 'Salvo.', msgCor: 'var(--ok)' }));
+  }
+  renderVals() {
+    const s = this.state, C = s.C, tela = s.tela;
+    const eu = s.usuarios.find(u => u.id === (s.euId || 'u01')) || { nome: 'Bruno Lima', papel: 'vow' };
+    const admin = eu.papel === 'vow' || eu.papel === 'deus';
+    const ABAS = [['hoje', 'Leads', 'O dia'], ['carteira', 'Carteira', 'A carteira'], ['resultado', 'Resultado', 'O fecho'], ...(admin ? [['potencial', 'Potencial', 'O mercado'], ['qr', 'QR', 'A casa'], ['equipe', 'Equipe', 'A casa']] : [])];
+    const out = {
+      eu: { nome: eu.nome, papelNome: this.PAPEIS[eu.papel]?.nome || eu.papel }, ehEquipe: tela === 'equipe', ehQr: tela === 'qr', ehPotencial: tela === 'potencial', pt: { carregando: true, linhas: [], share: [] }, qrDias: [], qrForm: s.qrForm, qrMsg: s.qrMsg, qrMsgCor: s.qrMsgCor, equipe: [], papeisOpc: [], novoU: s.novoU, msgU: s.msgU, msgUCor: s.msgUCor,
+      abas: ABAS.map(([id, rotulo, grupo], i) => ({ rotulo, grupo, sep: i > 0 && ABAS[i - 1][2] !== grupo, cls: (tela === id || (tela === 'lead' && s.de === id)) ? 'on' : '', ir: (e) => { e.preventDefault(); this.ir(id); } })),
+      irJornada: (e) => { e.preventDefault(); this.ir('carteira'); },
+      sair: () => { try { localStorage.removeItem('vow.sessao'); } catch (e) {} window.location.href = '/'; },
+      ehHoje: tela === 'hoje', ehPipeline: tela === 'pipeline', ehCarteira: tela === 'carteira', ehResultado: tela === 'resultado', ehLead: tela === 'lead',
+      grupos: [], colunas: [], carteira: [], motivos: [], origens: [], pipe: {}, res: {}, busca: s.busca, msg: s.msg, msgCor: s.msgCor,
+    };
+    if (!C) return out;
+    const fB = v => this.brl(v), fC = v => this.brlCurto(v);
+    const abrir = id => (e) => { e.preventDefault(); this.abrir(id); };
+    const FASE_CLS = { fechado: 'ok', perdido: 'risk', capturado: 'off' };
+
+    if (tela === 'hoje') {
+      // Um diagnóstico preenchido = um formulário. Quem fez os dois conta duas vezes.
+      const hojeIso = new Date().toISOString().slice(0, 10), corte7 = new Date(Date.now() - 7 * 864e5).toISOString();
+      const forms = s.leads.reduce((n, l) => n + (l.diagnosticos || []).length, 0);
+      const deHoje = s.leads.filter(l => l.criadoEm.slice(0, 10) === hojeIso).reduce((n, l) => n + (l.diagnosticos || []).length, 0);
+      const de7 = s.leads.filter(l => l.criadoEm >= corte7).reduce((n, l) => n + (l.diagnosticos || []).length, 0);
+      const dois = s.leads.filter(l => (l.diagnosticos || []).length > 1).length;
+      const semContato = s.leads.map(C.comCrm).filter(l => !l.primeiroContatoEm && !C.estagio(l.estagio).final).length;
+      out.fp = { total: forms, legenda: `De ${s.leads.length} pessoas que abriram o diagnóstico. Cada linha da conta é um formulário completo — quem fez verbas e indiretos conta duas vezes.`,
+        tiles: [{ l: 'Leads', v: s.leads.length, n: `um cadastro por pessoa · ${deHoje} hoje, ${de7} em 7 dias`, cls: '' }, { l: 'Faturamento', v: fC(s.leads.reduce((n, l) => n + (l.faturamento || 0), 0)), n: 'soma das redes que já preencheram', cls: 'on' }, { l: 'Fizeram os dois', v: dois, n: s.leads.length ? `${Math.round((dois / s.leads.length) * 100)}% da base · lead mais quente` : '—', cls: '' }, { l: 'Ninguém falou ainda', v: semContato, n: semContato ? 'sem primeiro contato registrado' : 'todos com contato feito', cls: '' }] };
+    }
+    if (tela === 'pipeline') {
+      const p = C.montarPipeline(s.leads);
+      out.pipe = { totalAbertos: p.totalAbertos, nFases: `nas ${p.colunas.length} fases do funil`, foraDoSla: p.foraDoSla, slaCls: p.foraDoSla ? 'on' : '', slaCor: p.foraDoSla ? 'var(--risco)' : 'var(--ink)', slaTxt: p.foraDoSla ? 'capturados há mais de 48 h sem ninguém falar' : 'nenhum atrasado', previsao: fC(p.previsaoPonderada), emJogo: fC(p.valorEmJogoTotal) };
+      out.colunas = p.colunas.map(c => {
+        const cv = p.conversoes.find(x => x.de === c.id), temConv = cv && cv.taxa !== null && cv.chegaram > 0, baixa = temConv && cv.taxa < 40;
+        return { n: c.n, nome: c.nome, total: c.total, dica: c.dica, saida: c.saida, soma: `${fC(c.valorEmJogo)} em jogo${c.previsao ? ` · ${fC(c.previsao)} previstos` : ''}`, temConv, convTxt: temConv ? `${cv.taxa}% seguiram adiante` : '', convDet: temConv ? `${cv.passaram} de ${cv.chegaram}` : '', convBg: baixa ? 'var(--risk-wash)' : 'var(--ok-wash)', convCor: baixa ? 'var(--risco)' : 'var(--ok)', vazia: !c.leads.length,
+          leads: c.leads.map(l => { const m = []; if (l.foraDoSla) m.push({ t: 'fora do prazo', cls: 'risk' }); else if (l.atrasadoNaFase) m.push({ t: `parado ${this.parado(l.diasParado)}`, cls: 'warn' }); else m.push({ t: this.parado(l.diasParado), cls: 'off' }); if (l.origem === 'abras') m.push({ t: 'ABRAS', cls: 'info' }); if (l.origem === 'qr') m.push({ t: 'QR', cls: 'info' }); if (l.agendar) m.push({ t: 'pediu conversa', cls: 'info' }); if (l.responsavel) m.push({ t: l.responsavel.split(' ')[0], cls: 'off' });
+            return { emp: l.empresa || l.nome, pes: l.nome || l.email, jogo: fC(l.valorEmJogo), hon: l.honorario ? fB(l.honorario) : '', marcas: m, abrir: abrir(l.id) }; }) };
+      });
+    }
+    if (tela === 'carteira') {
+      const q = s.busca.trim().toLowerCase();
+      const lista = s.leads.map(C.comCrm).filter(l => (!s.origem || l.origem === s.origem) && (!q || [l.nome, l.empresa, l.email].some(v => String(v || '').toLowerCase().includes(q)))).sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
+      const nSel = lista.filter(l => s.sel[l.id]).length;
+      out.setBusca = (e) => this.setState({ busca: e.target.value });
+      out.chipsOrigem = [['', 'Todos'], ['abras', 'ABRAS'], ['qr', 'QR'], ['site', 'Site']].map(([v, label]) => ({ label, on: s.origem === v, pick: () => this.setState({ origem: v }) }));
+      out.carteira = lista.map(l => ({ nome: l.nome || l.email, email: l.email, origemTxt: l.origem === 'abras' ? ' · ABRAS' : l.origem === 'qr' ? ' · QR' : '', empresa: l.empresa || '—', estagioNome: l.estagioNome, faseCls: FASE_CLS[l.estagio] || 'info', jogo: fC(l.valorEmJogo), hon: l.honorario ? fB(l.honorario) : '—', resp: l.responsavel || '—', parado: l.foraDoSla ? 'fora do prazo' : this.parado(l.diasParado), paradoCls: l.foraDoSla ? 'tag risk' : '', sel: !!s.sel[l.id], toggleSel: () => this.setState(st => ({ sel: { ...st.sel, [l.id]: !st.sel[l.id] } })), abrir: abrir(l.id) }));
+      out.carteiraVazia = !lista.length; out.temSel = nSel > 0; out.excluirTxt = `Excluir ${nSel} selecionado${nSel === 1 ? '' : 's'}`;
+      out.todosSel = lista.length > 0 && nSel === lista.length;
+      out.toggleTodos = (e) => { const on = e.target.checked; this.setState({ sel: Object.fromEntries(lista.map(l => [l.id, on])) }); };
+      out.excluirSel = () => { if (!confirm(`Excluir ${nSel} lead(s)? Não há como desfazer.`)) return; this.setState(st => ({ leads: st.leads.filter(l => !st.sel[l.id]), sel: {} })); };
+      out.exportar = () => { const cab = ['nome', 'empresa', 'email', 'telefone', 'faturamento', 'fase', 'valorEmJogo', 'honorario', 'responsavel', 'criadoEm']; const csv = [cab.join(';'), ...lista.map(l => [l.nome, l.empresa, l.email, l.telefone, l.faturamento, l.estagioNome, l.valorEmJogo, l.honorario ?? '', l.responsavel ?? '', l.criadoEm].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'))].join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' })); a.download = 'leads-vow.csv'; a.click(); };
+    }
+    if (tela === 'resultado') {
+      const desde = s.periodo ? new Date(Date.now() - s.periodo * 864e5).toISOString() : '';
+      const r = C.montarResultado(s.leads, desde), maior = Math.max(...r.motivos.map(m => m.total), 1);
+      out.chipsPeriodo = [[30, '30 dias'], [90, '90 dias'], [0, 'Tudo']].map(([d, label]) => ({ label, on: s.periodo === d, pick: () => this.setState({ periodo: d }) }));
+      out.res = { fechados: r.fechados, receita: fB(r.receitaFechada), perdidos: r.perdidos, perdidaTxt: r.perdidaEmProposta ? `${fB(r.perdidaEmProposta)} que chegaram a ter proposta` : 'nenhum chegou a ter proposta', taxa: r.taxa === null ? '—' : r.taxa + '%', taxaTxt: r.taxa === null ? 'nenhum negócio decidido no período' : 'dos negócios decididos', ciclo: r.cicloMedioDias === null ? '—' : r.cicloMedioDias + 'd', cicloTxt: r.cicloMedioDias === null ? 'sem fechamento no período' : 'da captura à assinatura' };
+      out.motivos = r.motivos.map(m => ({ rotulo: m.rotulo, total: m.total, acao: m.acao, w: `${(m.total / maior) * 100}%` }));
+      const ORIG = { abras: 'Diagnóstico ABRAS', qr: 'QR do estande', site: 'Site' };
+      out.origens = ['abras', 'qr', 'site'].map(o => { const f = s.leads.filter(l => l.origem === o && l.estagio === 'fechado' && (!desde || (l.fechadoEm || l.criadoEm) >= desde)).length, p = s.leads.filter(l => l.origem === o && l.estagio === 'perdido' && (!desde || (l.fechadoEm || l.criadoEm) >= desde)).length; return { nome: ORIG[o], txt: `${f} ganhos · ${p} perdidos` }; });
+    }
+    if (tela === 'potencial') {
+      const M = s.M, rk = s.ranking;
+      if (!M || !rk) { out.pt = { carregando: true, linhas: [], share: [], busca: s.ptBusca }; }
+      else {
+        const pctR = s.ptRevenda, pctI = s.ptIndiretos, corte = s.ptCorte;
+        const calc = (fat) => ({ perda: M.simular('revenda', fat, pctR).perda, ganho: M.simular('indiretos', fat, pctI).ganho });
+        const q = s.ptBusca.trim().toLowerCase();
+        const noCorte = rk.filter(r => r.fat >= corte && (!s.ptUf || r.uf === s.ptUf));
+        const comCalc = noCorte.map(r => { const c = calc(r.fat); return { ...r, ...c, total: c.perda + c.ganho }; });
+        const visiveis = comCalc.filter(r => !q || r.razao.toLowerCase().includes(q));
+        const ORD = { total: (a, b) => b.total - a.total, fat: (a, b) => b.fat - a.fat, pos: (a, b) => a.pos - b.pos };
+        visiveis.sort(ORD[s.ptOrdem]);
+        const soma = (k, l) => l.reduce((n, r) => n + r[k], 0);
+        const fatRanking = soma('fat', rk), fatLeads = s.leads.reduce((n, l) => n + (l.faturamento || 0), 0);
+        const CONSUMO_SETOR = 1.1451e12; // ABRAS 2026 · consumo das famílias no varejo alimentar, 2025
+        const pctFmt = (v) => (v * 100).toLocaleString('pt-BR', { maximumFractionDigits: v < 0.01 ? 2 : 1 }) + '%';
+        const chips = (vals, atual, campo) => vals.map(v => ({ label: M.fmtPct(v / 100), on: atual === v, pick: () => this.setState({ [campo]: v }) }));
+        out.pt = {
+          carregando: false, vazio: !visiveis.length, busca: s.ptBusca, uf: s.ptUf,
+          pctRevendaTxt: M.fmtPct(pctR / 100), pctIndiretosTxt: M.fmtPct(pctI / 100),
+          chipsRevenda: chips([1.5, 2, 3, 4, 6], pctR, 'ptRevenda'), chipsIndiretos: chips([4, 6, 8, 10, 12], pctI, 'ptIndiretos'),
+          chipsCorte: [[0, 'Todas'], [300e6, 'R$ 300 mi+'], [1e9, 'R$ 1 bi+'], [5e9, 'R$ 5 bi+']].map(([v, label]) => ({ label, on: corte === v, pick: () => this.setState({ ptCorte: v }) })),
+          ufs: [{ v: '', t: 'Todos os estados' }, ...[...new Set(rk.map(r => r.uf))].sort().map(u => ({ v: u, t: u }))],
+          setUf: (e) => this.setState({ ptUf: e.target.value }), setBusca: (e) => this.setState({ ptBusca: e.target.value }),
+          chipsOrdem: [['total', 'Maior potencial'], ['fat', 'Maior faturamento'], ['pos', 'Posição no ranking']].map(([v, label]) => ({ label, on: s.ptOrdem === v, pick: () => this.setState({ ptOrdem: v }) })),
+          nRedes: noCorte.length, nRedesTxt: `de ${rk.length} no ranking`,
+          fatTotal: fC(soma('fat', comCalc)), perdaTotal: fC(soma('perda', comCalc)), ganhoTotal: fC(soma('ganho', comCalc)),
+          aliquota: M.fmtPct(M.ALIQUOTA), mostrando: `mostrando ${Math.min(visiveis.length, 40)} de ${visiveis.length}`,
+          linhas: visiveis.slice(0, 40).map(r => ({ pos: r.pos, razao: r.razao, uf: r.uf, fat: fC(r.fat), perda: fC(r.perda), ganho: fC(r.ganho), total: fC(r.total),
+            mov: r.ant === 'Nova' ? 'nova no ranking' : r.ant === String(r.pos) ? 'mesma posição de 2025' : (+r.ant > r.pos ? `subiu ${+r.ant - r.pos} de 2025` : `caiu ${r.pos - +r.ant} de 2025`) })),
+          share: [
+            { l: 'Redes que preencheram', v: s.leads.length, n: 'cadastros no diagnóstico', cls: '' },
+            { l: 'Faturamento que passou', v: fC(fatLeads), n: 'soma das redes capturadas', cls: 'on' },
+            { l: 'Share do ranking', v: pctFmt(fatLeads / fatRanking), n: `de ${fC(fatRanking)} das ${rk.length} redes`, cls: '' },
+            { l: 'Share do setor', v: pctFmt(fatLeads / CONSUMO_SETOR), n: 'do consumo alimentar de 2025 (R$ 1,145 tri)', cls: '' },
+          ],
+          shareBarra: `${Math.min(100, Math.max(0.4, (fatLeads / fatRanking) * 100))}%`,
+          shareRot: `${fC(fatLeads)} capturados`, rankingTotal: fC(fatRanking), mapaHref: this.MAPA_URL,
+          exportar: () => { const csv = ['posicao;razao_social;uf;faturamento;perda_verbas;credito_indiretos;em_jogo',
+            ...visiveis.map(r => [r.pos, `"${r.razao.replace(/"/g, '""')}"`, r.uf, Math.round(r.fat), Math.round(r.perda), Math.round(r.ganho), Math.round(r.total)].join(';'))].join('\n');
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' })); a.download = 'potencial-abras.csv'; a.click(); },
+        };
+      }
+    }
+    if (tela === 'qr' && s.qr) {
+      const q = s.qr, Q = s.Q, hoje = new Date().toISOString().slice(0, 10), ativo = !!q.url;
+      const curto = `${this.BASE}/q/${q.codigo}`;
+      const salvar = () => { const u = s.qrForm.trim(); if (!/^https?:\/\/[^\s]+\.[^\s]+$/i.test(u)) return this.setState({ qrMsg: 'Informe um endereço completo, com https://', qrMsgCor: 'var(--risco)' });
+        const novo = { ...q, url: u, criadoEm: q.criadoEm || new Date().toISOString() }; try { localStorage.setItem('vow.qr', JSON.stringify({ url: u, codigo: q.codigo })); } catch (e) {}
+        this.setState({ qr: novo, qrMsg: 'Salvo. O QR já aparece na landing.', qrMsgCor: 'var(--ok)' }); };
+      out.setQrForm = (e) => this.setState({ qrForm: e.target.value, qrMsg: '' }); out.qrEnter = (e) => { if (e.key === 'Enter') salvar(); };
+      out.qrSalvar = salvar; out.qrSalvarTxt = ativo ? 'Salvar e regenerar' : 'Salvar e liberar o QR';
+      out.qrAtivo = ativo; out.qrCurto = curto; out.qrUrl = q.url;
+      if (ativo) { const p = Q.qrPath(curto); out.qrD = p.d; out.qrViewBox = `0 0 ${p.size} ${p.size}`;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 ${p.size + 8} ${p.size + 8}" shape-rendering="crispEdges"><rect x="-4" y="-4" width="${p.size + 8}" height="${p.size + 8}" fill="#fff"/><path d="${p.d}" fill="#000"/></svg>`;
+        const baixar = (href, nome) => { const a = document.createElement('a'); a.href = href; a.download = nome; a.click(); };
+        out.qrBaixarSvg = () => baixar('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg), `qr-${q.codigo}.svg`);
+        out.qrBaixarPng = () => { const img = new Image(); img.onload = () => { const c = document.createElement('canvas'); c.width = c.height = 1200; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 1200, 1200); x.imageSmoothingEnabled = false; x.drawImage(img, 0, 0, 1200, 1200); baixar(c.toDataURL('image/png'), `qr-${q.codigo}.png`); }; img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); };
+        out.qrCopiar = () => { try { navigator.clipboard.writeText(curto); } catch (e) {} this.setState({ qrCopiado: true }); setTimeout(() => this.setState({ qrCopiado: false }), 1500); };
+        out.qrCopiarTxt = s.qrCopiado ? 'Copiado' : 'Copiar endereço'; }
+      const L = q.leituras || [], deHoje = L.filter(x => x.slice(0, 10) === hoje);
+      const dias = Array.from({ length: 7 }, (_, i) => { const d = new Date(Date.now() - (6 - i) * 864e5); const k = d.toISOString().slice(0, 10); return { k, n: L.filter(x => x.slice(0, 10) === k).length, rot: d.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '') }; });
+      const max = Math.max(...dias.map(d => d.n), 1);
+      out.qrDias = dias.map(d => ({ n: d.n, rot: d.rot, h: `${Math.round((d.n / max) * 100)}%`, bg: d.k === hoje ? 'var(--ink)' : 'var(--storm)' }));
+      const viaQr = s.leads.filter(l => l.origem === 'qr').length;
+      out.qrTotal = L.length; out.qrHoje = deHoje.length; out.qrLeads = viaQr;
+      out.qrDesde = q.criadoEm ? `desde ${this.dataBr(q.criadoEm)}` : ''; out.qrUltima = L.length ? `última ${this.quando(L[L.length - 1])}` : 'nenhuma ainda';
+      out.qrConv = L.length ? `${Math.round((viaQr / L.length) * 100)}% das leituras` : '—';
+      out.qrSimular = () => this.setState(st => ({ qr: { ...st.qr, leituras: [...(st.qr.leituras || []), new Date().toISOString()] } }));
+    }
+    if (tela === 'equipe') {
+      const abertos = s.leads.map(C.comCrm).filter(l => !C.estagio(l.estagio).final);
+      out.equipe = s.usuarios.map(u => { const P = this.PAPEIS[u.papel] || {}; const n = abertos.filter(l => l.responsavel === u.nome).length; const souEu = u.id === eu.id;
+        return { nome: u.nome, email: u.email, papelNome: P.nome || u.papel, papelCls: P.cls || 'off', pendente: u.status === 'convidado', souEu,
+          acesso: u.status === 'ativo' ? 'ativo' : u.status === 'convidado' ? 'convite pendente' : 'desativado', acessoCls: u.status === 'ativo' ? 'ok' : u.status === 'convidado' ? 'warn' : 'off',
+          ultimo: u.status === 'convidado' ? `convidado ${this.quando(u.convidadoEm)}` : u.ultimoAcesso ? `último acesso ${this.quando(u.ultimoAcesso)}` : '',
+          carteira: n ? `${n} aberta${n === 1 ? '' : 's'}` : '—', podeAlternar: !souEu && !u.fixo, alternarTxt: u.status === 'inativo' ? 'Reativar' : 'Desativar',
+          alternar: () => this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, status: x.status === 'inativo' ? (x.ultimoAcesso ? 'ativo' : 'convidado') : 'inativo' } : x) })),
+          reenviar: () => this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, convidadoEm: new Date().toISOString() } : x), msgU: `Convite reenviado para ${u.email} (demonstração).`, msgUCor: 'var(--ok)' })) }; });
+      out.papeisOpc = Object.entries(this.PAPEIS).filter(([, P]) => !P.fixo).map(([id, P]) => { const on = s.novoU.papel === id; return { nome: P.nome, desc: P.desc, on, borda: on ? 'var(--ink)' : 'var(--line-2)', bg: on ? 'var(--acento-suave)' : 'transparent', pick: () => this.setState(st => ({ novoU: { ...st.novoU, papel: id } })) }; });
+      out.setNovoU = { nome: (e) => { const v = e.target.value; this.setState(st => ({ novoU: { ...st.novoU, nome: v } })); }, email: (e) => { const v = e.target.value; this.setState(st => ({ novoU: { ...st.novoU, email: v } })); } };
+      out.convidar = () => { const { nome, email, papel } = s.novoU; const em = email.trim().toLowerCase();
+        if (!nome.trim()) return this.setState({ msgU: 'Informe o nome.', msgUCor: 'var(--risco)' });
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return this.setState({ msgU: 'Confira o e-mail.', msgUCor: 'var(--risco)' });
+        if (s.usuarios.some(u => u.email === em)) return this.setState({ msgU: 'Esse e-mail já está na equipe.', msgUCor: 'var(--risco)' });
+        this.setState(st => ({ usuarios: [...st.usuarios, { id: 'u' + Date.now(), nome: nome.trim(), email: em, papel, status: 'convidado', convidadoEm: new Date().toISOString(), ultimoAcesso: null }], novoU: { nome: '', email: '', papel: 'vendedor' }, msgU: `Convite enviado para ${em} (demonstração).`, msgUCor: 'var(--ok)' })); };
+    }
+    if (tela === 'lead' && s.leadId && s.form) {
+      const raw = s.leads.find(x => x.id === s.leadId); const l = C.comCrm(raw); const est = C.estagio(s.form.estagio);
+      const inter = s.interacoes.filter(i => i.leadId === l.id);
+      const jor = C.jornada(raw, [...inter].sort((a, b) => a.criadoEm.localeCompare(b.criadoEm)));
+      out.voltar = (e) => { e.preventDefault(); this.ir(s.de); };
+      out.voltarTxt = { hoje: 'Leads', carteira: 'Carteira', resultado: 'Resultado', potencial: 'Potencial' }[s.de] || 'Carteira';
+      out.ld = { empresa: l.empresa || l.nome || 'Sem empresa', contato: [l.nome, l.email, l.telefone, l.cnpj].filter(Boolean).join(' · '), foraDoSla: l.foraDoSla, parado: this.parado(l.diasParado), jogo: fC(l.valorEmJogo), previsao: l.honorario ? fC(l.previsao) : '—', previsaoTxt: l.honorario ? 'Honorário × probabilidade.' : 'Sem honorário informado ainda.' };
+      out.trilha = jor.trilha.map((p, i, arr) => { const trava = jor.maiorEspera && jor.maiorEspera.id === p.id && (p.dias ?? 0) >= 3;
+        return { nome: p.nome, linhaL: i === 0 ? '50%' : '0', linhaR: i === arr.length - 1 ? '50%' : '0', linhaBg: p.alcancado ? 'var(--ink)' : 'var(--line-2)', bolaBg: p.atual ? 'var(--surface)' : p.alcancado ? 'var(--ink)' : 'var(--bg-deep)', bolaBorda: p.alcancado || p.atual ? 'var(--ink)' : 'var(--line-2)', bolaSombra: p.atual ? '0 0 0 4px var(--acento-suave)' : 'none', nmCor: p.alcancado ? 'var(--ink)' : 'var(--muted)', nmPeso: p.atual ? 600 : p.alcancado ? 500 : 400, qdo: p.alcancado ? this.dataBr(p.em) + (p.inferido ? ' ~' : '') : '—', dur: p.dias !== null ? p.dias + (p.dias === 1 ? ' dia' : ' dias') : '', durCor: trava ? 'var(--risco)' : 'var(--muted)', durPeso: trava ? 500 : 400 }; });
+      out.jor = { diasTotais: jor.diasTotais, fasesVencidas: jor.fasesVencidas, fasesTxt: jor.fasesVencidas === 1 ? 'fase vencida' : 'fases vencidas', temTrava: !!(jor.maiorEspera && (jor.maiorEspera.dias ?? 0) >= 3), travaNome: jor.maiorEspera?.nome, travaDias: jor.maiorEspera?.dias, inferido: jor.trilha.some(p => p.inferido) };
+      out.fases = C.ESTAGIOS.map(e => { const on = e.id === s.form.estagio; const cor = e.id === 'fechado' ? 'var(--ok)' : e.id === 'perdido' ? 'var(--risco)' : 'var(--ink)';
+        return { nome: e.nome, on, bg: on ? cor : 'transparent', borda: on ? cor : 'var(--line-2)', cor: on ? 'var(--branco)' : 'var(--dim)', pick: () => this.setState(st => ({ form: { ...st.form, estagio: e.id } })) }; });
+      out.faseSaida = est.saida ? `Para avançar: ${est.saida}` : 'Fase final.';
+      out.formPerda = s.form.estagio === 'perdido';
+      out.form = s.form; out.motivosRef = C.MOTIVOS_PERDA; out.tiposRef = C.TIPOS_INTERACAO;
+      out.setForm = Object.fromEntries(Object.keys(s.form).map(k => [k, (e) => { const v = e.target.value; this.setState(st => ({ form: { ...st.form, [k]: v } })); }]));
+      out.salvar = () => this.salvar();
+      out.novoTexto = s.novoTexto; out.novoTipo = s.novoTipo;
+      out.setNovoTexto = (e) => this.setState({ novoTexto: e.target.value }); out.setNovoTipo = (e) => this.setState({ novoTipo: e.target.value });
+      out.registrar = () => { const t = s.novoTexto.trim(); if (!t) return; const i = { id: 'i' + Date.now(), leadId: l.id, tipo: s.novoTipo, autor: 'Bruno Lima', texto: t, criadoEm: new Date().toISOString() }; const mud = !raw.primeiroContatoEm && s.novoTipo !== 'nota' ? { primeiroContatoEm: i.criadoEm } : {}; this.setState(st => ({ interacoes: [...st.interacoes, i], novoTexto: '', leads: st.leads.map(x => x.id === l.id ? { ...x, ...mud } : x) })); };
+      const tempo = [...inter].sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
+      out.semHistorico = !tempo.length;
+      out.tempo = tempo.map(i => ({ tipo: i.tipo, qdo: this.quando(i.criadoEm), texto: i.texto, autor: i.autor || 'sistema', ponto: i.tipo === 'sistema' ? 'var(--ink)' : 'var(--line-2)' }));
+      out.linhas = [...(l.diagnosticos || []).map(d => ({ a: d.tipo === 'revenda' ? 'Verbas com a indústria' : 'Serviços e indiretos', b: fB(d.destaque) })),
+        { a: 'Faturamento da rede', b: fC(l.faturamento) }, { a: 'Origem', b: { abras: 'Diagnóstico ABRAS', qr: 'QR do estande', site: 'Site' }[l.origem] || 'Site' }, { a: 'Capturado em', b: this.quando(l.criadoEm) }, { a: 'Primeiro contato', b: l.primeiroContatoEm ? this.quando(l.primeiroContatoEm) : 'ainda não' }, { a: 'Pediu conversa', b: l.agendar ? 'sim' : 'não' }, { a: 'Diagnóstico por e-mail', b: l.email_enviado ? 'enviado' : 'pendente' }];
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>

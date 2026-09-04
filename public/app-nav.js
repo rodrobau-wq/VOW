@@ -21,6 +21,7 @@ const ABAS = [
   { href: '/app/projetos',  rotulo: 'Projetos',  grupo: 'A entrega' },
   { href: '/app/dados',     rotulo: 'Base',      grupo: 'A entrega' },
   { href: '/app/usuarios',  rotulo: 'Equipe',    grupo: 'A entrega' },
+  { href: '/app/qr',        rotulo: 'QR',        grupo: 'A entrega' },
 ]
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]))

@@ -7,3 +7,6 @@ data/leads.json
 
 # base da plataforma (gerada pelo seed)
 data/db.json
+
+# Backup de leads: contém dado de cliente, não vai para o repositório.
+backup-leads-*.json

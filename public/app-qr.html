@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR · Plataforma VOW</title>
+<link rel="stylesheet" href="/tokens.css">
+<link rel="icon" href="/icone.svg">
+<style>
+  main{padding:32px;max-width:960px;margin:0 auto}
+  h1{font-size:38px;margin:0 0 4px}
+  h1 em{font-style:italic;font-weight:300}
+  .sub{color:var(--muted);font-size:15px;margin:0 0 26px;max-width:70ch}
+  .bloco{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:24px;margin-bottom:16px}
+  .bloco h2{font-size:24px;margin:0 0 6px}
+  .bloco .leg{font-size:13.5px;color:var(--muted);margin:0 0 18px;max-width:70ch}
+  label{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  input{width:100%;height:40px;padding:0 12px;border:1px solid var(--line-2);border-radius:4px;
+    background:var(--raised);color:var(--ink);font:400 14px/1 var(--fonte);outline:none}
+  input:focus{border-color:var(--ink)}
+  .ff{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+  .msg{font-size:13.5px;min-height:19px;margin-top:12px;color:var(--risco)}
+  .msg.ok{color:var(--ok)}
+  .par{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+  .qr{background:#fff;padding:12px;border:1px solid var(--line);display:block}
+  .curto{font-variant-numeric:tabular-nums;font-size:15px;font-weight:500;margin-top:6px;word-break:break-all}
+  .fine{font-size:12.5px;color:var(--muted);margin-top:4px;word-break:break-all}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
+  @media(max-width:700px){.kpis{grid-template-columns:1fr}}
+  .kpi{border:1px solid var(--line);border-radius:4px;padding:16px}
+  .kpi .num{font-size:34px;margin-top:8px;font-variant-numeric:tabular-nums}
+  .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .botoes{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .vazio{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <h1>O <em>QR</em> do estande</h1>
+  <p class="sub">Cadastre o destino e o QR aparece na landing. Cada leitura passa antes pelo
+  nosso endereço curto — é assim que se conta quem veio do cartaz.</p>
+
+  <div class="bloco">
+    <h2>Para onde o QR leva</h2>
+    <p class="leg">O código impresso nunca muda: ele carrega o endereço curto. Trocar o destino
+    aqui não invalida nada que já foi impresso.</p>
+    <form class="ff" id="f">
+      <div><label for="url">Endereço</label>
+        <input id="url" type="url" inputmode="url" placeholder="https://vow-abras.onrender.com" required></div>
+      <button class="btn" type="submit">Salvar</button>
+    </form>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <div class="bloco" id="bcodigo" hidden>
+    <h2>O código</h2>
+    <div class="par" style="margin-top:16px">
+      <svg id="qr" width="220" height="220" class="qr" shape-rendering="crispEdges"
+           role="img" aria-label="QR code do estande"><path fill="#000"></path></svg>
+      <div>
+        <div class="eyebrow">Endereço curto no QR</div>
+        <div class="curto" id="curto"></div>
+        <div class="fine" id="destino"></div>
+        <div class="botoes">
+          <button class="btn ghost sm" type="button" id="svg">Baixar SVG</button>
+          <button class="btn ghost sm" type="button" id="copiar">Copiar endereço</button>
+        </div>
+      </div>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="eyebrow">Leituras</div><div class="num" id="kTotal">0</div>
+        <div class="fine" id="kDesde"></div></div>
+      <div class="kpi"><div class="eyebrow">Hoje</div><div class="num" id="kHoje">0</div>
+        <div class="fine" id="kUltima"></div></div>
+      <div class="kpi"><div class="eyebrow">Vieram do QR</div><div class="num" id="kLeads">0</div>
+        <div class="fine">leads com origem QR</div></div>
+    </div>
+  </div>
+</main>
+
+<script type="module">
+import { montarNav } from '/app-nav.js'
+import { qrPath } from '/qr.js'
+
+const $ = (id) => document.getElementById(id)
+const ctx = await montarNav('/app/qr')
+// Só a VOW troca o destino; o resto da equipe vê o número e o código.
+const soLeitura = ctx.usuario.papel !== 'vow'
+if (soLeitura) { $('url').disabled = true; $('f').querySelector('button').disabled = true }
+
+const dia = (s) => new Date(s).toLocaleDateString('pt-BR')
+const hora = (s) => new Date(s).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+
+async function carregar () {
+  const [qr, leads] = await Promise.all([
+    fetch('/api/app/qr').then((r) => r.json()),
+    fetch('/api/app/leads').then((r) => r.json()).catch(() => []),
+  ])
+  $('url').value = qr.url || ''
+  if (!qr.url) { $('bcodigo').hidden = true; return }
+
+  const curto = new URL('/q/' + qr.codigo, location.origin).href
+  const { d, size } = qrPath(curto)
+  $('qr').setAttribute('viewBox', `0 0 ${size} ${size}`)
+  $('qr').querySelector('path').setAttribute('d', d)
+  $('curto').textContent = curto
+  $('destino').textContent = 'redireciona para ' + qr.url
+  $('bcodigo').hidden = false
+
+  const ls = qr.leituras || []
+  const hoje = new Date().toDateString()
+  $('kTotal').textContent = ls.length
+  $('kDesde').textContent = ls.length ? 'desde ' + dia(ls[0]) : 'nenhuma ainda'
+  $('kHoje').textContent = ls.filter((e) => new Date(e).toDateString() === hoje).length
+  $('kUltima').textContent = ls.length ? 'última ' + hora(ls[ls.length - 1]) : ''
+  $('kLeads').textContent = (Array.isArray(leads) ? leads : []).filter((l) => l.origem === 'qr').length
+
+  $('svg').onclick = () => {
+    const s = new XMLSerializer().serializeToString($('qr'))
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' }))
+    a.download = 'qr-vow-' + qr.codigo + '.svg'
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+  $('copiar').onclick = async () => {
+    await navigator.clipboard.writeText(curto)
+    $('copiar').textContent = 'Copiado'
+    setTimeout(() => { $('copiar').textContent = 'Copiar endereço' }, 1600)
+  }
+}
+
+$('f').addEventListener('submit', async (ev) => {
+  ev.preventDefault()
+  const r = await fetch('/api/app/qr', {
+    method: 'PUT', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ url: $('url').value.trim() }),
+  })
+  const dados = await r.json()
+  $('msg').textContent = r.ok ? 'Salvo. O código já aponta para o novo destino.' : (dados.erro || 'Não deu para salvar.')
+  $('msg').className = 'msg' + (r.ok ? ' ok' : '')
+  if (r.ok) carregar()
+})
+
+carregar()
+</script>
+</body>
+</html>

@@ -3,10 +3,11 @@
  *
  * DUAS REGRAS QUE NÃO SE NEGOCIAM:
  *
- * 1. `verificacao` e `interacao` são append-only. Uma é o log de diligência e
- *    a defesa em fiscalização; a outra é o histórico do que foi combinado com
- *    o cliente. Um UPDATE em qualquer das duas destrói o valor da tabela, e
- *    `atualizar()` recusa as duas.
+ * 1. `verificacao`, `interacao` e `leitura` são append-only. A primeira é o
+ *    log de diligência e a defesa em fiscalização; a segunda, o histórico do
+ *    que foi combinado com o cliente; a terceira, quantas vezes o QR do
+ *    estande foi lido. Um UPDATE em qualquer delas destrói o valor da
+ *    tabela, e `atualizar()` recusa as três.
  *
  * 2. Todo dado de negócio é escopado por `redeId`. Nenhuma consulta atravessa
  *    tenant — `listar()` exige a rede, e não há como pedir "todos os
@@ -20,17 +21,17 @@ import crypto from 'node:crypto'
 import { consulta, preparar, emMemoria, tabelaMemoria, salvarNoDisco } from './db.js'
 
 /** Coleções que nunca são atualizadas, só recebem linha nova. */
-const APPEND_ONLY = new Set(['verificacao', 'interacao'])
+const APPEND_ONLY = new Set(['verificacao', 'interacao', 'leitura'])
 
 /** Coleções que não pertencem a uma rede: são o cadastro da própria
  *  plataforma. `interacao` entra aqui porque acompanha lead, e lead é da
  *  VOW — só vira rede depois de fechar. */
 // `projeto` acompanha o lead, e lead é da VOW até virar cliente.
-const GLOBAIS = new Set(['rede', 'usuario', 'interacao', 'projeto'])
+const GLOBAIS = new Set(['rede', 'usuario', 'interacao', 'projeto', 'qr', 'leitura'])
 
 const COLECOES = new Set([
   'rede', 'usuario', 'fornecedor', 'verificacao', 'item', 'contrato', 'excecao', 'interacao',
-  'projeto',
+  'projeto', 'qr', 'leitura',
 ])
 
 function checa(colecao) {

@@ -65,24 +65,33 @@ import { montarNav, esc } from '/app-nav.js'
 const ctx = await montarNav('/app/usuarios')
 
 const $ = (id) => document.getElementById(id)
-const PAPEIS = { vow: 'Consultor VOW', comprador: 'Comprador', fiscal: 'Fiscal',
-                 juridico: 'Jurídico', suprimentos: 'Suprimentos', diretoria: 'Diretoria' }
-$('papel').innerHTML = Object.entries(PAPEIS)
-  .map(([v, r]) => `<option value="${v}" ${v === 'vow' ? 'selected' : ''}>${r}</option>`).join('')
+const PAPEIS = { deus: 'Dono da plataforma', vow: 'Administrador VOW', vendedor: 'Vendedor',
+                 comprador: 'Comprador', fiscal: 'Fiscal', juridico: 'Jurídico',
+                 suprimentos: 'Suprimentos', diretoria: 'Diretoria' }
+// O dono não se convida: a conta é sempre promovida pelo servidor.
+const CONVIDAVEIS = Object.fromEntries(Object.entries(PAPEIS).filter(([v]) => v !== 'deus'))
+// Vendedor é o padrão: administrador se promove, não se convida em massa.
+$('papel').innerHTML = Object.entries(CONVIDAVEIS)
+  .map(([v, r]) => `<option value="${v}" ${v === 'vendedor' ? 'selected' : ''}>${r}</option>`).join('')
 
 async function carregar() {
   const us = await (await fetch('/api/app/usuarios')).json()
   $('lista').innerHTML = us.map((u) => {
     const eu = u.email === ctx.usuario.email
-    return `<div class="linha ${u.ativo ? '' : 'off'}">
+    const st = u.status || 'ativo'
+    // O rótulo diz a situação; a cor só acompanha.
+    const selo = (u.fixo ? '<span class="tag off">conta protegida</span> ' : '') +
+      ({ convidado: '<span class="tag warn">convidado</span>',
+         inativo: '<span class="tag off">desativado</span>', ativo: '' }[st])
+    return `<div class="linha ${st === 'inativo' ? 'off' : ''}">
       <div class="id">
-        <div class="nm">${esc(u.nome)}${eu ? ' <span class="tag off">você</span>' : ''}
-          ${u.ativo ? '' : '<span class="tag off">desativado</span>'}</div>
-        <div class="em">${esc(u.email)} · ${esc(PAPEIS[u.papel] || u.papel)}</div>
+        <div class="nm">${esc(u.nome)}${eu ? ' <span class="tag off">você</span>' : ''} ${selo}</div>
+        <div class="em">${esc(u.email)} · ${esc(PAPEIS[u.papel] || u.papel)}${
+          st === 'convidado' ? ' · ainda não definiu a senha' : ''}</div>
       </div>
       <div class="acoes">
-        ${eu ? '' : `<button class="btn ghost sm" data-id="${u.id}" data-ativo="${!u.ativo}">
-          ${u.ativo ? 'Desativar' : 'Reativar'}</button>`}
+        ${eu || u.fixo ? '' : `<button class="btn ghost sm" data-id="${u.id}" data-status="${st === 'inativo' ? 'ativo' : 'inativo'}">
+          ${st === 'inativo' ? 'Reativar' : 'Desativar'}</button>`}
       </div>
     </div>`
   }).join('') || '<div class="vazio">Ninguém ainda.</div>'
@@ -91,7 +100,7 @@ async function carregar() {
     b.addEventListener('click', async () => {
       const r = await fetch(`/api/app/usuarios/${b.dataset.id}`, {
         method: 'PATCH', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ ativo: b.dataset.ativo === 'true' }),
+        body: JSON.stringify({ status: b.dataset.status }),
       })
       if (!r.ok) { const j = await r.json(); alert(j.erro); return }
       carregar()
@@ -113,7 +122,7 @@ $('convidar').addEventListener('click', async () => {
     // Sem e-mail configurado o link volta aqui, para quem convidou repassar.
     msg.innerHTML = j.emailEnviado
       ? `Convite enviado para ${esc(j.email)}.`
-      : `Conta criada. O e-mail não saiu — repasse este link, que vale 30 minutos:
+      : `Conta criada. O e-mail não saiu — repasse este link, que vale 24 horas:
          <a href="${esc(j.link)}">${esc(j.link)}</a>`
     for (const id of ['nome', 'email']) $(id).value = ''
     carregar()

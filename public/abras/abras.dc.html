@@ -17,7 +17,7 @@
   input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 4px; background: var(--concrete); outline: none; margin: 0; }
   input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: var(--preto); border: 5px solid var(--silver); box-shadow: 0 0 0 1.5px var(--preto); cursor: pointer; }
   input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--preto); border: 4px solid var(--silver); cursor: pointer; }
-  input[type=text], input[type=email], input[type=tel] { height: 52px; border-radius: 4px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); padding: 0 16px; font: 400 16px/1 var(--fonte); width: 100%; box-sizing: border-box; }
+  input[type=text], input[type=email], input[type=tel], input[type=password], input:not([type]) { height: 52px; border-radius: 4px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); padding: 0 16px; font: 400 16px/1 var(--fonte); width: 100%; box-sizing: border-box; }
   input:focus { border-color: var(--preto); outline: none; }
   input::placeholder { color: var(--storm); }
   @keyframes up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
@@ -35,6 +35,15 @@
           <span class="eyebrow" style="font-size: 10px">A inteligência tributária que alimenta o Brasil</span>
         </span>
       </a>
+      <sc-if value="{{ ehHome }}" hint-placeholder-val="{{ true }}">
+        <div role="group" aria-label="Orientação da tela" style="display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--line-2); border-radius: 4px">
+          <sc-for list="{{ orientOpc }}" as="o" hint-placeholder-count="2">
+            <button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" title="{{ o.rot }}" style="display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 13px; border: 0; border-radius: 4px; cursor: pointer; font: 400 12.5px/1 var(--fonte); background: {{ o.bg }}; color: {{ o.cor }}">
+              <i style="display: block; border: 1.5px solid currentColor; border-radius: 2px; width: {{ o.iw }}; height: {{ o.ih }}"></i><span>{{ o.rot }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
       <div style="flex: 1"></div>
       <sc-if value="{{ naoHome }}" hint-placeholder-val="{{ false }}">
         <div style="display: flex; gap: 6px; align-items: center" aria-hidden="true">
@@ -46,7 +55,7 @@
       </sc-if>
       <sc-if value="{{ ehHome }}" hint-placeholder-val="{{ true }}">
         <a href="#" style="font-size: 14px; color: var(--dim); text-decoration: none">O que é a VOW</a>
-        <a href="#" style="font-size: 14px; color: var(--dim); text-decoration: none">CRM</a>
+        <a href="#" onClick="{{ abrirLogin }}" style="font-size: 14px; color: var(--dim); text-decoration: none">CRM</a>
       </sc-if>
     </div>
   </nav>
@@ -56,12 +65,28 @@
     <!-- HOME -->
     <sc-if value="{{ ehHome }}" hint-placeholder-val="{{ true }}">
       <section style="animation: up .4s ease both">
-        <div class="eyebrow" style="margin-bottom: 22px">JBP 2027 · IBS/CBS · LC 214/2025</div>
-        <h1 style="margin-bottom: 24px; max-width: 18ch">Já fez o seu JBP? <span style="font-weight: 300">Planejou com as novas regras tributárias?</span></h1>
-        <p style="font-size: clamp(17px, 2vw, 23px); color: var(--dim); max-width: 60ch; margin: 0 0 34px; line-height: 1.5">A reforma já está no seu contrato com a indústria e nos seus contratos de serviço. Em três minutos você vê o que muda, quanto custa e o que levar para a mesa.</p>
-        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
-          <button class="btn lg" onClick="{{ irEscolha }}">Fazer o diagnóstico gratuito</button>
-          <span style="font-size: 13.5px; color: var(--muted)">Três minutos, sem compromisso. O diagnóstico chega no seu e-mail ao final.</span>
+        <div data-screen-label="Hero" style="display: grid; grid-template-columns: {{ heroCols }}; gap: {{ heroGap }}; align-items: center; min-height: {{ heroMinH }}">
+          <div>
+            <div class="eyebrow" style="margin-bottom: 22px">JBP 2027 · IBS/CBS · LC 214/2025</div>
+            <h1 style="margin-bottom: 24px; max-width: 18ch; font-size: {{ heroH1 }}">Já fez o seu JBP de 2027? <span style="font-weight: 300">Planejou com as novas regras tributárias?</span></h1>
+            <p style="font-size: clamp(17px, 2vw, 23px); color: var(--dim); max-width: 60ch; margin: 0; line-height: 1.5">A reforma já está no seu contrato com a indústria e nos seus contratos de serviço. Em três minutos você vê o que muda, quanto custa e o que levar para a mesa.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 16px; border-left: {{ heroBorda }}; padding-left: {{ heroPad }}; margin-top: {{ heroTopo }}">
+            <div style="display: flex; flex-direction: {{ ctaDir }}; gap: 12px; align-items: {{ ctaAlign }}; flex-wrap: wrap">
+              <button class="btn lg" onClick="{{ irEscolha }}" style="width: {{ ctaW }}">Fazer o diagnóstico gratuito</button>
+              <span style="font-size: 13.5px; color: var(--muted)">Três minutos, sem compromisso. O diagnóstico chega no seu e-mail ao final.</span>
+            </div>
+            <sc-if value="{{ qrAtivo }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; gap: 22px; align-items: center; padding: 20px 24px; border: 1px solid var(--line); background: var(--surface); max-width: 560px; box-sizing: border-box">
+                <svg viewBox="{{ qrViewBox }}" width="132" height="132" shape-rendering="crispEdges" role="img" aria-label="QR code para fazer o diagnóstico no celular" style="display: block; flex: none; background: var(--branco); padding: 8px; box-sizing: border-box; border: 1px solid var(--line)"><path d="{{ qrD }}" fill="#000000"></path></svg>
+                <div style="display: flex; flex-direction: column; gap: 6px">
+                  <div class="eyebrow">Prefere no celular?</div>
+                  <div style="font-size: 18px; font-weight: 500; line-height: 1.3">Aponte a câmera e faça o diagnóstico de onde estiver.</div>
+                  <div class="fine">Mesmo diagnóstico, mesmo resultado no seu e-mail.</div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
         </div>
 
         <div style="margin-top: 72px; padding-top: 48px; border-top: 1px solid var(--line)">
@@ -321,8 +346,8 @@
             </div>
             <div class="card" style="text-align: center; border-style: dashed">
               <div class="eyebrow">Leve no celular</div>
-              <div style="width: 180px; height: 180px; margin: 12px auto 0; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; color: var(--muted); font-size: 12px; padding: 12px; box-sizing: border-box; line-height: 1.4">QR code gerado pelo servidor ao enviar (/d/:id)</div>
-              <p class="fine" style="margin-top: 12px">Aponte a câmera para abrir este diagnóstico no celular.</p>
+              <svg viewBox="{{ qrDiagViewBox }}" width="180" height="180" shape-rendering="crispEdges" role="img" aria-label="QR code deste diagnóstico" style="display: block; margin: 12px auto 0; background: var(--branco); padding: 10px; box-sizing: border-box; border: 1px solid var(--line)"><path d="{{ qrDiagD }}" fill="#000000"></path></svg>
+              <p class="fine" style="margin-top: 12px">Aponte a câmera para abrir este diagnóstico no celular. Em produção o endereço é único por diagnóstico (/d/:id).</p>
             </div>
           </div>
           <p class="fine" style="margin-top: 22px">{{ disclaimer }}</p>
@@ -355,6 +380,73 @@
     </sc-if>
   </main>
 
+  <sc-if value="{{ loginAberto }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Login CRM" onClick="{{ fecharLogin }}" style="position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.55); display: grid; place-items: center; padding: 20px">
+      <div onClick="{{ pararClique }}" role="dialog" aria-modal="true" style="width: 100%; max-width: 420px; background: var(--surface); border: 1px solid var(--line); padding: 32px; box-sizing: border-box; animation: up .25s ease both">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px">
+          <div style="display: flex; align-items: center; gap: 10px"><span class="caduceu" aria-hidden="true"></span><span class="eyebrow">Plataforma · CRM</span></div>
+          <button class="btn text sm" onClick="{{ fecharLogin }}" aria-label="Fechar" style="text-decoration: none; font-size: 18px">×</button>
+        </div>
+
+        <sc-if value="{{ lg.ehEntrar }}" hint-placeholder-val="{{ true }}">
+          <h2 style="font-size: 26px; font-weight: 600; margin: 0 0 6px">Entrar</h2>
+          <p style="font-size: 14px; color: var(--muted); margin: 0 0 20px">Só para a equipe do Grupo VOW.</p>
+          <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 0 0 6px">E-mail</label>
+          <input type="email" autoComplete="username" placeholder="nome@grupovow.com.br" value="{{ lg.email }}" onInput="{{ lgSet.email }}" />
+          <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">Senha</label>
+          <div style="position: relative">
+            <input type="{{ lg.senhaTipo }}" autoComplete="current-password" placeholder="Sua senha" value="{{ lg.senha }}" onInput="{{ lgSet.senha }}" onKeyDown="{{ lgEnter }}" style="padding-right: 52px" />
+            <button type="button" onClick="{{ lgOlho }}" aria-label="{{ lg.olhoRotulo }}" aria-pressed="{{ lg.mostrar }}" title="{{ lg.olhoRotulo }}" style="position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; display: grid; place-items: center; background: none; border: 0; border-radius: 4px; cursor: pointer; color: var(--muted)" style-hover="color: var(--ink)">
+              <sc-if value="{{ lg.mostrar }}" hint-placeholder-val="{{ false }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path><path d="M9.9 5.1A10.8 10.8 0 0 1 12 5c5 0 9 4 10 7-.4 1.1-1.2 2.4-2.4 3.6"></path><path d="M6.6 6.6C4.2 8 2.6 10.2 2 12c1 3 5 7 10 7 1.5 0 2.9-.3 4.1-.9"></path></svg>
+              </sc-if>
+              <sc-if value="{{ lg.ocultar }}" hint-placeholder-val="{{ true }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 12c1-3 5-7 10-7s9 4 10 7c-1 3-5 7-10 7S3 15 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </sc-if>
+            </button>
+          </div>
+          <div style="font-size: 13.5px; min-height: 19px; margin-top: 10px; color: var(--risco)">{{ lg.msg }}</div>
+          <button class="btn lg" style="width: 100%; margin-top: 6px" onClick="{{ lgEntrar }}" disabled="{{ lg.ocupado }}">{{ lg.entrarTxt }}</button>
+          <div style="display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; font-size: 13.5px">
+            <a href="#" onClick="{{ lgIr.esqueci }}">Esqueci a senha</a>
+            <a href="#" onClick="{{ lgIr.cadastro }}">Ainda não tenho acesso</a>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ lg.ehEsqueci }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-size: 26px; font-weight: 600; margin: 0 0 6px">Redefinir a senha</h2>
+          <p style="font-size: 14px; color: var(--muted); margin: 0 0 20px">Você recebe um link por e-mail para escolher uma senha nova. Vale por 1 hora.</p>
+          <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 0 0 6px">E-mail</label>
+          <input type="email" autoComplete="username" placeholder="nome@grupovow.com.br" value="{{ lg.email }}" onInput="{{ lgSet.email }}" onKeyDown="{{ lgEnter }}" />
+          <div style="font-size: 13.5px; min-height: 19px; margin-top: 10px; color: var(--risco)">{{ lg.msg }}</div>
+          <button class="btn lg" style="width: 100%; margin-top: 6px" onClick="{{ lgEsqueci }}" disabled="{{ lg.ocupado }}">{{ lg.esqueciTxt }}</button>
+          <div style="margin-top: 16px; font-size: 13.5px"><a href="#" onClick="{{ lgIr.entrar }}">← Voltar para entrar</a></div>
+        </sc-if>
+
+        <sc-if value="{{ lg.ehCadastro }}" hint-placeholder-val="{{ false }}">
+          <h2 style="font-size: 26px; font-weight: 600; margin: 0 0 6px">Criar acesso</h2>
+          <p style="font-size: 14px; color: var(--muted); margin: 0 0 20px">Qualquer e-mail <b style="color: var(--ink); font-weight: 500">@grupovow.com.br</b> pode entrar. A senha é definida pelo link que chega no seu e-mail.</p>
+          <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 0 0 6px">Nome</label>
+          <input autoComplete="name" placeholder="Nome e sobrenome" value="{{ lg.nome }}" onInput="{{ lgSet.nome }}" />
+          <label style="display: block; font-size: 12.5px; color: var(--muted); margin: 14px 0 6px">E-mail corporativo</label>
+          <input type="email" autoComplete="username" placeholder="nome@grupovow.com.br" value="{{ lg.email }}" onInput="{{ lgSet.email }}" onKeyDown="{{ lgEnter }}" />
+          <div style="font-size: 13.5px; min-height: 19px; margin-top: 10px; color: var(--risco)">{{ lg.msg }}</div>
+          <button class="btn lg" style="width: 100%; margin-top: 6px" onClick="{{ lgCadastrar }}" disabled="{{ lg.ocupado }}">{{ lg.cadastroTxt }}</button>
+          <p class="fine" style="margin-top: 12px">Você entra como vendedor. Um administrador pode mudar o papel depois, na aba Equipe.</p>
+          <div style="margin-top: 16px; font-size: 13.5px"><a href="#" onClick="{{ lgIr.entrar }}">← Já tenho acesso</a></div>
+        </sc-if>
+
+        <sc-if value="{{ lg.ehEnviado }}" hint-placeholder-val="{{ false }}">
+          <span class="tag ok" style="margin-bottom: 14px">E-mail enviado</span>
+          <h2 style="font-size: 26px; font-weight: 600; margin: 0 0 6px">{{ lg.enviadoTit }}</h2>
+          <p style="font-size: 14px; color: var(--dim); margin: 0 0 6px; line-height: 1.5">{{ lg.enviadoTxt }}</p>
+          <p class="fine" style="margin: 12px 0 0">Não chegou? Confira o spam ou <a href="#" onClick="{{ lgReenviar }}">reenvie</a>. Nesta demonstração o e-mail não é disparado.</p>
+          <div style="margin-top: 20px; font-size: 13.5px"><a href="#" onClick="{{ lgIr.entrar }}">← Voltar para entrar</a></div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
   <footer style="border-top: 1px solid var(--line); padding: 40px 24px 56px; color: var(--muted); font-size: 13.5px">
     <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px">
       <div style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap">
@@ -368,8 +460,37 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;telaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;escolha&quot;,&quot;simular&quot;,&quot;resultado&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;'home'|'escolha'|'simular'|'resultado'&quot;,&quot;section&quot;:&quot;Demonstração&quot;}}">
 class Component extends DCLogic {
-  state = { M: null, tela: 'home', produto: null, fat: 300e6, pct: 3, ativas: null, pesos: {}, dReceb: 45, prazo: 60, agendar: false, nome: '', cnpj: '', email: '', telefone: '', cnpjStatus: '', cnpjCor: '', empresa: null, msgCad: '', msg: '', enviando: false, feitos: {}, origem: 'site' };
+  state = { orient: null, login: null, Q: null, qrUrl: null, M: null, tela: 'home', produto: null, fat: 300e6, pct: 3, ativas: null, pesos: {}, dReceb: 45, prazo: 60, agendar: false, nome: '', cnpj: '', email: '', telefone: '', cnpjStatus: '', cnpjCor: '', empresa: null, msgCad: '', msg: '', enviando: false, feitos: {}, origem: 'site' };
+  BASE = 'https://vow-abras.onrender.com';
+  qrVals() {
+    const { Q, qrUrl } = this.state;
+    const out = { qrAtivo: !!(Q && qrUrl) };
+    if (!Q) return out;
+    if (qrUrl) { const p = Q.qrPath(`${this.BASE}/q/abras`); out.qrD = p.d; out.qrViewBox = `0 0 ${p.size} ${p.size}`; }
+    const d = Q.qrPath(`${this.BASE}/d/demo`); out.qrDiagD = d.d; out.qrDiagViewBox = `0 0 ${d.size} ${d.size}`;
+    return out;
+  }
+  ORIENT_CHAVE = 'vow_abras_orientacao';
+  orientVals() {
+    // Retrato: coluna única (painel do estande). Paisagem: texto à esquerda, ações à direita (monitor de recepção).
+    const o = this.state.orient || 'vertical', h = o === 'horizontal';
+    const pick = (v) => () => { try { localStorage.setItem(this.ORIENT_CHAVE, v); } catch (e) {} this.setState({ orient: v }); };
+    return {
+      orientOpc: [['vertical', 'Vertical', '11px', '17px'], ['horizontal', 'Horizontal', '17px', '11px']].map(([id, rot, iw, ih]) => ({ rot, iw, ih, on: o === id, bg: o === id ? 'var(--acento)' : 'transparent', cor: o === id ? 'var(--acento-tinta)' : 'var(--muted)', pick: pick(id) })),
+      heroCols: h ? 'minmax(0, 1.15fr) minmax(0, .85fr)' : '1fr', heroGap: h ? '56px' : '0', heroMinH: h ? 'min(60vh, 560px)' : '0',
+      heroH1: h ? 'clamp(38px, 4.6vw, 64px)' : 'var(--t-h1)',
+      heroBorda: h ? '1px solid var(--line)' : '0', heroPad: h ? '56px' : '0', heroTopo: h ? '0' : '34px',
+      ctaDir: h ? 'column' : 'row', ctaAlign: h ? 'stretch' : 'center', ctaW: h ? '100%' : 'auto',
+    };
+  }
   componentDidMount() {
+    let orient = null; try { orient = localStorage.getItem(this.ORIENT_CHAVE); } catch (e) {}
+    this.setState({ orient: orient || (window.innerWidth > window.innerHeight ? 'horizontal' : 'vertical') });
+    import('/qr.js').then(Q => {
+      // O CRM cadastra o endereço (aba QR) e o QR fica liberado aqui. Sem cadastro, o bloco não aparece.
+      let qrUrl = this.BASE; try { const s = JSON.parse(localStorage.getItem('vow.qr') || 'null'); if (s && 'url' in s) qrUrl = s.url || null; } catch (e) {}
+      this.setState({ Q, qrUrl });
+    });
     import('/motor.js').then(M => {
       const t = this.props.telaInicial ?? 'home';
       const demo = t !== 'home' && t !== 'escolha' ? { produto: 'revenda', email: 'demo@rede.com.br', nome: 'Demonstração', feitos: t === 'resultado' ? { revenda: true } : {} } : {};
@@ -381,12 +502,78 @@ class Component extends DCLogic {
   fatPara(f) { return Math.round(1000 * Math.log(f / 5e6) / Math.log(10000)); }
   escolher(id) { const p = this.state.M.PRODUTOS[id]; this.setState({ produto: id, pct: p.pctDefault, ativas: null, pesos: {} }); this.ir(this.state.email ? 'simular' : 'cadastro'); }
   calc() { const { M, produto, fat, pct, ativas, pesos } = this.state; return M.simular(produto, fat, pct, ativas, pesos); }
+  DOMINIO = 'grupovow.com.br';
+  // Superadmin fixo: fora do domínio, mas dono da plataforma. A senha vive
+  // como hash no servidor; o atalho 'vow2027' só existe onde não há servidor.
+  SUPERADMIN = 'rodrobau@gmail.com';
+  // A guarda de sessão está montada em /app — por isso o CRM mora sob ela.
+  CRM_URL = '/app/crm';
+  lgSet(patch) { this.setState(st => ({ login: { ...st.login, ...patch } })); }
+  lgEmailOk(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+  lgCorporativo(e) { return e.toLowerCase().endsWith('@' + this.DOMINIO); }
+  lgSimular(depois) { this.lgSet({ ocupado: true, msg: '' }); setTimeout(() => this.lgSet({ ocupado: false, ...depois }), 600); }
+  // No editor do Design não há servidor: o modal encena. Em produção ele
+  // chama a API de verdade. Um try/catch decide qual dos dois está rodando.
+  async lgApi(rota, corpo) {
+    this.lgSet({ ocupado: true, msg: '' });
+    try {
+      const r = await fetch(rota, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corpo) });
+      const d = await r.json().catch(() => ({}));
+      this.lgSet({ ocupado: false });
+      return { ok: r.ok, ...d };
+    } catch (e) { this.lgSet({ ocupado: false }); return null; }
+  }
+  loginVals() {
+    const l = this.state.login;
+    const out = { loginAberto: !!l, abrirLogin: (e) => { e && e.preventDefault(); this.setState({ login: { passo: 'entrar', email: '', senha: '', nome: '', msg: '', ocupado: false } }); }, lg: {} };
+    if (!l) return out;
+    const ir = (passo) => (e) => { e && e.preventDefault(); this.lgSet({ passo, msg: '', senha: '' }); };
+    const email = l.email.trim().toLowerCase();
+    const entrar = async () => { if (!this.lgEmailOk(email)) return this.lgSet({ msg: 'Confira o e-mail.' }); if (!l.senha) return this.lgSet({ msg: 'Digite a senha.' });
+      const r = await this.lgApi('/api/app/entrar', { email, senha: l.senha });
+      // Sem servidor (editor do Design) o atalho do protótipo continua valendo.
+      if (!r) return this.lgSimular(email === this.SUPERADMIN && l.senha === 'vow2027'
+        ? (window.location.href = this.CRM_URL, {}) : { msg: 'E-mail ou senha não conferem.' });
+      if (r.ok) { window.location.href = this.CRM_URL; return; }
+      // Nunca dizer qual dos dois está errado: isso confirmaria o e-mail.
+      this.lgSet({ msg: r.erro || 'E-mail ou senha não conferem.' }); };
+    const esqueci = async () => { if (!this.lgEmailOk(email)) return this.lgSet({ msg: 'Confira o e-mail.' });
+      const feito = { passo: 'enviado', enviadoTit: 'Veja seu e-mail', enviadoTxt: `Se ${email} tiver acesso, o link para redefinir a senha já foi enviado. Vale por 1 hora.` };
+      const r = await this.lgApi('/api/app/senha/esqueci', { email });
+      // Resposta igual com e sem conta: a tela não conta quem existe.
+      if (!r) return this.lgSimular(feito);
+      this.lgSet(feito); };
+    const cadastrar = async () => { if (!l.nome.trim()) return this.lgSet({ msg: 'Informe o nome.' }); if (!this.lgEmailOk(email)) return this.lgSet({ msg: 'Confira o e-mail.' });
+      if (email === this.SUPERADMIN) return this.lgSet({ msg: 'Esse e-mail já é o administrador da plataforma. Use "Entrar" ou "Esqueci a senha".' });
+      if (!this.lgCorporativo(email)) return this.lgSet({ msg: `Só e-mails @${this.DOMINIO} podem criar acesso. Se você é da equipe, use o e-mail corporativo.` });
+      const feito = { passo: 'enviado', enviadoTit: `Quase lá, ${l.nome.trim().split(' ')[0]}`, enviadoTxt: `Enviamos para ${email} o link para definir sua senha e entrar. Vale por 24 horas.` };
+      const r = await this.lgApi('/api/app/cadastro', { nome: l.nome.trim(), email });
+      if (!r) return this.lgSimular(feito);
+      if (!r.ok) return this.lgSet({ msg: r.erro || 'Não deu para criar o acesso.' });
+      this.lgSet(feito); };
+    const acao = { entrar, esqueci, cadastro: cadastrar }[l.passo];
+    Object.assign(out, {
+      fecharLogin: (e) => { e && e.preventDefault(); this.setState({ login: null }); },
+      pararClique: (e) => e.stopPropagation(),
+      lgSet: { email: (e) => this.lgSet({ email: e.target.value }), senha: (e) => this.lgSet({ senha: e.target.value }), nome: (e) => this.lgSet({ nome: e.target.value }) },
+      lgIr: { entrar: ir('entrar'), esqueci: ir('esqueci'), cadastro: ir('cadastro') },
+      lgEnter: (e) => { if (e.key === 'Enter' && acao) acao(); },
+      lgEntrar: entrar, lgEsqueci: esqueci, lgCadastrar: cadastrar,
+      lgReenviar: (e) => { e.preventDefault(); this.lgSet({ enviadoTxt: l.enviadoTxt + ' Reenviado agora.' }); },
+      lgOlho: () => this.lgSet({ mostrar: !l.mostrar }),
+      lg: { ...l, mostrar: !!l.mostrar, ocultar: !l.mostrar, senhaTipo: l.mostrar ? 'text' : 'password', olhoRotulo: l.mostrar ? 'Ocultar senha' : 'Mostrar senha', ehEntrar: l.passo === 'entrar', ehEsqueci: l.passo === 'esqueci', ehCadastro: l.passo === 'cadastro', ehEnviado: l.passo === 'enviado',
+        entrarTxt: l.ocupado ? 'Entrando…' : 'Entrar', esqueciTxt: l.ocupado ? 'Enviando…' : 'Enviar link de redefinição', cadastroTxt: l.ocupado ? 'Enviando…' : 'Criar acesso' },
+    });
+    return out;
+  }
   renderVals() {
     const s = this.state, M = s.M;
+    Object.assign(this._lv = this.loginVals(), {});
     const tela = s.tela;
     const ORDEM = ['escolha', 'cadastro', 'simular', 'resultado'];
     const i = ORDEM.indexOf(tela);
     const out = {
+      ...this._lv, ...this.qrVals(), ...this.orientVals(),
       ehHome: tela === 'home', naoHome: tela !== 'home', ehEscolha: tela === 'escolha', ehCadastro: tela === 'cadastro', ehSimular: tela === 'simular', ehResultado: tela === 'resultado', ehFim: tela === 'fim',
       pinos: ORDEM.map((_, k) => ({ w: k <= i ? '30px' : '12px', bg: k <= i ? 'var(--preto)' : 'var(--concrete)' })),
       irHome: (e) => { e && e.preventDefault(); this.ir('home'); },

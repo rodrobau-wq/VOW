@@ -201,11 +201,51 @@
       <span class="nota">ou fale com a gente: <a href="mailto:contato@grupovow.com.br">contato@grupovow.com.br</a></span>
     </div>
   </section>
+
+  <!--
+    O QR só aparece quando alguém da VOW cadastrou o destino no CRM. Sem
+    destino não há código, e um QR quebrado num estande é pior que nenhum.
+  -->
+  <section class="bloco" id="qrbloco" hidden>
+    <div class="eyebrow">Prefere no celular?</div>
+    <h2 style="margin:12px 0 10px">Aponte a câmera</h2>
+    <p class="sub">O diagnóstico foi feito para a tela do celular. Leve com você e responda
+    quando puder.</p>
+    <div style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;margin-top:28px">
+      <svg id="qrsvg" width="180" height="180" shape-rendering="crispEdges" role="img"
+           aria-label="QR code para o diagnóstico"
+           style="display:block;background:#fff;padding:10px;box-sizing:border-box;
+                  border:1px solid var(--line)"><path fill="#000"></path></svg>
+      <div>
+        <div class="nota">Ou abra direto:</div>
+        <div style="margin-top:6px"><a id="qrlink" href="/diagnostico"></a></div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
   <img src="/marca/logo-horizontal-slogan-storm.png"
        alt="Grupo VOW — a inteligência tributária que alimenta o Brasil">
 </footer>
+<script type="module">
+  // Falhar aqui não pode tirar a landing do ar: o QR é conveniência, não caminho.
+  try {
+    const r = await fetch('/api/qr')
+    if (r.ok) {
+      const { url } = await r.json()
+      const { qrPath } = await import('/qr.js')
+      const curto = new URL('/q/abras', location.origin).href
+      const { d, size } = qrPath(curto)
+      const svg = document.getElementById('qrsvg')
+      svg.setAttribute('viewBox', `0 0 ${size} ${size}`)
+      svg.querySelector('path').setAttribute('d', d)
+      const a = document.getElementById('qrlink')
+      a.href = curto
+      a.textContent = new URL(url).host
+      document.getElementById('qrbloco').hidden = false
+    }
+  } catch (e) {}
+</script>
 </body>
 </html>

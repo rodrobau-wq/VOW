@@ -23,10 +23,11 @@ import { baseUrl } from '../lib-url.js'
 import { diagnosticar, PREMISSAS, PORTES } from '../motor.js'
 import { enviarDiagnostico, montarHtml } from '../email.js'
 import { app as rotasApp } from './app.js'
+import { exigeLogin } from '../auth.js'
 import { lerLeads, gravarLead, caminhoDb } from '../leads-db.js'
 import * as store from '../store.js'
 import { temPostgres } from '../db.js'
-import { primeiroAcesso, garantirRedeVow } from '../bootstrap.js'
+import { primeiroAcesso, garantirSuperadmin, garantirRedeVow } from '../bootstrap.js'
 import { protegido } from '../basic-auth.js'
 import { migrarDoDisco, ultimaMigracao } from '../migrar.js'
 
@@ -143,7 +144,8 @@ app.post('/api/lead', async (req, res, next) => {
       agendar: agendar === true,
       // De onde veio: 'abras' no estande, 'site' na landing. É o corte que o
       // comercial mais usa depois da feira.
-      origem: String(origem || 'site').slice(0, 40),
+      // 'qr' vem de quem leu o código do estande; 'abras' do totem.
+      origem: ['abras', 'site', 'qr'].includes(origem) ? origem : 'site',
       faturamento: entrada ? entrada.faturamento : 0,
       // "fez os dois" é o sinal comercial que a plataforma exibe.
       fezOsDois: diagnosticos.length > 1,
@@ -267,6 +269,51 @@ app.get('/d/:id', async (req, res, next) => {
   }
 })
 
+/* ======================================================================
+ * QR do estande.
+ *
+ * O código impresso aponta SEMPRE para /q/:codigo, nunca para o destino
+ * final. Trocar para onde ele leva não invalida o material já impresso —
+ * que é o ponto: cartaz de feira não se reimprime no meio do evento.
+ * ====================================================================== */
+
+/** Só o que a landing precisa para decidir se mostra o QR. */
+app.get('/api/qr', async (_req, res, next) => {
+  try {
+    const qr = await store.achar('qr', (q) => q.codigo === 'abras')
+    if (!qr?.url) return res.status(404).json({ erro: 'QR não configurado' })
+    res.json({ codigo: qr.codigo, url: qr.url })
+  } catch (e) { next(e) }
+})
+
+app.get('/q/:codigo', async (req, res, next) => {
+  try {
+    const codigo = String(req.params.codigo || '').slice(0, 40)
+    const qr = await store.achar('qr', (q) => q.codigo === codigo)
+    // Sem destino cadastrado o código não existe: 404, e a landing esconde
+    // o bloco do QR em vez de oferecer um caminho que não leva a lugar nenhum.
+    if (!qr?.url) return res.status(404).send('QR não configurado.')
+
+    /**
+     * A leitura é append-only. Guardamos o hash do IP, não o IP: dá para
+     * distinguir leituras repetidas do mesmo aparelho sem manter dado
+     * pessoal de quem passou na frente do estande.
+     */
+    await store.inserir('leitura', {
+      codigo,
+      em: new Date().toISOString(),
+      ua: String(req.headers['user-agent'] || '').slice(0, 200),
+      ip_hash: crypto.createHash('sha256')
+        .update(String(req.ip || '') + (process.env.SESSION_SECRET || ''))
+        .digest('hex').slice(0, 16),
+    })
+
+    const destino = new URL(qr.url)
+    destino.searchParams.set('origem', 'qr')
+    res.redirect(302, destino.toString())
+  } catch (e) { next(e) }
+})
+
 /* ------------------------------------------------------------------ telas */
 // `/` é a landing pública (topo de funil). O totem da feira fica em /totem,
 // e o index.html deixa de ser servido pelo static para não disputar a raiz.
@@ -297,6 +344,22 @@ app.use(rotasApp)
 // browser e no servidor, sem build step nem cópia que possa divergir.
 app.get('/motor.js', (_req, res) =>
   res.type('application/javascript').sendFile(path.join(RAIZ, 'motor.js')))
+// Gerador de QR sem dependência: o pavilhão não tem rede garantida e a
+// marca não carrega script de terceiros.
+app.get('/qr.js', (_req, res) =>
+  res.type('application/javascript').sendFile(path.join(RAIZ, 'qr.js')))
+
+// As etapas do funil moram na raiz porque servidor e telas leem as mesmas.
+app.get('/crm.js', (_req, res) =>
+  res.type('application/javascript').sendFile(path.join(RAIZ, 'crm.js')))
+/**
+ * O mapa do potencial e o ranking que ele lê moram em `public/` porque o
+ * protótipo os carrega por caminho relativo — mas contam onde estão os leads.
+ * Esta guarda vem antes do `static`: sem ela o arquivo sai direto do disco.
+ */
+app.get(['/abras/mapa-potencial.html', '/abras/ranking-abras-2026.csv',
+         '/abras/crm-demo.js'], exigeLogin)
+
 app.use(express.static(path.join(RAIZ, 'public'), { index: false }))
 
 app.use((err, _req, res, _next) => {
@@ -319,6 +382,8 @@ app.listen(port, async () => {
     if (!m.migrou) console.log(`Migração: ${m.motivo}`)
     const r = await primeiroAcesso()
     if (!r.criado) console.log(`Plataforma: ${r.motivo}`)
+    const d = await garantirSuperadmin()
+    if (!d.ok) console.log(`Dono da plataforma: ${d.motivo}`)
     const v = await garantirRedeVow()
     if (!v.criada) console.log(`Rede da casa: ${v.motivo}`)
   } catch (e) {

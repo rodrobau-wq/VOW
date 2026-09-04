@@ -16,13 +16,32 @@ import * as store from './store.js'
 const COOKIE = 'vow_sess'
 const DURACAO_MS = 12 * 60 * 60 * 1000 // um dia de trabalho
 const MAGIC_MS = 15 * 60 * 1000
-const SENHA_MS = 30 * 60 * 1000        // redefinir senha exige achar o e-mail
+const SENHA_MS = 60 * 60 * 1000        // 1 h — prazo do handoff
+/** Convite de auto-cadastro: 24 h, porque a pessoa pode não estar no e-mail. */
+const CONVITE_MS = 24 * 60 * 60 * 1000
 
 /** Piso de tamanho. Não é política de segurança, é o mínimo defensável. */
 export const SENHA_MINIMA = 10
 
-/** Papéis do brief. `vow` é o consultor, e enxerga todas as redes. */
-export const PAPEIS = ['comprador', 'fiscal', 'juridico', 'suprimentos', 'diretoria', 'vow']
+/**
+ * Papéis. `vow` é o administrador e enxerga tudo; `vendedor` trabalha o
+ * funil mas não administra equipe nem apaga base. Os quatro seguintes são
+ * os papéis do cliente, do brief.
+ */
+export const PAPEIS = ['deus', 'vow', 'vendedor', 'comprador', 'fiscal', 'juridico', 'suprimentos', 'diretoria']
+
+/**
+ * Quem administra a plataforma. `deus` é o dono: tem tudo que `vow` tem, mais
+ * o direito de promover e rebaixar administradores. A distinção existe para
+ * que um `vow` não possa se tornar dono sozinho.
+ */
+export const ehAdmin = (u) => u?.papel === 'vow' || u?.papel === 'deus'
+export const ehDono = (u) => u?.papel === 'deus'
+
+/** `convidado` já entra pelo link, mas ainda não definiu senha. */
+export const STATUS = ['convidado', 'ativo', 'inativo']
+/** Conta sem status é anterior ao campo e continua valendo. */
+export const podeEntrar = (u) => Boolean(u) && (u.status || 'ativo') !== 'inativo'
 
 function segredo() {
   const s = process.env.SESSION_SECRET
@@ -123,12 +142,12 @@ export function lerLinkMagico(token) {
 const digital = (senhaHash) =>
   crypto.createHash('sha256').update(String(senhaHash || '')).digest('base64url').slice(0, 16)
 
-export function gerarLinkSenha(usuario) {
+export function gerarLinkSenha(usuario, { convite = false } = {}) {
   return assinar({
     usuarioId: usuario.id,
     senha: true,
     dg: digital(usuario.senhaHash),
-    exp: Date.now() + SENHA_MS,
+    exp: Date.now() + (convite ? CONVITE_MS : SENHA_MS),
   })
 }
 
@@ -169,7 +188,7 @@ export async function carregaContexto(req, res, next) {
     const usuario = await store.porId('usuario', req.sessao.usuarioId)
     // Desativar precisa valer para quem já está dentro: o cookie dura 12 h e
     // sem esta checagem a pessoa seguiria trabalhando o dia todo.
-    if (usuario && usuario.ativo === false) {
+    if (usuario && !podeEntrar(usuario)) {
       fecharSessao(res)
       return ehApi(req)
         ? res.status(401).json({ erro: 'conta desativada' })

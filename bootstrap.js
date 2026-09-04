@@ -48,6 +48,33 @@ export async function primeiroAcesso() {
 }
 
 /**
+ * Garante o dono da plataforma.
+ *
+ * Diferente de `primeiroAcesso`, esta roda sempre: um deploy antigo já tem
+ * usuário, e o dono precisa existir mesmo assim. Ela só promove — nunca cria
+ * senha, nunca reativa conta desativada — porque o caminho de senha é o link
+ * de redefinição, não uma variável de ambiente.
+ *
+ * `fixo: true` é o que impede a conta de ser rebaixada ou desativada pela
+ * tela de equipe. Sem isso, um administrador poderia deixar a plataforma sem
+ * dono e ninguém teria como voltar atrás sem shell no servidor.
+ */
+export async function garantirSuperadmin() {
+  const email = String(process.env.SUPERADMIN_EMAIL || process.env.ADMIN_EMAIL || '')
+    .trim().toLowerCase()
+  if (!email) return { ok: false, motivo: 'SUPERADMIN_EMAIL não definida' }
+
+  const usuarios = await store.listar('usuario')
+  const dono = usuarios.find((u) => String(u.email).toLowerCase() === email)
+  if (!dono) return { ok: false, motivo: `${email} ainda não tem conta` }
+  if (dono.papel === 'deus' && dono.fixo) return { ok: true, mudou: false, email }
+
+  await store.atualizar('usuario', dono.id, { papel: 'deus', fixo: true })
+  console.log(`Dono da plataforma: ${email} (papel deus, conta protegida)`)
+  return { ok: true, mudou: true, email }
+}
+
+/**
  * Cria o registro da própria VOW.
  *
  * A VOW é uma consultoria, mas também é uma empresa: tem fornecedores,

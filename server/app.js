@@ -24,9 +24,9 @@ import {
 
 import { montarPainel, CLASSES_CREDITO, RISCOS, CALENDARIO } from '../painel.js'
 import {
-  abrirSessao, fecharSessao, carregaContexto, conferirSenha, hashSenha,
+  abrirSessao, ehAdmin, ehDono, fecharSessao, carregaContexto, conferirSenha, hashSenha,
   exigeLogin, exigeRede, gerarLinkMagico, lerLinkMagico, lerSessao,
-  gerarLinkSenha, lerLinkSenha, SENHA_MINIMA, PAPEIS,
+  gerarLinkSenha, lerLinkSenha, SENHA_MINIMA, PAPEIS, STATUS, podeEntrar,
 } from '../auth.js'
 
 const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -55,7 +55,7 @@ app.post('/api/app/entrar', async (req, res, next) => {
     // desativada: nenhuma das três confirma quem é da VOW para quem está
     // testando de fora. Desativar precisa fechar a porta de verdade — sem
     // isto o botão da tela de usuários não faria nada.
-    if (!usuario || usuario.ativo === false || !conferirSenha(senha, usuario.senhaHash)) {
+    if (!podeEntrar(usuario) || !conferirSenha(senha, usuario.senhaHash)) {
       return res.status(401).json({ erro: 'E-mail ou senha não conferem.' })
     }
 
@@ -78,7 +78,7 @@ app.post('/api/app/link-magico', async (req, res, next) => {
     const email = String(req.body?.email || '').trim().toLowerCase()
     const usuario = await store.achar('usuario', (u) => u.email === email)
     const resposta = { ok: true, mensagem: 'Se este e-mail tiver acesso, o link chega em instantes.' }
-    if (!usuario || usuario.ativo === false) return res.json(resposta)
+    if (!podeEntrar(usuario)) return res.json(resposta)
 
     const token = gerarLinkMagico(usuario.id)
     const base = baseUrl(req)
@@ -159,7 +159,7 @@ app.post('/api/app/primeiro-acesso', protegido, async (req, res, next) => {
 app.post('/api/app/senha/esqueci', async (req, res, next) => {
   try {
     const email = String(req.body?.email || '').trim().toLowerCase()
-    const resposta = { ok: true, mensagem: 'Se este e-mail tiver acesso, o link chega em instantes. Ele vale por 30 minutos.' }
+    const resposta = { ok: true, mensagem: 'Se este e-mail tiver acesso, o link chega em instantes. Ele vale por 1 hora.' }
     const usuario = await store.achar('usuario', (u) => u.email === email)
     if (!usuario) return res.json(resposta)
 
@@ -197,9 +197,55 @@ app.post('/api/app/senha/redefinir', async (req, res, next) => {
     }
 
     // Trocar o hash invalida o próprio link que trouxe a pessoa até aqui.
-    await store.atualizar('usuario', usuario.id, { senhaHash: hashSenha(senha) })
+    // E quem define a senha deixa de ser convidado: passou a usar a conta.
+    await store.atualizar('usuario', usuario.id, {
+      senhaHash: hashSenha(senha),
+      status: usuario.status === 'convidado' ? 'ativo' : (usuario.status || 'ativo'),
+    })
     abrirSessao(res, { usuarioId: usuario.id, redeId: null })
     res.json({ ok: true, destino: '/app' })
+  } catch (e) { next(e) }
+})
+
+/**
+ * Auto-cadastro do time VOW.
+ *
+ * Aberto na internet, então a trava é o domínio — e ela vive AQUI, no
+ * servidor. A tela também confere, mas conferência de tela é conveniência:
+ * quem chama a API direto não passa por ela.
+ *
+ * A resposta é sempre a mesma, exista ou não a conta. Senão a rota vira um
+ * verificador de quem trabalha na VOW para qualquer um na internet.
+ */
+const DOMINIO_VOW = /@grupovow\.com\.br$/i
+
+app.post('/api/app/cadastro', async (req, res, next) => {
+  try {
+    const nome = String(req.body?.nome || '').trim().slice(0, 120)
+    const email = String(req.body?.email || '').trim().toLowerCase().slice(0, 200)
+    const neutra = { ok: true, mensagem: 'Se este e-mail puder ter acesso, o link de criação chega em instantes. Ele vale por 24 horas.' }
+
+    if (!nome) return res.status(400).json({ erro: 'Informe o seu nome.' })
+    if (!EMAIL_RE_CRM.test(email)) return res.status(400).json({ erro: 'E-mail inválido.' })
+    // Domínio errado é o único caso que vale dizer em voz alta: não expõe
+    // cadastro nenhum e evita a pessoa esperar um e-mail que não vem.
+    if (!DOMINIO_VOW.test(email)) {
+      return res.status(403).json({ erro: 'O acesso é restrito a e-mails @grupovow.com.br.' })
+    }
+    if (await store.achar('usuario', (u) => u.email === email)) return res.json(neutra)
+
+    // Senha sorteada que ninguém conhece: a pessoa define a dela pelo link.
+    const provisoria = crypto.randomBytes(18).toString('base64url')
+    const u = await store.inserir('usuario', {
+      nome, email, papel: 'vendedor', senhaHash: hashSenha(provisoria), redes: [],
+      status: 'convidado', origem: 'auto-cadastro', convidadoEm: new Date().toISOString(),
+    })
+
+    const link = `${baseUrl(req)}/app/senha/${gerarLinkSenha({ id: u.id, senhaHash: u.senhaHash }, { convite: true })}`
+    const peca = emailAcesso({ nome, link, tipo: 'senha', minutos: 24 * 60 })
+    const envio = await enviarEmail({ para: email, assunto: peca.assunto, html: peca.html, texto: peca.texto })
+    if (!envio.enviado) neutra.link = link
+    res.json(neutra)
   } catch (e) { next(e) }
 })
 
@@ -494,11 +540,50 @@ app.post('/api/app/crm/leads/:id/interacoes', async (req, res, next) => {
  * Onde os dados moram, e o que só o consultor VOW pode fazer.
  * ====================================================================== */
 
-/** Só o consultor VOW enxerga a base inteira e apaga registro. */
+/** Só quem administra enxerga a base inteira e apaga registro. */
 function soVow(req, res, next) {
-  if (req.usuario.papel !== 'vow') return res.status(403).json({ erro: 'acesso restrito' })
+  if (!ehAdmin(req.usuario)) return res.status(403).json({ erro: 'acesso restrito' })
   next()
 }
+
+/* ======================================================================
+ * QR do estande — leitura e configuração pelo CRM.
+ * ====================================================================== */
+
+app.get('/api/app/qr', async (_req, res, next) => {
+  try {
+    const qr = await store.achar('qr', (q) => q.codigo === 'abras')
+    const leituras = await store.listar('leitura', null, (l) => l.codigo === 'abras')
+    res.json({
+      codigo: 'abras',
+      url: qr?.url || null,
+      criadoEm: qr?.criadoEm || null,
+      // Só o instante: o hash de IP e o user-agent ficam no servidor.
+      leituras: leituras.map((l) => l.em).sort(),
+    })
+  } catch (e) { next(e) }
+})
+
+app.put('/api/app/qr', soVow, async (req, res, next) => {
+  try {
+    const bruta = String(req.body?.url || '').trim()
+    let url
+    try {
+      url = new URL(bruta)
+      if (!/^https?:$/.test(url.protocol)) throw new Error()
+    } catch {
+      return res.status(400).json({ erro: 'Informe um endereço completo, com https://' })
+    }
+
+    const qr = await store.achar('qr', (q) => q.codigo === 'abras')
+    // O código impresso não muda: só o destino. É por isso que o QR aponta
+    // para /q/abras e nunca para a URL final.
+    const salvo = qr
+      ? await store.atualizar('qr', qr.id, { url: url.toString() })
+      : await store.inserir('qr', { codigo: 'abras', url: url.toString(), criadoEm: new Date().toISOString() })
+    res.json({ codigo: 'abras', url: salvo.url, criadoEm: salvo.criadoEm })
+  } catch (e) { next(e) }
+})
 
 /* ======================================================================
  * Usuários da plataforma.
@@ -508,7 +593,7 @@ app.get('/api/app/usuarios', soVow, async (_req, res, next) => {
   try {
     const us = await store.listar('usuario')
     // O hash da senha nunca sai daqui, nem para o próprio administrador.
-    res.json(us.map(({ senhaHash, ...u }) => ({ ...u, ativo: u.ativo !== false }))
+    res.json(us.map(({ senhaHash, ...u }) => ({ ...u, status: u.status || 'ativo' }))
       .sort((a, b) => String(a.nome).localeCompare(String(b.nome))))
   } catch (e) { next(e) }
 })
@@ -533,8 +618,8 @@ app.post('/api/app/usuarios', soVow, async (req, res, next) => {
      */
     const provisoria = crypto.randomBytes(18).toString('base64url')
     const u = await store.inserir('usuario', {
-      nome, email, papel, senhaHash: hashSenha(provisoria), redes: [], ativo: true,
-      convidadoPor: req.usuario.nome,
+      nome, email, papel, senhaHash: hashSenha(provisoria), redes: [],
+      status: 'convidado', convidadoPor: req.usuario.nome, convidadoEm: new Date().toISOString(),
     })
 
     const base = baseUrl(req)
@@ -544,7 +629,7 @@ app.post('/api/app/usuarios', soVow, async (req, res, next) => {
 
     const { senhaHash, ...limpo } = u
     // Sem e-mail configurado, o link volta para quem convidou repassar.
-    res.json({ ...limpo, ativo: true, emailEnviado: envio.enviado, link: envio.enviado ? null : link })
+    res.json({ ...limpo, status: 'convidado', emailEnviado: envio.enviado, link: envio.enviado ? null : link })
   } catch (e) { next(e) }
 })
 
@@ -553,28 +638,48 @@ app.patch('/api/app/usuarios/:id', soVow, async (req, res, next) => {
     const u = await store.porId('usuario', req.params.id)
     if (!u) return res.status(404).json({ erro: 'usuário não encontrado' })
 
+    // A conta do dono não é editável por ninguém — nem por ela mesma. É o que
+    // garante que sempre exista alguém capaz de destravar a plataforma.
+    if (u.fixo) return res.status(409).json({ erro: 'A conta do dono da plataforma é protegida.' })
+
     const mudancas = {}
     if (req.body?.papel !== undefined) {
       if (!PAPEIS.includes(req.body.papel)) return res.status(400).json({ erro: 'Papel inválido.' })
-      // Trancar-se para fora é irreversível sem shell: o último `vow` fica.
-      if (u.id === req.usuario.id && req.body.papel !== 'vow') {
+      // Só o dono cria outro dono: um administrador não se promove sozinho.
+      if (req.body.papel === 'deus' && !ehDono(req.usuario)) {
+        return res.status(403).json({ erro: 'Só o dono da plataforma define outro dono.' })
+      }
+      // Trancar-se para fora é irreversível sem shell: o último admin fica.
+      if (u.id === req.usuario.id && !ehAdmin({ papel: req.body.papel })) {
         return res.status(409).json({ erro: 'Você não pode tirar o próprio acesso de administrador.' })
       }
       mudancas.papel = req.body.papel
     }
-    if (req.body?.ativo !== undefined) {
-      if (u.id === req.usuario.id && req.body.ativo === false) {
+    if (req.body?.status !== undefined) {
+      if (!STATUS.includes(req.body.status)) return res.status(400).json({ erro: 'Situação inválida.' })
+      if (u.id === req.usuario.id && req.body.status === 'inativo') {
         return res.status(409).json({ erro: 'Você não pode desativar a própria conta.' })
       }
-      mudancas.ativo = req.body.ativo === true
+      mudancas.status = req.body.status
     }
     const salvo = await store.atualizar('usuario', u.id, mudancas)
     const { senhaHash, ...limpo } = salvo
-    res.json({ ...limpo, ativo: limpo.ativo !== false })
+    res.json({ ...limpo, status: limpo.status || 'ativo' })
   } catch (e) { next(e) }
 })
 
 app.get('/app/usuarios', tela('usuarios'))
+app.get('/app/qr', tela('qr'))
+
+/**
+ * Protótipo do CRM no Brandguide. Fica sob /app porque é ali que a guarda de
+ * sessão está montada — mostra a estrutura da carteira, mesmo com dados de
+ * demonstração.
+ */
+app.get('/app/crm', (_req, res) =>
+  res.sendFile(path.join(RAIZ, 'public', 'abras', 'crm.dc.html')))
+
+
 
 /**
  * Exclui um lead e tudo que pende dele.
