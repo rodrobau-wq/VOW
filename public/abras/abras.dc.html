@@ -534,7 +534,9 @@ class Component extends DCLogic {
       // Sem servidor (editor do Design) o atalho do protótipo continua valendo.
       if (!r) return this.lgSimular(email === this.SUPERADMIN && l.senha === 'vow2027'
         ? (window.location.href = this.CRM_URL, {}) : { msg: 'E-mail ou senha não conferem.' });
-      if (r.ok) { window.location.href = this.CRM_URL; return; }
+      // O protótipo do CRM lê daqui para saber quem está logado. A sessão de
+      // verdade é o cookie assinado; isto é só o nome na tela.
+      if (r.ok) { try { localStorage.setItem('vow.sessao', JSON.stringify({ email, em: new Date().toISOString() })); } catch (e) {} window.location.href = this.CRM_URL; return; }
       // Nunca dizer qual dos dois está errado: isso confirmaria o e-mail.
       this.lgSet({ msg: r.erro || 'E-mail ou senha não conferem.' }); };
     const esqueci = async () => { if (!this.lgEmailOk(email)) return this.lgSet({ msg: 'Confira o e-mail.' });

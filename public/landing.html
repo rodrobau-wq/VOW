@@ -82,7 +82,7 @@
   </a>
   <div class="sp"></div>
   <a class="lnk" href="/site">O que é a VOW</a>
-  <a class="lnk" href="/app/pipeline">CRM</a>
+  <a class="lnk" href="/app/crm" data-login-crm>CRM</a>
 </div></nav>
 
 <main>
@@ -228,6 +228,12 @@
   <img src="/marca/logo-horizontal-slogan-storm.png"
        alt="Grupo VOW — a inteligência tributária que alimenta o Brasil">
 </footer>
+<script type="module">
+  // Mesmo modal do totem: entrar, esqueci a senha, criar acesso. O href
+  // continua valendo se o módulo não carregar — o link nunca fica morto.
+  import { montarLoginCrm } from '/login-crm.js'
+  montarLoginCrm()
+</script>
 <script type="module">
   // Falhar aqui não pode tirar a landing do ar: o QR é conveniência, não caminho.
   try {

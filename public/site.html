@@ -150,7 +150,7 @@
     <a class="lnk" href="#produtos">Plataforma</a>
     <a class="lnk" href="#como">Como funciona</a>
     <a class="btn ghost abras-nav" href="/diagnostico?e=abras">ABRAS 2026</a>
-    <a class="lnk" href="/app/pipeline">CRM</a>
+    <a class="lnk" href="/app/crm" data-login-crm>CRM</a>
     <a class="btn" href="/diagnostico">Diagnóstico grátis</a>
   </div>
 </nav>
@@ -273,5 +273,10 @@
   </div>
 </footer>
 
+<script type="module">
+  // O mesmo modal da landing e do totem. Três páginas, um caminho de entrada.
+  import { montarLoginCrm } from '/login-crm.js'
+  montarLoginCrm()
+</script>
 </body>
 </html>
