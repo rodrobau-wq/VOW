@@ -259,3 +259,26 @@ export function montarHoje(leads) {
       .sort((a, b) => b.diasParado - a.diasParado),
   }
 }
+
+/**
+ * A linha do tempo só registra o que mudou.
+ *
+ * Sem isto, salvar a ficha por um motivo repetia todos os outros campos:
+ * "Honorário: em branco" a cada clique em Salvar num lead que nunca teve
+ * honorário, "Próxima ação: X" de novo quando ninguém mexeu na ação. Uma
+ * linha do tempo cheia de linha que não conta nada deixa de ser lida — e aí
+ * não serve para reconstituir a jornada, que é a única razão de ela existir.
+ *
+ * `null` e `undefined` são a mesma ausência: um lead antigo não tem o campo,
+ * um lead novo tem o campo em branco, e os dois significam "sem honorário".
+ */
+export function mudouDeVerdade(antes, depois) {
+  const norm = (v) => (v === undefined || v === '' ? null : v)
+  const a = norm(antes), d = norm(depois)
+  if (a === null && d === null) return false
+  if (a === null || d === null) return true
+  if (typeof a === 'object' || typeof d === 'object') {
+    return JSON.stringify(a) !== JSON.stringify(d)
+  }
+  return a !== d
+}

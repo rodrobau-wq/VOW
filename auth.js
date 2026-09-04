@@ -202,7 +202,7 @@ export async function carregaContexto(req, res, next) {
     }
     req.usuario = usuario
 
-    const permitidas = usuario.papel === 'vow'
+    const permitidas = ehAdmin(usuario)
       ? (await store.listar('rede')).map((r) => r.id)
       : usuario.redes || []
 

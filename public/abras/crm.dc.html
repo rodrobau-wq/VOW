@@ -37,8 +37,10 @@
       </sc-for>
     </nav>
     <div class="sp"></div>
-    <a class="tag off" href="/app/pipeline" title="Nada nesta tela sai do seu navegador. Clique para abrir o CRM com os dados reais."
-       style="text-decoration: none">Dados de demonstração · abrir o real</a>
+    <sc-if value="{{ ehDemo }}" hint-placeholder-val="{{ true }}">
+      <a class="tag off" href="/app/pipeline" title="Nada nesta tela sai do seu navegador. Clique para abrir o CRM com os dados reais."
+         style="text-decoration: none">Dados de demonstração · abrir o real</a>
+    </sc-if>
     <div class="quem"><b>{{ eu.nome }}</b>{{ eu.papelNome }}</div>
     <button class="sair" type="button" onClick="{{ sair }}">Sair</button>
   </header>
@@ -427,24 +429,59 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;telaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hoje&quot;,&quot;carteira&quot;,&quot;resultado&quot;,&quot;potencial&quot;,&quot;qr&quot;,&quot;equipe&quot;],&quot;default&quot;:&quot;hoje&quot;,&quot;tsType&quot;:&quot;'hoje'|'carteira'|'resultado'|'potencial'|'qr'|'equipe'&quot;,&quot;section&quot;:&quot;Demonstração&quot;}}">
 class Component extends DCLogic {
-  state = { C: null, leads: [], interacoes: [], usuarios: [], tela: 'hoje', leadId: null, de: 'carteira', busca: '', origem: '', sel: {}, periodo: 30, form: null, msg: '', msgCor: 'var(--risco)', novoTexto: '', novoTipo: 'nota', novoU: { nome: '', email: '', papel: 'vendedor' }, msgU: '', msgUCor: 'var(--ok)', Q: null, qr: null, qrForm: '', qrMsg: '', qrMsgCor: 'var(--ok)', qrCopiado: false, M: null, ranking: null, ptRevenda: 3, ptIndiretos: 8, ptCorte: 300e6, ptUf: '', ptOrdem: 'total', ptBusca: '' };
+  state = { real: false, C: null, leads: [], interacoes: [], usuarios: [], tela: 'hoje', leadId: null, de: 'carteira', busca: '', origem: '', sel: {}, periodo: 30, form: null, msg: '', msgCor: 'var(--risco)', novoTexto: '', novoTipo: 'nota', novoU: { nome: '', email: '', papel: 'vendedor' }, msgU: '', msgUCor: 'var(--ok)', Q: null, qr: null, qrForm: '', qrMsg: '', qrMsgCor: 'var(--ok)', qrCopiado: false, M: null, ranking: null, ptRevenda: 3, ptIndiretos: 8, ptCorte: 300e6, ptUf: '', ptOrdem: 'total', ptBusca: '' };
   BASE = 'https://vow-abras.onrender.com';
   MAPA_URL = '/abras/mapa-potencial.html';
   PAPEIS = { deus: { nome: 'Dono da plataforma', cls: 'ok', desc: 'Acesso total. Único que não pode ser desativado nem rebaixado.', fixo: true }, vow: { nome: 'Administrador', cls: 'info', desc: 'Vê a carteira inteira, convida e desativa pessoas, exclui leads e cadastra redes.' }, vendedor: { nome: 'Vendedor', cls: 'off', desc: 'Trabalha as oportunidades: muda fase, registra histórico, propõe honorário. Não exclui nem administra.' } };
+  /**
+   * Troca a demonstração pelo banco.
+   *
+   * Tudo ou nada: meia carteira real ao lado de meia inventada seria pior do
+   * que a demonstração inteira. Se qualquer uma das quatro chamadas falhar,
+   * a tela continua sendo o protótipo e continua dizendo isso.
+   */
+  async carregarReal() {
+    try {
+      const [ctx, leads, interacoes, usuarios] = await Promise.all([
+        fetch('/api/app/contexto').then(r => r.ok ? r.json() : Promise.reject()),
+        fetch('/api/app/crm/leads').then(r => r.ok ? r.json() : Promise.reject()),
+        fetch('/api/app/crm/interacoes').then(r => r.ok ? r.json() : Promise.reject()),
+        fetch('/api/app/usuarios').then(r => r.ok ? r.json() : Promise.reject()),
+      ]);
+      const eu = usuarios.find(u => u.email === ctx.usuario.email);
+      this.setState({ real: true, leads, interacoes, usuarios, euId: eu ? eu.id : null });
+    } catch (e) { /* sem servidor: segue a demonstração, e o selo continua lá */ }
+    // O QR é independente: vale ler mesmo que o resto tenha falhado.
+    try {
+      const r = await fetch('/api/app/qr');
+      if (!r.ok) return;
+      const d = await r.json();
+      this.setState({ qr: { codigo: d.codigo, url: d.url, criadoEm: d.criadoEm, leituras: d.leituras || [] }, qrForm: d.url || '' });
+    } catch (e) {}
+  }
+
+  /** Relê a carteira depois de uma escrita, para a tela não mentir. */
+  async recarregar() {
+    if (!this.state.real) return;
+    try {
+      const [leads, interacoes] = await Promise.all([
+        fetch('/api/app/crm/leads').then(r => r.json()),
+        fetch('/api/app/crm/interacoes').then(r => r.json()),
+      ]);
+      this.setState({ leads, interacoes });
+    } catch (e) {}
+  }
+
   componentDidMount() {
     Promise.all([import('/crm.js'), import('/abras/crm-demo.js'), import('/qr.js')]).then(([C, D, Q]) => {
       let qr = { ...D.QR }; try { const salvo = JSON.parse(localStorage.getItem('vow.qr') || 'null'); if (salvo && salvo.url) qr = { ...qr, ...salvo }; } catch (e) {}
       // Quem entrou pelo login da landing (vow.sessao) é quem aparece logado; senão, o admin da demonstração.
       let euId = 'u01'; try { const ss = JSON.parse(localStorage.getItem('vow.sessao') || 'null'); const u = ss && D.USUARIOS.find(x => x.email === ss.email); if (u) euId = u.id; } catch (e) {}
       this.setState({ C, Q, leads: D.LEADS, interacoes: D.INTERACOES, usuarios: D.USUARIOS, euId, qr, qrForm: qr.url || '', tela: this.props.telaInicial ?? 'hoje' });
-      // O QR é a única aba que mexe em produção: o número de leituras e o
-      // destino vêm do servidor, não da demonstração. Mostrar 66 leituras
-      // inventadas ao lado de um botão que grava de verdade engana.
-      fetch('/api/app/qr').then(r => r.ok ? r.json() : null).then(d => {
-        if (!d) return;
-        const real = { codigo: d.codigo, url: d.url, criadoEm: d.criadoEm, leituras: d.leituras || [], real: true };
-        this.setState({ qr: real, qrForm: d.url || '' });
-      }).catch(() => {});
+      // A demonstração acima é o que o editor do Claude Design mostra, onde
+      // não há servidor. Havendo um, ela é substituída pelo banco antes de
+      // qualquer clique — e o selo "dados de demonstração" some junto.
+      this.carregarReal();
     });
     // Ranking ABRAS 2026 + motor: só a aba Potencial usa, mas carregar cedo evita a tela em branco.
     import('/motor.js').then(M => this.setState({ M }));
@@ -464,11 +501,31 @@ class Component extends DCLogic {
   quando(iso) { if (!iso) return '—'; const d = new Date(iso); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
   parado(d) { return d === 0 ? 'hoje' : d === 1 ? 'há 1 dia' : `há ${d} dias`; }
   registrarSis(leadId, texto, extra = {}) { return { id: 'i' + Date.now() + Math.random(), leadId, tipo: 'sistema', autor: (this.state.usuarios.find(u => u.id === (this.state.euId || 'u01')) || {}).nome || 'Bruno Lima', texto, criadoEm: new Date().toISOString(), ...extra }; }
-  salvar() {
-    const { C, leads, form, leadId } = this.state; const atual = leads.find(l => l.id === leadId); const est = C.estagio(form.estagio);
+  async salvar() {
+    const { C, leads, form, leadId, real } = this.state; const atual = leads.find(l => l.id === leadId); const est = C.estagio(form.estagio);
     const hon = form.honorario === '' ? null : Number(form.honorario);
     if (form.estagio === 'fechado' && !(hon > 0)) return this.setState({ msg: 'Informe o honorário antes de marcar como fechado.', msgCor: 'var(--risco)' });
     if (form.estagio === 'perdido' && !C.ehMotivo(form.motivoPerda)) return this.setState({ msg: 'Escolha o motivo da perda.', msgCor: 'var(--risco)' });
+
+    // Com servidor, quem decide é o servidor: ele valida de novo, grava a
+    // mudança de fase na linha do tempo e devolve o lead já recalculado.
+    if (real) {
+      this.setState({ msg: 'Salvando…', msgCor: 'var(--muted)' });
+      const corpo = {
+        responsavel: form.responsavel.trim(), probabilidade: Number(form.probabilidade) / 100,
+        honorario: hon, estagio: form.estagio,
+        proximaAcao: form.acao.trim() ? { texto: form.acao.trim(), quando: form.quando } : null,
+      };
+      if (form.estagio === 'perdido') { corpo.motivoPerda = form.motivoPerda; corpo.motivoDetalhe = form.motivoDetalhe.trim(); }
+      try {
+        const r = await fetch(`/api/app/crm/leads/${leadId}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corpo) });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) return this.setState({ msg: d.erro || 'Não deu para salvar.', msgCor: 'var(--risco)' });
+        await this.recarregar();
+        return this.setState({ msg: 'Salvo.', msgCor: 'var(--ok)' });
+      } catch (e) { return this.setState({ msg: 'Sem conexão com o servidor.', msgCor: 'var(--risco)' }); }
+    }
+
     const agora = new Date().toISOString(), novo = { ...atual, responsavel: form.responsavel.trim() || null, probabilidade: Number(form.probabilidade) / 100, honorario: hon, proximaAcao: form.acao.trim() ? { texto: form.acao.trim(), quando: form.quando } : null };
     const inter = [];
     if (form.estagio !== atual.estagio) {
@@ -487,6 +544,8 @@ class Component extends DCLogic {
     const admin = eu.papel === 'vow' || eu.papel === 'deus';
     const ABAS = [['hoje', 'Leads', 'O dia'], ['carteira', 'Carteira', 'A carteira'], ['resultado', 'Resultado', 'O fecho'], ...(admin ? [['potencial', 'Potencial', 'O mercado'], ['qr', 'QR', 'A casa'], ['equipe', 'Equipe', 'A casa']] : [])];
     const out = {
+      // O selo é o contrário de `real`: some no instante em que o banco entra.
+      ehDemo: !s.real,
       eu: { nome: eu.nome, papelNome: this.PAPEIS[eu.papel]?.nome || eu.papel }, ehEquipe: tela === 'equipe', ehQr: tela === 'qr', ehPotencial: tela === 'potencial', pt: { carregando: true, linhas: [], share: [] }, qrDias: [], qrForm: s.qrForm, qrMsg: s.qrMsg, qrMsgCor: s.qrMsgCor, equipe: [], papeisOpc: [], novoU: s.novoU, msgU: s.msgU, msgUCor: s.msgUCor,
       abas: ABAS.map(([id, rotulo, grupo], i) => ({ rotulo, grupo, sep: i > 0 && ABAS[i - 1][2] !== grupo, cls: (tela === id || (tela === 'lead' && s.de === id)) ? 'on' : '', ir: (e) => { e.preventDefault(); this.ir(id); } })),
       irJornada: (e) => { e.preventDefault(); this.ir('carteira'); },
@@ -530,9 +589,27 @@ class Component extends DCLogic {
       out.carteiraVazia = !lista.length; out.temSel = nSel > 0; out.excluirTxt = `Excluir ${nSel} selecionado${nSel === 1 ? '' : 's'}`;
       out.todosSel = lista.length > 0 && nSel === lista.length;
       out.toggleTodos = (e) => { const on = e.target.checked; this.setState({ sel: Object.fromEntries(lista.map(l => [l.id, on])) }); };
-      // O selo no canto não bastou: quem clica em "Excluir" acha que excluiu.
-      // O aviso precisa estar no caminho da ação, não ao lado dela.
-      out.excluirSel = () => { if (!confirm(`Demonstração: estes ${nSel} lead(s) somem só da sua tela e voltam ao recarregar. Nada é apagado de verdade — a carteira real fica em /app/leads. Continuar?`)) return; this.setState(st => ({ leads: st.leads.filter(l => !st.sel[l.id]), sel: {} })); };
+      out.excluirSel = async () => {
+        if (s.real) {
+          if (!confirm(`Excluir ${nSel} lead(s)? Não há como desfazer.`)) return;
+          const ids = lista.filter(l => s.sel[l.id]).map(l => l.id);
+          const recusados = [];
+          for (const id of ids) {
+            try {
+              const r = await fetch(`/api/app/crm/leads/${id}`, { method: 'DELETE' });
+              if (!r.ok) { const d = await r.json().catch(() => ({})); recusados.push(d.erro || 'recusado'); }
+            } catch (e) { recusados.push('sem conexão'); }
+          }
+          this.setState({ sel: {} });
+          await this.recarregar();
+          // Lead que virou projeto não some sem o projeto sair antes: dizer
+          // "excluídos" quando o servidor recusou seria a mentira de novo.
+          if (recusados.length) alert(`${recusados.length} de ${ids.length} não foram excluídos: ${recusados[0]}`);
+          return;
+        }
+        // O selo no canto não bastou: quem clica em "Excluir" acha que excluiu.
+        if (!confirm(`Demonstração: estes ${nSel} lead(s) somem só da sua tela e voltam ao recarregar. Nada é apagado de verdade — a carteira real fica em /app/leads. Continuar?`)) return;
+        this.setState(st => ({ leads: st.leads.filter(l => !st.sel[l.id]), sel: {} })); };
       out.exportar = () => { const cab = ['nome', 'empresa', 'email', 'telefone', 'faturamento', 'fase', 'valorEmJogo', 'honorario', 'responsavel', 'criadoEm']; const csv = [cab.join(';'), ...lista.map(l => [l.nome, l.empresa, l.email, l.telefone, l.faturamento, l.estagioNome, l.valorEmJogo, l.honorario ?? '', l.responsavel ?? '', l.criadoEm].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'))].join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' })); a.download = 'leads-vow.csv'; a.click(); };
     }
     if (tela === 'resultado') {
@@ -631,14 +708,45 @@ class Component extends DCLogic {
           acesso: u.status === 'ativo' ? 'ativo' : u.status === 'convidado' ? 'convite pendente' : 'desativado', acessoCls: u.status === 'ativo' ? 'ok' : u.status === 'convidado' ? 'warn' : 'off',
           ultimo: u.status === 'convidado' ? `convidado ${this.quando(u.convidadoEm)}` : u.ultimoAcesso ? `último acesso ${this.quando(u.ultimoAcesso)}` : '',
           carteira: n ? `${n} aberta${n === 1 ? '' : 's'}` : '—', podeAlternar: !souEu && !u.fixo, alternarTxt: u.status === 'inativo' ? 'Reativar' : 'Desativar',
-          alternar: () => { if (!confirm('Demonstração: isto não muda o acesso de ninguém. A equipe de verdade fica em /app/usuarios. Continuar?')) return; this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, status: x.status === 'inativo' ? (x.ultimoAcesso ? 'ativo' : 'convidado') : 'inativo' } : x) })); },
-          reenviar: () => this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, convidadoEm: new Date().toISOString() } : x), msgU: `Demonstração: nenhum e-mail saiu para ${u.email}. Para reenviar de verdade, use /app/usuarios.`, msgUCor: 'var(--risco)' })) }; });
+          alternar: async () => {
+            const novo = u.status === 'inativo' ? (u.ultimoAcesso ? 'ativo' : 'convidado') : 'inativo';
+            if (s.real) {
+              try {
+                const r = await fetch(`/api/app/usuarios/${u.id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status: novo }) });
+                const d = await r.json().catch(() => ({}));
+                if (!r.ok) return this.setState({ msgU: d.erro || 'Não deu para mudar.', msgUCor: 'var(--risco)' });
+                const us = await fetch('/api/app/usuarios').then(x => x.json());
+                return this.setState({ usuarios: us, msgU: `${u.nome} agora está ${novo}.`, msgUCor: 'var(--ok)' });
+              } catch (e) { return this.setState({ msgU: 'Sem conexão com o servidor.', msgUCor: 'var(--risco)' }); }
+            }
+            if (!confirm('Demonstração: isto não muda o acesso de ninguém. A equipe de verdade fica em /app/usuarios. Continuar?')) return;
+            this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, status: novo } : x) })); },
+          reenviar: () => { if (s.real) {
+              fetch('/api/app/senha/esqueci', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: u.email }) })
+                .then(async r => { const d = await r.json().catch(() => ({}));
+                  this.setState({ msgU: d.link ? `Link gerado. O e-mail não saiu — repasse: ${d.link}` : `Novo link enviado para ${u.email}.`, msgUCor: d.link ? 'var(--risco)' : 'var(--ok)' }); })
+                .catch(() => this.setState({ msgU: 'Sem conexão com o servidor.', msgUCor: 'var(--risco)' }));
+              return; }
+            this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, convidadoEm: new Date().toISOString() } : x), msgU: `Demonstração: nenhum e-mail saiu para ${u.email}. Para reenviar de verdade, use /app/usuarios.`, msgUCor: 'var(--risco)' })); } }; });
       out.papeisOpc = Object.entries(this.PAPEIS).filter(([, P]) => !P.fixo).map(([id, P]) => { const on = s.novoU.papel === id; return { nome: P.nome, desc: P.desc, on, borda: on ? 'var(--ink)' : 'var(--line-2)', bg: on ? 'var(--acento-suave)' : 'transparent', pick: () => this.setState(st => ({ novoU: { ...st.novoU, papel: id } })) }; });
       out.setNovoU = { nome: (e) => { const v = e.target.value; this.setState(st => ({ novoU: { ...st.novoU, nome: v } })); }, email: (e) => { const v = e.target.value; this.setState(st => ({ novoU: { ...st.novoU, email: v } })); } };
       out.convidar = () => { const { nome, email, papel } = s.novoU; const em = email.trim().toLowerCase();
         if (!nome.trim()) return this.setState({ msgU: 'Informe o nome.', msgUCor: 'var(--risco)' });
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return this.setState({ msgU: 'Confira o e-mail.', msgUCor: 'var(--risco)' });
         if (s.usuarios.some(u => u.email === em)) return this.setState({ msgU: 'Esse e-mail já está na equipe.', msgUCor: 'var(--risco)' });
+        if (s.real) {
+          fetch('/api/app/usuarios', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ nome: nome.trim(), email: em, papel }) })
+            .then(async r => { const d = await r.json().catch(() => ({}));
+              if (!r.ok) return this.setState({ msgU: d.erro || 'Não deu para convidar.', msgUCor: 'var(--risco)' });
+              const us = await fetch('/api/app/usuarios').then(x => x.json());
+              // O link volta na resposta quando o e-mail não saiu — sem isso
+              // a pessoa convidada fica esperando uma mensagem que não vem.
+              this.setState({ usuarios: us, novoU: { nome: '', email: '', papel: 'vendedor' },
+                msgU: d.link ? `Convite criado. O e-mail não saiu — repasse: ${d.link}` : `Convite enviado para ${em}.`,
+                msgUCor: d.link ? 'var(--risco)' : 'var(--ok)' }); })
+            .catch(() => this.setState({ msgU: 'Sem conexão com o servidor.', msgUCor: 'var(--risco)' }));
+          return;
+        }
         this.setState(st => ({ usuarios: [...st.usuarios, { id: 'u' + Date.now(), nome: nome.trim(), email: em, papel, status: 'convidado', convidadoEm: new Date().toISOString(), ultimoAcesso: null }], novoU: { nome: '', email: '', papel: 'vendedor' }, msgU: `Demonstração: nenhum e-mail saiu para ${em}. Para convidar de verdade, use /app/usuarios.`, msgUCor: 'var(--risco)' })); };
     }
     if (tela === 'lead' && s.leadId && s.form) {
@@ -660,7 +768,16 @@ class Component extends DCLogic {
       out.salvar = () => this.salvar();
       out.novoTexto = s.novoTexto; out.novoTipo = s.novoTipo;
       out.setNovoTexto = (e) => this.setState({ novoTexto: e.target.value }); out.setNovoTipo = (e) => this.setState({ novoTipo: e.target.value });
-      out.registrar = () => { const t = s.novoTexto.trim(); if (!t) return; const i = { id: 'i' + Date.now(), leadId: l.id, tipo: s.novoTipo, autor: 'Bruno Lima', texto: t, criadoEm: new Date().toISOString() }; const mud = !raw.primeiroContatoEm && s.novoTipo !== 'nota' ? { primeiroContatoEm: i.criadoEm } : {}; this.setState(st => ({ interacoes: [...st.interacoes, i], novoTexto: '', leads: st.leads.map(x => x.id === l.id ? { ...x, ...mud } : x) })); };
+      out.registrar = async () => { const t = s.novoTexto.trim(); if (!t) return;
+        if (s.real) {
+          try {
+            const r = await fetch(`/api/app/crm/leads/${l.id}/interacoes`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ tipo: s.novoTipo, texto: t }) });
+            if (!r.ok) return this.setState({ msg: 'Não deu para registrar.', msgCor: 'var(--risco)' });
+            this.setState({ novoTexto: '' });
+            return this.recarregar();
+          } catch (e) { return this.setState({ msg: 'Sem conexão com o servidor.', msgCor: 'var(--risco)' }); }
+        }
+        const i = { id: 'i' + Date.now(), leadId: l.id, tipo: s.novoTipo, autor: 'Bruno Lima', texto: t, criadoEm: new Date().toISOString() }; const mud = !raw.primeiroContatoEm && s.novoTipo !== 'nota' ? { primeiroContatoEm: i.criadoEm } : {}; this.setState(st => ({ interacoes: [...st.interacoes, i], novoTexto: '', leads: st.leads.map(x => x.id === l.id ? { ...x, ...mud } : x) })); };
       const tempo = [...inter].sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
       out.semHistorico = !tempo.length;
       out.tempo = tempo.map(i => ({ tipo: i.tipo, qdo: this.quando(i.criadoEm), texto: i.texto, autor: i.autor || 'sistema', ponto: i.tipo === 'sistema' ? 'var(--ink)' : 'var(--line-2)' }));

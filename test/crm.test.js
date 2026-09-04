@@ -6,7 +6,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
   comCrm, montarPipeline, montarResultado, montarHoje,
-  ESTAGIOS, ABERTOS, MOTIVOS_PERDA, SLA_PRIMEIRO_CONTATO_H, valorEmJogo,
+  ESTAGIOS, ABERTOS, MOTIVOS_PERDA, SLA_PRIMEIRO_CONTATO_H, valorEmJogo, mudouDeVerdade
 } from '../crm.js'
 
 const DIA = 864e5
@@ -213,4 +213,30 @@ test('conversão mostra quanto seguiu adiante de cada fase', () => {
   assert.equal(c('proposta').taxa, 0)
   // Sem nenhum lead, não há taxa — e nula não é zero.
   assert.equal(montarPipeline([]).conversoes[0].taxa, null)
+})
+
+test('a linha do tempo só registra o que mudou', () => {
+  // Salvar a ficha por um motivo não pode repetir os outros campos: uma
+  // linha do tempo cheia de linha que não conta nada deixa de ser lida.
+  assert.equal(mudouDeVerdade('Ana', 'Ana'), false)
+  assert.equal(mudouDeVerdade('Ana', 'Bruno'), true)
+  assert.equal(mudouDeVerdade(50000, 50000), false)
+  assert.equal(mudouDeVerdade(null, 50000), true)
+  assert.equal(mudouDeVerdade(50000, null), true)
+})
+
+test('ausência é ausência, seja ela null, undefined ou vazio', () => {
+  // Lead antigo não tem o campo; lead novo tem o campo em branco. Tratar os
+  // dois como diferentes registrava "Honorário: em branco" a cada Salvar.
+  for (const [a, b] of [[undefined, null], [null, undefined], [undefined, ''], ['', null], [null, null]]) {
+    assert.equal(mudouDeVerdade(a, b), false, `${JSON.stringify(a)} vs ${JSON.stringify(b)}`)
+  }
+})
+
+test('próxima ação compara conteúdo, não identidade', () => {
+  const a = { texto: 'Ligar para o CFO', quando: '2026-09-20' }
+  assert.equal(mudouDeVerdade(a, { ...a }), false)
+  assert.equal(mudouDeVerdade(a, { ...a, quando: '2026-09-21' }), true)
+  assert.equal(mudouDeVerdade(a, null), true)
+  assert.equal(mudouDeVerdade(null, a), true)
 })

@@ -20,6 +20,7 @@ import { enviarEmail, emailAcesso } from '../email.js'
 import {
   ESTAGIOS, MOTIVOS_PERDA, TIPOS_INTERACAO, SLA_PRIMEIRO_CONTATO_H,
   comCrm, ehEstagio, ehMotivo, estagio, montarPipeline, montarResultado, montarHoje, jornada,
+  mudouDeVerdade,
 } from '../crm.js'
 
 import { montarPainel, CLASSES_CREDITO, RISCOS, CALENDARIO } from '../painel.js'
@@ -59,11 +60,18 @@ app.post('/api/app/entrar', async (req, res, next) => {
       return res.status(401).json({ erro: 'E-mail ou senha não conferem.' })
     }
 
-    const redes = usuario.papel === 'vow'
+    const redes = ehAdmin(usuario)
       ? (await store.listar('rede')).map((r) => r.id)
       : usuario.redes || []
 
     abrirSessao(res, { usuarioId: usuario.id, redeId: redes.length === 1 ? redes[0] : null })
+    // Quem entrou e quando. A tela de equipe promete "último acesso" e até
+    // aqui não havia nada gravando isso — a coluna nascia sempre vazia.
+    // Convidado que entra pela primeira vez deixa de ser convidado.
+    await store.atualizar('usuario', usuario.id, {
+      ultimoAcesso: new Date().toISOString(),
+      ...(usuario.status === 'convidado' ? { status: 'ativo' } : {}),
+    })
     res.json({ ok: true, destino: redes.length === 1 ? '/app' : '/app/redes' })
   } catch (e) { next(e) }
 })
@@ -100,7 +108,7 @@ app.get('/app/entrar/:token', async (req, res, next) => {
     const usuario = await store.porId('usuario', p.usuarioId)
     if (!usuario) return res.redirect('/app/entrar?erro=link')
 
-    const redes = usuario.papel === 'vow'
+    const redes = ehAdmin(usuario)
       ? (await store.listar('rede')).map((r) => r.id)
       : usuario.redes || []
     abrirSessao(res, { usuarioId: usuario.id, redeId: redes.length === 1 ? redes[0] : null })
@@ -277,7 +285,7 @@ app.get('/api/app/contexto', async (req, res, next) => {
  */
 app.post('/api/app/redes', async (req, res, next) => {
   try {
-    if (req.usuario.papel !== 'vow') return res.status(403).json({ erro: 'acesso restrito' })
+    if (!ehAdmin(req.usuario)) return res.status(403).json({ erro: 'acesso restrito' })
     const razao = String(req.body?.razao || '').trim().slice(0, 160)
     if (!razao) return res.status(400).json({ erro: 'Informe o nome da rede.' })
 
@@ -377,6 +385,22 @@ app.get('/api/app/crm/resultado', async (req, res, next) => {
   try { res.json(montarResultado(await lerLeads(), req.query.desde)) } catch (e) { next(e) }
 })
 
+/**
+ * Toda a linha do tempo da carteira, não a de um lead só.
+ *
+ * A tela "Agora" precisa saber o que aconteceu ontem em qualquer
+ * oportunidade; buscar lead a lead seriam dezenas de chamadas para montar
+ * uma lista. `desde` existe para não arrastar o histórico inteiro todo dia.
+ */
+app.get('/api/app/crm/interacoes', async (req, res, next) => {
+  try {
+    const desde = String(req.query.desde || '')
+    const todas = await store.listar('interacao', null,
+      (i) => (desde ? i.criadoEm >= desde : true))
+    res.json(todas.sort((a, b) => b.criadoEm.localeCompare(a.criadoEm)).slice(0, 2000))
+  } catch (e) { next(e) }
+})
+
 app.get('/api/app/crm/leads', async (req, res, next) => {
   try {
     const { estagio: filtroEstagio, origem, responsavel, q } = req.query
@@ -466,7 +490,9 @@ app.patch('/api/app/crm/leads/:id', async (req, res, next) => {
 
     if (b.responsavel !== undefined) {
       mudancas.responsavel = String(b.responsavel || '').slice(0, 120)
-      if (mudancas.responsavel !== atual.responsavel) notas.push(`Responsável: ${mudancas.responsavel || 'ninguém'}`)
+      if (mudouDeVerdade(atual.responsavel, mudancas.responsavel)) {
+        notas.push(`Responsável: ${mudancas.responsavel || 'ninguém'}`)
+      }
     }
     if (b.honorario !== undefined) {
       const v = b.honorario === null || b.honorario === '' ? null : Number(b.honorario)
@@ -474,7 +500,9 @@ app.patch('/api/app/crm/leads/:id', async (req, res, next) => {
         return res.status(400).json({ erro: 'honorário inválido' })
       }
       mudancas.honorario = v
-      if (v !== atual.honorario) notas.push(`Honorário: ${v === null ? 'em branco' : 'R$ ' + v.toLocaleString('pt-BR')}`)
+      if (mudouDeVerdade(atual.honorario, v)) {
+        notas.push(`Honorário: ${v === null ? 'em branco' : 'R$ ' + v.toLocaleString('pt-BR')}`)
+      }
     }
     if (b.probabilidade !== undefined) {
       const v = Number(b.probabilidade)
@@ -491,7 +519,12 @@ app.patch('/api/app/crm/leads/:id', async (req, res, next) => {
       mudancas.proximaAcao = a && a.texto
         ? { texto: String(a.texto).slice(0, 300), quando: String(a.quando || '').slice(0, 10) }
         : null
-      if (mudancas.proximaAcao) notas.push(`Próxima ação: ${mudancas.proximaAcao.texto} (${mudancas.proximaAcao.quando || 'sem data'})`)
+      const depois = mudancas.proximaAcao
+      if (mudouDeVerdade(atual.proximaAcao, depois)) {
+        notas.push(depois
+          ? `Próxima ação: ${depois.texto} (${depois.quando || 'sem data'})`
+          : 'Próxima ação removida')
+      }
     }
 
     const salvo = await atualizarLead(req.params.id, mudancas)
@@ -582,10 +615,17 @@ app.put('/api/app/qr', soVow, async (req, res, next) => {
  * Usuários da plataforma.
  * ====================================================================== */
 
-app.get('/api/app/usuarios', soVow, async (_req, res, next) => {
+/**
+ * Quem é da casa. Qualquer pessoa logada vê a lista.
+ *
+ * Era restrito a administrador, e isso quebrava o resto: sem os nomes não há
+ * como atribuir responsável nem exibir quem escreveu cada linha do
+ * histórico. Não há segredo aqui — o hash da senha nunca sai, e convidar,
+ * promover e desativar continuam sendo só de administrador.
+ */
+app.get('/api/app/usuarios', async (_req, res, next) => {
   try {
     const us = await store.listar('usuario')
-    // O hash da senha nunca sai daqui, nem para o próprio administrador.
     res.json(us.map(({ senhaHash, ...u }) => ({ ...u, status: u.status || 'ativo' }))
       .sort((a, b) => String(a.nome).localeCompare(String(b.nome))))
   } catch (e) { next(e) }

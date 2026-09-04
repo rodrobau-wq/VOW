@@ -85,7 +85,7 @@ import { qrPath } from '/qr.js'
 const $ = (id) => document.getElementById(id)
 const ctx = await montarNav('/app/qr')
 // Só a VOW troca o destino; o resto da equipe vê o número e o código.
-const soLeitura = ctx.usuario.papel !== 'vow'
+const soLeitura = !['vow', 'deus'].includes(ctx.usuario.papel)
 if (soLeitura) { $('url').disabled = true; $('f').querySelector('button').disabled = true }
 
 const dia = (s) => new Date(s).toLocaleDateString('pt-BR')
