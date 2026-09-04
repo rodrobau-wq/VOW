@@ -275,10 +275,13 @@ app.get('/', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'landing.html
 // estande). O site completo — seções de produto, como funciona, rodapé —
 // continua inteiro aqui, e é para onde a navegação aponta.
 app.get('/site', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'site.html')))
-// O totem saiu do escopo: o lead entra só pela landing. Os protótipos do
-// Claude Design continuam no repositório como referência de design, em
-// docs/handoff-abras/prototipos/, fora do que é servido — eles usam a
-// paleta antiga e não podem aparecer como se fossem o produto.
+/**
+ * Protótipos do Claude Design, no Brandguide 2026. São a FONTE DA VERDADE
+ * do desenho: quando o produto e eles divergirem, quem está errado é o
+ * produto. Ficam servidos para poder ser comparados lado a lado.
+ */
+app.get('/abras', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'abras', 'abras.dc.html')))
+app.get('/plataforma', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'abras', 'plataforma.dc.html')))
 
 // O diagnóstico gratuito da landing. Mesma tela do protótipo do totem, mas
 // adaptada à web (responsiva, não 1080x1920) e ligada ao backend de verdade:

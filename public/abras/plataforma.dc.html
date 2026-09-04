@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="/abras/">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="/tokens.css" />
+<style>
+  body.paper a { color: var(--gold); }
+  body.paper a:hover { color: var(--ink); }
+  button, input, select, textarea { font-family: var(--sans); }
+  @keyframes vowUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+<script>document.addEventListener('DOMContentLoaded', function () { document.body.classList.add('paper') })</script>
+</helmet>
+
+<div data-screen-label="Plataforma" style="min-height: 100vh; background: var(--bg); color: var(--ink); font-family: var(--sans)">
+  <div class="appbar">
+    <a class="marca" href="#" onClick="{{ goPainel }}" style="text-decoration: none; color: inherit"><span class="caduceu"></span><span><span class="nome">VOW</span><span class="sob">Plataforma</span></span></a>
+    <nav class="abas">
+      <sc-for list="{{ abas }}" as="a" hint-placeholder-count="6">
+        <sc-if value="{{ a.sep }}" hint-placeholder-val="{{ false }}"><span class="sep" aria-hidden="true"></span></sc-if>
+        <a href="#" onClick="{{ a.go }}" class="{{ a.cls }}" title="{{ a.grupo }}">{{ a.rotulo }}</a>
+      </sc-for>
+    </nav>
+    <div class="sp"></div>
+    <button class="rede" type="button">Supermercados Horizonte · 14 lojas</button>
+    <div class="quem"><b>Renata Moura</b>CFO</div>
+    <button class="sair" type="button">Sair</button>
+  </div>
+
+  <div style="background: var(--gold-wash); border-bottom: 1px solid var(--line); padding: 8px 28px; font-size: 12.5px; color: var(--dim); display: flex; gap: 18px; flex-wrap: wrap; align-items: center">
+    <span><b style="font-weight: 500; color: var(--ink)">Dados de demonstração.</b> Premissas de alíquota, mix e classe de crédito pendentes de validação do time fiscal da VOW.</span>
+    <span style="color: var(--faint)">Consulta oficial de extinção do débito IBS/CBS: ainda não publicada · usando fontes públicas + evidência das notas</span>
+  </div>
+
+  <main class="app-main">
+
+    <!-- PAINEL -->
+    <sc-if value="{{ isPainel }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Painel" style="animation: vowUp .25s ease">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 24px">
+          <div><h1 style="font-size: 38px; margin-bottom: 4px">Supermercados Horizonte</h1><p style="color: var(--muted); font-size: 15px; margin: 0">O que precisa da sua atenção hoje. Quarta, 03 de setembro de 2026.</p></div>
+          <div style="font-size: 13.5px; color: var(--muted); text-align: right; line-height: 1.6">Desde ontem: <b style="color: var(--ink); font-weight: 500">{{ ontem.novas }}</b> exceções novas, <b style="color: var(--ink); font-weight: 500">{{ ontem.fechadas }}</b> fechadas.<br /><b style="color: var(--risk); font-weight: 500">{{ ontem.vencidas }} fora do prazo.</b></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 16px">
+          <sc-for list="{{ quatro }}" as="n" hint-placeholder-count="4">
+            <button onClick="{{ n.go }}" style="text-align: left; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; display: flex; flex-direction: column; color: var(--ink)" style-hover="border-color: var(--gold-edge)">
+              <div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">{{ n.rot }}</div>
+              <div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 32px; line-height: 1; margin: 12px 0 0; color: {{ n.cor }}">{{ n.v }}</div>
+              <div style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5; flex: 1">{{ n.pe }}</div>
+              <div style="margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line-2); font-size: 12px; color: var(--faint); line-height: 1.5">{{ n.falta }}</div>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.35fr .65fr; gap: 16px; align-items: start">
+          <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 20px 24px; border-bottom: 1px solid var(--line)"><h2 style="font-size: 24px">Fila de exceções</h2><span style="font-size: 13px; color: var(--muted)">{{ filaTotal }} abertas · fato, causa, ação</span></div>
+            <sc-for list="{{ fila }}" as="e" hint-placeholder-count="5">
+              <div style="padding: 18px 24px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 16px; align-items: start">
+                <div>
+                  <div style="font-weight: 500; font-size: 14.5px; line-height: 1.45">{{ e.fato }}</div>
+                  <div style="font-size: 13px; color: var(--muted); margin-top: 6px; line-height: 1.55"><b style="color: var(--dim); font-weight: 500">Causa:</b> {{ e.causa }}<br /><b style="color: var(--dim); font-weight: 500">Ação:</b> {{ e.acao }}</div>
+                  <div style="display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; font-size: 12px"><span style="padding: 3px 10px; border-radius: var(--r-pill); background: var(--bg-deep); color: var(--muted)">{{ e.origem }}</span><span style="padding: 3px 10px; border-radius: var(--r-pill); background: var(--bg-deep); color: var(--muted)">{{ e.responsavel }}</span><span style="padding: 3px 10px; border-radius: var(--r-pill); background: {{ e.prazoBg }}; color: {{ e.prazoFg }}">{{ e.prazoTxt }}</span></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px"><button onClick="{{ e.abrir }}" style="height: 34px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--line-2); background: transparent; color: var(--ink); font-size: 13px; cursor: pointer" style-hover="border-color: var(--gold-edge)">Abrir</button><button onClick="{{ e.fechar }}" style="height: 34px; padding: 0 14px; border-radius: var(--r-pill); border: 0; background: var(--ink); color: var(--surface); font-size: 13px; cursor: pointer">Fechar</button></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden">
+              <div style="padding: 20px 24px; border-bottom: 1px solid var(--line)"><h2 style="font-size: 24px">O que ainda falta</h2></div>
+              <div style="padding: 8px 24px 4px">
+                <div style="display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--dim)"><span>Fornecedores sem alíquota efetiva (Sistema 3)</span><b class="tnum" style="color: var(--ink); font-weight: 500">{{ falta.semAliq }}</b></div>
+                <div style="display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--dim)"><span>Fornecedores sem regime declarado</span><b class="tnum" style="color: var(--ink); font-weight: 500">{{ falta.semRegime }}</b></div>
+                <div style="display: flex; justify-content: space-between; gap: 14px; padding: 11px 0; font-size: 14px; color: var(--dim)"><span>Fornecedores pagos sem contrato</span><b class="tnum" style="color: var(--ink); font-weight: 500">{{ falta.semContrato }}</b></div>
+              </div>
+              <div style="padding: 0 24px 22px"><div class="rule"><p>A plataforma mostra o que já sabe e marca o que falta. Número estimado por cima não sustenta conversa com a indústria nem defesa em fiscalização.</p></div></div>
+            </div>
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 24px">
+              <div class="eyebrow" style="margin-bottom: 10px">Os seis momentos da operação</div>
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <sc-for list="{{ momentos }}" as="m" hint-placeholder-count="6"><button onClick="{{ m.go }}" style="display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center; text-align: left; background: transparent; border: 0; padding: 6px 0; cursor: pointer; color: var(--ink); font-size: 13.5px" style-hover="color: var(--gold)"><span class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 18px; color: var(--gold)">{{ m.n }}</span><span>{{ m.t }}</span><span style="font-size: 11.5px; color: var(--faint)">{{ m.sist }}</span></button></sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- CARTEIRA -->
+    <sc-if value="{{ isForn }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Carteira de fornecedores" style="animation: vowUp .25s ease">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 20px">
+          <div><h1 style="font-size: 34px; margin-bottom: 4px">Fornecedores</h1><p style="color: var(--muted); font-size: 15px; margin: 0">1.197 CNPJs · varredura de hoje 06:00 · duas perguntas por fornecedor: <b style="font-weight: 500; color: var(--ink)">o débito será extinto?</b> e <b style="font-weight: 500; color: var(--ink)">quanto volta como crédito?</b></p></div>
+          <div style="display: flex; gap: 8px"><button onClick="{{ goMapa }}" class="btn ghost" style="height: 40px">Mapa da carteira</button><button onClick="{{ goPortalDemo }}" class="btn" style="height: 40px">Pedir declaração de regime</button></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px">
+          <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px 22px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px">Eixo 1 · Risco (o débito será extinto?)</div><div style="display: flex; gap: 18px; flex-wrap: wrap"><sc-for list="{{ riscoResumo }}" as="r" hint-placeholder-count="3"><div style="display: flex; align-items: baseline; gap: 8px"><span class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 26px; color: {{ r.cor }}">{{ r.n }}</span><span style="font-size: 13px; color: var(--dim)">{{ r.rot }}</span></div></sc-for></div></div>
+          <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px 22px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px">Eixo 2 · Classe de crédito (quanto volta?)</div><div style="display: flex; gap: 18px; flex-wrap: wrap"><sc-for list="{{ classeResumo }}" as="c" hint-placeholder-count="4"><div style="display: flex; align-items: baseline; gap: 8px"><span class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 26px; color: var(--ink)">{{ c.n }}</span><span style="font-size: 13px; color: var(--dim)">{{ c.rot }}</span></div></sc-for></div></div>
+        </div>
+        <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap"><sc-for list="{{ fornFiltros }}" as="f" hint-placeholder-count="5"><button onClick="{{ f.pick }}" class="chip" aria-pressed="{{ f.on }}">{{ f.rotulo }}</button></sc-for></div>
+        <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden">
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1.1fr 1.1fr 1fr 1fr 0.9fr; gap: 12px; padding: 10px 22px; border-bottom: 1px solid var(--line); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted)"><div>Fornecedor</div><div>Categoria</div><div>Risco</div><div>Classe de crédito</div><div style="text-align: right">Compras 12 m</div><div style="text-align: right">Imposto embutido</div><div>Próx. pedido</div></div>
+          <sc-for list="{{ fornRows }}" as="f" hint-placeholder-count="10">
+            <button onClick="{{ f.abrir }}" style="display: grid; grid-template-columns: 2fr 1fr 1.1fr 1.1fr 1fr 1fr 0.9fr; gap: 12px; width: 100%; text-align: left; padding: 13px 22px; border: 0; border-bottom: 1px solid var(--line); background: transparent; cursor: pointer; font-size: 14px; color: var(--ink); align-items: center" style-hover="background: var(--raised)">
+              <div><div style="font-weight: 500">{{ f.nome }}</div><div class="tnum" style="font-size: 12px; color: var(--muted)">{{ f.cnpj }} · {{ f.regime }}</div></div>
+              <div style="color: var(--dim)">{{ f.categoria }}</div>
+              <div style="display: flex; align-items: center; gap: 7px"><span style="width: 9px; height: 9px; border-radius: 50%; background: {{ f.riscoCor }}; flex-shrink: 0"></span><span style="font-size: 13px">{{ f.riscoRot }}</span></div>
+              <div style="font-size: 13px"><span style="padding: 3px 10px; border-radius: var(--r-pill); border: 1px solid var(--line-2); color: var(--dim)">{{ f.classeRot }}</span></div>
+              <div class="tnum" style="text-align: right">{{ f.comprasF }}</div>
+              <div class="tnum" style="text-align: right; color: {{ f.expCor }}">{{ f.expF }}</div>
+              <div class="tnum" style="font-size: 13px; color: {{ f.pedCor }}">{{ f.pedF }}</div>
+            </button>
+          </sc-for>
+        </div>
+        <p class="fine" style="margin-top: 10px">Imposto embutido = compras × alíquota efetiva dos itens fornecidos (Sistema 3). Um fornecedor de cesta básica movimenta muito e carrega pouco crédito; a exposição é proporcional ao imposto, não ao volume. Onde a alíquota efetiva falta, o valor sai como “—”, nunca estimado por cima.</p>
+      </div>
+    </sc-if>
+
+    <!-- FICHA -->
+    <sc-if value="{{ isFicha }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Ficha do fornecedor" style="animation: vowUp .25s ease">
+        <button onClick="{{ goForn }}" style="background: none; border: 0; color: var(--muted); font-size: 13px; cursor: pointer; padding: 0; margin-bottom: 14px" style-hover="color: var(--ink)">← Carteira</button>
+        <div style="display: grid; grid-template-columns: 340px minmax(0,1fr); gap: 16px; align-items: start">
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px">
+              <div class="eyebrow" style="margin-bottom: 8px">{{ sup.categoria }} · {{ sup.cidade }}</div>
+              <h1 style="font-size: 28px; margin-bottom: 4px">{{ sup.nome }}</h1>
+              <div class="tnum" style="font-size: 13px; color: var(--muted)">{{ sup.cnpj }} · desde {{ sup.desde }}</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px">
+                <div style="border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px"><div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted)">Risco</div><div style="display: flex; align-items: center; gap: 7px; margin-top: 6px"><span style="width: 10px; height: 10px; border-radius: 50%; background: {{ sup.riscoCor }}"></span><b style="font-weight: 500">{{ sup.riscoRot }}</b></div></div>
+                <div style="border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px"><div style="font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted)">Classe de crédito</div><div style="margin-top: 6px"><b style="font-weight: 500">{{ sup.classeRot }}</b> <span style="font-size: 12px; color: var(--muted)">· {{ sup.aprovF }}</span></div></div>
+              </div>
+              <div style="margin-top: 14px; font-size: 13.5px; line-height: 1.55; color: var(--dim)">{{ sup.leitura }}</div>
+            </div>
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Score decomposto</div><span class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 26px; line-height: 1; color: {{ sup.scoreCor }}">{{ sup.score }}<span style="font-size: 14px; color: var(--faint)"> / 100</span></span></div>
+              <div style="display: flex; flex-direction: column; gap: 9px">
+                <sc-for list="{{ sup.dims }}" as="d" hint-placeholder-count="6"><div style="display: grid; grid-template-columns: 150px 1fr 34px; gap: 10px; align-items: center; font-size: 12.5px"><span style="color: var(--dim)">{{ d.rot }}</span><div style="height: 6px; background: var(--track); border-radius: 3px"><div style="height: 100%; width: {{ d.w }}; background: {{ d.cor }}; border-radius: 3px"></div></div><span class="tnum" style="text-align: right; color: var(--ink)">{{ d.v }}</span></div></sc-for>
+              </div>
+              <p class="fine" style="margin: 12px 0 0">Pesos calibrados pela VOW. O score existe para o comprador justificar a decisão ao fornecedor, não para substituí-la.</p>
+            </div>
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 24px">
+              <div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px">Decisão · pedido de {{ sup.pedidoValorF }} em {{ sup.pedF }}</div>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <button onClick="{{ sup.bloquear }}" style="text-align: left; cursor: pointer; border: 1px solid var(--line-2); border-radius: var(--r-sm); background: transparent; padding: 12px 14px; color: var(--ink)" style-hover="border-color: var(--risk)"><div style="font-weight: 500; font-size: 14px">Sugerir bloqueio</div><div style="font-size: 12.5px; color: var(--muted); margin-top: 2px">Ruptura em {{ sup.cobertura }} · {{ sup.altsN }} alternativas homologadas · vai à Controladoria</div></button>
+                <button onClick="{{ sup.rad }}" style="text-align: left; cursor: pointer; border: 1px solid var(--line-2); border-radius: var(--r-sm); background: transparent; padding: 12px 14px; color: var(--ink)" style-hover="border-color: var(--gold)"><div style="font-weight: 500; font-size: 14px">Liberar sob RAD</div><div style="font-size: 12.5px; color: var(--muted); margin-top: 2px">A Horizonte recolhe {{ sup.radF }} e garante o crédito · desembolso antecipado</div></button>
+                <button onClick="{{ sup.excecao }}" style="text-align: left; cursor: pointer; border: 1px solid var(--line-2); border-radius: var(--r-sm); background: transparent; padding: 12px 14px; color: var(--ink)" style-hover="border-color: var(--gold)"><div style="font-weight: 500; font-size: 14px">Liberar com exceção</div><div style="font-size: 12.5px; color: var(--muted); margin-top: 2px">Registrada na fila com responsável e prazo · alçada Fiscal</div></button>
+              </div>
+              <sc-if value="{{ sup.decisao }}" hint-placeholder-val="{{ false }}"><div style="margin-top: 12px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--gold-wash); font-size: 13px; color: var(--dim)">Registrado: <b style="font-weight: 500; color: var(--ink)">{{ sup.decisao }}</b> · na trilha de auditoria</div></sc-if>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px">
+              <sc-for list="{{ sup.blocos }}" as="b" hint-placeholder-count="6">
+                <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px 20px">
+                  <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 10px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">{{ b.n }} · {{ b.t }}</div><span style="font-size: 11.5px; padding: 2px 9px; border-radius: var(--r-pill); background: {{ b.tagBg }}; color: {{ b.tagFg }}">{{ b.tag }}</span></div>
+                  <div style="display: flex; flex-direction: column; gap: 6px"><sc-for list="{{ b.linhas }}" as="l" hint-placeholder-count="3"><div style="display: grid; grid-template-columns: 1fr auto; gap: 12px; font-size: 13px; line-height: 1.45"><span style="color: var(--dim)">{{ l.k }}</span><b class="tnum" style="font-weight: 500; text-align: right; color: {{ l.cor }}">{{ l.v }}</b></div></sc-for></div>
+                  <sc-if value="{{ b.nota }}" hint-placeholder-val="{{ false }}"><div style="font-size: 12px; color: var(--faint); margin-top: 10px; line-height: 1.5">{{ b.nota }}</div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px 20px">
+              <div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px">7 · Sinais compostos — o que só aparece no cruzamento</div>
+              <div style="display: flex; flex-direction: column; gap: 8px"><sc-for list="{{ sup.sinais }}" as="s" hint-placeholder-count="3"><div style="display: grid; grid-template-columns: 8px 1fr; gap: 12px; align-items: start; font-size: 13.5px; line-height: 1.5"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{ s.cor }}; margin-top: 6px"></span><span><b style="font-weight: 500">{{ s.t }}</b> — {{ s.d }}</span></div></sc-for></div>
+            </div>
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden">
+              <div style="padding: 14px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Histórico de verificações</div><span class="fine">log imutável · retenção 5 anos + 1 dia</span></div>
+              <sc-for list="{{ sup.hist }}" as="h" hint-placeholder-count="5"><div style="display: grid; grid-template-columns: 110px 1fr auto; gap: 14px; padding: 10px 20px; border-bottom: 1px solid var(--line); font-size: 13px; align-items: baseline"><span class="tnum" style="color: var(--muted); font-family: var(--mono); font-size: 12px">{{ h.ts }}</span><span>{{ h.o }}</span><span style="font-size: 12px; color: var(--faint)">{{ h.fonte }}</span></div></sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- MAPA -->
+    <sc-if value="{{ isMapa }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Mapa da carteira" style="animation: vowUp .25s ease">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 20px">
+          <div><h1 style="font-size: 34px; margin-bottom: 4px">Mapa da carteira</h1><p style="color: var(--muted); font-size: 15px; margin: 0; max-width: 60em">Risco no eixo vertical, classe de crédito no horizontal. O tamanho é a exposição de imposto em reais (compras × alíquota efetiva × aproveitamento), não o volume de compra. A lista que sai daqui costuma ser diferente da curva ABC — essa é a novidade.</p></div>
+          <button onClick="{{ goForn }}" class="btn ghost" style="height: 40px">Ver como lista</button>
+        </div>
+        <div style="display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 16px; align-items: start">
+          <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px 24px 18px">
+            <div style="display: grid; grid-template-columns: 96px repeat(3, 1fr); gap: 8px">
+              <div></div>
+              <sc-for list="{{ mapaCols }}" as="c" hint-placeholder-count="3"><div style="text-align: center; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding-bottom: 4px">{{ c }}</div></sc-for>
+              <sc-for list="{{ mapaLinhas }}" as="l" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--dim)"><span style="width: 9px; height: 9px; border-radius: 50%; background: {{ l.cor }}"></span>{{ l.rot }}</div>
+                <sc-for list="{{ l.celulas }}" as="cel" hint-placeholder-count="3">
+                  <div style="min-height: 150px; border: 1px solid var(--line); border-radius: var(--r-sm); background: {{ cel.bg }}; padding: 10px; position: relative">
+                    <div style="font-size: 10.5px; color: var(--faint); margin-bottom: 6px">{{ cel.orient }}</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end">
+                      <sc-for list="{{ cel.bolhas }}" as="b" hint-placeholder-count="2"><button onClick="{{ b.abrir }}" title="{{ b.title }}" style="width: {{ b.d }}; height: {{ b.d }}; border-radius: 50%; border: 1.5px solid {{ b.borda }}; background: {{ b.fill }}; cursor: pointer; display: grid; place-items: center; font-size: 11px; color: var(--ink); font-weight: 500; padding: 0; overflow: hidden" style-hover="border-color: var(--ink)">{{ b.ini }}</button></sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </sc-for>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 14px; font-size: 12px; color: var(--faint)"><span>← menos crédito volta</span><span>Classe de crédito</span><span>mais crédito volta →</span></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 14px">
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px 20px">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Ranking · {{ rankTitulo }}</div><div style="display: flex; gap: 4px"><sc-for list="{{ rankModos }}" as="m" hint-placeholder-count="3"><button onClick="{{ m.pick }}" class="chip" aria-pressed="{{ m.on }}" style="height: 28px; padding: 0 10px; font-size: 12px">{{ m.rotulo }}</button></sc-for></div></div>
+              <sc-for list="{{ ranking }}" as="r" hint-placeholder-count="5"><div style="display: grid; grid-template-columns: 18px 1fr auto auto; gap: 10px; border-bottom: 1px solid var(--line); padding: 9px 0; font-size: 13.5px; align-items: center"><span class="tnum" style="color: var(--faint)">{{ r.n }}</span><button onClick="{{ r.abrir }}" style="text-align: left; background: transparent; border: 0; padding: 0; cursor: pointer; color: var(--ink); font: inherit" style-hover="color: var(--gold)"><div style="font-weight: 500">{{ r.nome }}</div><div style="font-size: 11.5px; color: var(--muted)">{{ r.riscoRot }} · {{ r.classeRot }}</div></button><span class="tnum" style="color: {{ r.cor }}">{{ r.valorF }}</span><button onClick="{{ r.fca }}" title="{{ r.fcaTitle }}" style="height: 26px; padding: 0 9px; border-radius: var(--r-pill); border: 1px solid {{ r.fcaBorda }}; background: {{ r.fcaBg }}; color: {{ r.fcaFg }}; font-size: 11.5px; cursor: pointer; white-space: nowrap">{{ r.fcaRot }}</button></div></sc-for>
+              <p class="fine" style="margin: 10px 0 0">{{ rankNota }} Abrir FCA cria a exceção na fila do Painel: fato, causa e ação preenchidos, responsável e prazo sugeridos.</p>
+            </div>
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 18px 20px">
+              <div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px">Janela do Simples · fecha 30/09</div>
+              <div style="display: flex; flex-direction: column; gap: 6px; font-size: 13.5px"><div style="display: flex; justify-content: space-between"><span style="color: var(--dim)">Optaram pelo regime regular</span><b class="tnum" style="font-weight: 500">{{ janela.optou }}</b></div><div style="display: flex; justify-content: space-between"><span style="color: var(--dim)">Ficam na guia única</span><b class="tnum" style="font-weight: 500">{{ janela.nao }}</b></div><div style="display: flex; justify-content: space-between"><span style="color: var(--dim)">Ainda não responderam</span><b class="tnum" style="font-weight: 500; color: var(--risk)">{{ janela.falta }}</b></div></div>
+              <button onClick="{{ goPortalDemo }}" class="btn" style="height: 38px; width: 100%; margin-top: 12px; font-size: 14px">Cobrar declaração pelo portal</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- CONTRATOS -->
+    <sc-if value="{{ isCont }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Contratos" style="animation: vowUp .25s ease">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 16px">
+          <div><h1 style="font-size: 34px; margin-bottom: 4px">Contratos</h1><p style="color: var(--muted); font-size: 15px; margin: 0">Meus contratos sustentam o crédito que estou tomando? Cobertura primeiro; depois serviços, depois o acordo com a indústria.</p></div>
+        </div>
+        <div style="display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap"><sc-for list="{{ contAbas }}" as="t" hint-placeholder-count="4"><button onClick="{{ t.pick }}" class="chip" aria-pressed="{{ t.on }}">{{ t.rotulo }}</button></sc-for></div>
+
+        <sc-if value="{{ contCob }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 14px; margin-bottom: 16px">
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px 24px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Cobertura contratual</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 32px; line-height: 1; margin-top: 12px">{{ cob.pct }}</div><div style="height: 6px; background: var(--track); border-radius: 3px; margin-top: 12px"><div style="height: 100%; width: {{ cob.pct }}; background: var(--gold); border-radius: 3px"></div></div><div style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5">do valor pago em 12 meses tem contrato vigente vinculado ao CNPJ. Denominador: quem recebeu dinheiro, não quem está cadastrado.</div></div>
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px 24px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Pago sem contrato</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 32px; line-height: 1; margin-top: 12px; color: var(--risk)">{{ cob.semF }}</div><div style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5">{{ cob.semN }} CNPJs · crédito sem sustentação e verba sem natureza declarada. Primeiro cruzamento que uma fiscalização faz.</div></div>
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px 24px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Gate de pagamento</div><div style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 32px; line-height: 1; margin-top: 12px">Alerta</div><div style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5">Dia 19 de 30 em modo alerta. Trava no ERP em 15/10: nenhum título pago sem contrato vinculado e fornecedor fora do vermelho.</div></div>
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px 24px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Fora do motor</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 32px; line-height: 1; margin-top: 12px; color: var(--muted)">{{ cob.fin }}</div><div style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5">Financeiros (empréstimo, FIDC, adquirência, seguros): regime específico da LC 214. Inventariados; vão à consultoria.</div></div>
+            </div>
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden">
+              <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.1fr 1.1fr 0.9fr auto; gap: 12px; padding: 10px 22px; border-bottom: 1px solid var(--line); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted)"><div>Favorecido pago sem contrato</div><div>Natureza provável</div><div>Risco · crédito</div><div style="text-align: right">Pago 12 m</div><div>Títulos</div><div></div></div>
+              <sc-for list="{{ cobRows }}" as="p" hint-placeholder-count="7">
+                <div style="display: grid; grid-template-columns: 2fr 1.2fr 1.1fr 1.1fr 0.9fr auto; gap: 12px; padding: 13px 22px; border-bottom: 1px solid var(--line); font-size: 14px; align-items: center; opacity: {{ p.op }}">
+                  <div><div style="font-weight: 500">{{ p.nome }}</div><div class="tnum" style="font-size: 12px; color: var(--muted)">{{ p.cnpj }} · {{ p.regime }}</div></div>
+                  <div style="color: var(--dim); font-size: 13.5px">{{ p.natureza }}</div>
+                  <div style="font-size: 12.5px; color: var(--dim)"><span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{ p.riscoCor }}"></span>{{ p.riscoRot }}</span> · {{ p.classeRot }}</div>
+                  <div class="tnum" style="text-align: right; font-weight: 500">{{ p.valorF }}</div>
+                  <div class="tnum" style="color: var(--muted)">{{ p.titulos }}</div>
+                  <div style="display: flex; gap: 6px; justify-content: flex-end"><sc-if value="{{ p.aberto }}" hint-placeholder-val="{{ true }}"><button onClick="{{ p.agir }}" style="height: 32px; padding: 0 14px; border-radius: var(--r-pill); border: 0; background: var(--ink); color: var(--surface); font-size: 12.5px; cursor: pointer; white-space: nowrap">{{ p.agirRot }}</button></sc-if><sc-if value="{{ p.feito }}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: var(--muted)">{{ p.feitoRot }}</span></sc-if></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ contServ }}" hint-placeholder-val="{{ false }}">
+          <div style="display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 16px; align-items: start">
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden">
+              <div style="padding: 18px 22px; border-bottom: 1px solid var(--line)"><h2 style="font-size: 22px">Serviços e indiretos · sete famílias</h2><p style="font-size: 13.5px; color: var(--muted); margin: 6px 0 0; line-height: 1.5">A pergunta é a oposta da verba: quanto de cada real pago volta como crédito. Depende do regime do prestador e da extinção do débito dele. Duas propostas com o mesmo preço deixaram de ser a mesma proposta.</p></div>
+              <div style="display: grid; grid-template-columns: 1.4fr 1fr 0.9fr 0.9fr 1fr 1fr; gap: 12px; padding: 10px 22px; border-bottom: 1px solid var(--line); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted)"><div>Família</div><div style="text-align: right">Gasto 12 m</div><div style="text-align: right">Crédito hoje</div><div style="text-align: right">Crédito 2027</div><div>Contratos</div><div>Pendência</div></div>
+              <sc-for list="{{ familias }}" as="f" hint-placeholder-count="7">
+                <div style="display: grid; grid-template-columns: 1.4fr 1fr 0.9fr 0.9fr 1fr 1fr; gap: 12px; padding: 12px 22px; border-bottom: 1px solid var(--line); font-size: 13.5px; align-items: center">
+                  <div><div style="font-weight: 500">{{ f.nome }}</div><div style="font-size: 12px; color: var(--muted)">{{ f.ex }}</div></div>
+                  <div class="tnum" style="text-align: right">{{ f.gastoF }}</div>
+                  <div class="tnum" style="text-align: right; color: var(--muted)">{{ f.hoje }}</div>
+                  <div class="tnum" style="text-align: right; color: {{ f.credCor }}">{{ f.cred }}</div>
+                  <div style="font-size: 12.5px; color: var(--dim)">{{ f.contratos }}</div>
+                  <div style="font-size: 12.5px; color: {{ f.pendCor }}">{{ f.pend }}</div>
+                </div>
+              </sc-for>
+              <div style="padding: 14px 22px"><div class="rule"><p>Comparar propostas pela fração de crédito engana: sobre o mesmo líquido ao prestador, a vantagem do crédito integral sobre a guia única é de ~2%. O comparador usa custo líquido, não a tabela de classes.</p></div></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 14px">
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 22px">
+                <div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px">Cotação · custo líquido de crédito</div>
+                <div style="font-size: 13px; color: var(--dim); margin-bottom: 12px">RFP-031 · Frete dedicado CD → 14 lojas · 12 meses</div>
+                <sc-for list="{{ propostas }}" as="p" hint-placeholder-count="3"><div style="border: 1px solid {{ p.borda }}; border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 8px; background: {{ p.bg }}"><div style="display: flex; justify-content: space-between; align-items: baseline"><b style="font-weight: 500; font-size: 14px">{{ p.nome }}</b><span style="font-size: 11.5px; color: var(--muted)">{{ p.regime }}</span></div><div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px; font-size: 12px"><div><div style="color: var(--faint)">Bruto</div><div class="tnum">{{ p.bruto }}</div></div><div><div style="color: var(--faint)">Crédito</div><div class="tnum" style="color: var(--ok)">− {{ p.cred }}</div></div><div><div style="color: var(--faint)">Líquido</div><div class="tnum" style="font-weight: 500">{{ p.liq }}</div></div></div><div style="font-size: 12px; color: {{ p.rankCor }}; margin-top: 6px">{{ p.rank }}</div></div></sc-for>
+                <button onClick="{{ contratarVencedor }}" class="btn" style="height: 38px; width: 100%; font-size: 14px; margin-top: 4px">Gerar minuta para o melhor líquido</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ contVerbas }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 14px; margin-bottom: 16px">
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 22px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Verba total 12 m</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 26px; line-height: 1; margin-top: 10px">{{ vb.totalF }}</div><div style="font-size: 12.5px; color: var(--muted); margin-top: 8px">{{ vb.pctFat }} do faturamento · 12 famílias</div></div>
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 22px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Passa a ser tributada</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 26px; line-height: 1; margin-top: 10px; color: var(--risk)">{{ vb.tribF }}</div><div style="font-size: 12.5px; color: var(--muted); margin-top: 8px">{{ vb.tribPct }} da verba · mix da Horizonte</div></div>
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 22px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Recomposição a negociar</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 26px; line-height: 1; margin-top: 10px; color: var(--gold)">{{ vb.recompF }}</div><div style="font-size: 12.5px; color: var(--muted); margin-top: 8px">custo zero para a indústria: ela credita integral</div></div>
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 22px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Perda se não recompor</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 26px; line-height: 1; margin-top: 10px; color: var(--risk)">{{ vb.perdaF }}</div><div style="font-size: 12.5px; color: var(--muted); margin-top: 8px">{{ vb.perdaLucro }} do lucro anual (margem 2%)</div></div>
+            </div>
+            <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden">
+              <div style="padding: 18px 22px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap"><div><h2 style="font-size: 22px">Matriz de tratamento por linha do acordo</h2><p style="font-size: 13.5px; color: var(--muted); margin: 6px 0 0">Classificar antes de renegociar. A classificação é da VOW; a decisão é do cliente. Levar ao JBP 2027.</p></div><span class="fine">contrato é o guarda-chuva · verba é o evento financeiro</span></div>
+              <div style="display: grid; grid-template-columns: 1.1fr 1fr 1.1fr 0.8fr 1fr 1.2fr 1.1fr; gap: 12px; padding: 10px 22px; border-bottom: 1px solid var(--line); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted)"><div>Linha</div><div style="text-align: right">Valor 12 m</div><div>Natureza</div><div>Tributa</div><div>Contrato</div><div>Ação</div><div>Decisão</div></div>
+              <sc-for list="{{ matriz }}" as="m" hint-placeholder-count="10">
+                <div style="display: grid; grid-template-columns: 1.1fr 1fr 1.1fr 0.8fr 1fr 1.2fr 1.1fr; gap: 12px; padding: 12px 22px; border-bottom: 1px solid var(--line); font-size: 13.5px; align-items: center">
+                  <div><div style="font-weight: 500">{{ m.nome }}</div><div style="font-size: 12px; color: var(--muted)">{{ m.hoje }}</div></div>
+                  <div class="tnum" style="text-align: right">{{ m.valorF }}</div>
+                  <div style="color: var(--dim); font-size: 13px">{{ m.natureza }}</div>
+                  <div style="font-size: 13px; color: {{ m.tribCor }}; font-weight: 500">{{ m.trib }}</div>
+                  <div style="font-size: 12.5px; color: {{ m.contCor }}">{{ m.contrato }}</div>
+                  <div style="font-size: 13px; color: var(--dim)">{{ m.acao }}</div>
+                  <div><select value="{{ m.dec }}" onChange="{{ m.onDec }}" style="width: 100%; height: 32px; border: 1px solid var(--line-2); border-radius: var(--r-sm); background: var(--raised); color: var(--ink); font-size: 12.5px; padding: 0 8px"><option value="">Decidir…</option><option value="Preservar">Preservar</option><option value="Migrar p/ desconto na nota">Migrar p/ desconto na nota</option><option value="Recompor">Recompor</option><option value="Documentar">Documentar</option></select></div>
+                </div>
+              </sc-for>
+              <div style="padding: 14px 22px; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap"><span style="font-size: 13px; color: var(--muted)">{{ vb.decididas }} de {{ vb.linhas }} linhas com decisão · Fiscal, Jurídico e Comercial validam em paralelo</span><button onClick="{{ gerarJBP }}" class="btn" style="height: 40px">Gerar cláusulas para o acordo 2027</button></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ contAprov }}" hint-placeholder-val="{{ false }}">
+          <div style="max-width: 900px">
+            <p style="font-size: 14px; color: var(--muted); margin: 0 0 14px; line-height: 1.55">Fiscal e Jurídico em paralelo, cada um vendo as cláusulas da sua área. Ressalva volta ao comprador com a cláusula apontada; duas aprovações liberam a assinatura no assinador de mercado sob marca VOW. Assinado, o contrato vai ao ERP vinculado ao CNPJ.</p>
+            <sc-for list="{{ aprov }}" as="a" hint-placeholder-count="3">
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 20px 22px; margin-bottom: 12px">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 12px"><div><div style="font-weight: 500; font-size: 16px">{{ a.numero }} · {{ a.objeto }}</div><div style="font-size: 13px; color: var(--muted); margin-top: 2px">{{ a.forn }} · {{ a.tipo }} · score {{ a.score }}</div></div><span style="font-size: 12px; padding: 3px 10px; border-radius: var(--r-pill); border: 1px solid var(--line-2); color: var(--dim); white-space: nowrap">{{ a.status }}</span></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                  <div style="border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13.5px"><span>Fiscal · <b style="font-weight: 500">{{ a.fis }}</b></span><sc-if value="{{ a.fisOpen }}" hint-placeholder-val="{{ true }}"><button onClick="{{ a.okFis }}" style="height: 30px; padding: 0 12px; border-radius: var(--r-pill); border: 0; background: var(--ink); color: var(--surface); font-size: 12.5px; cursor: pointer">Aprovar</button></sc-if></div>
+                  <div style="border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; font-size: 13.5px"><span>Jurídico · <b style="font-weight: 500">{{ a.jur }}</b></span><sc-if value="{{ a.jurOpen }}" hint-placeholder-val="{{ true }}"><button onClick="{{ a.okJur }}" style="height: 30px; padding: 0 12px; border-radius: var(--r-pill); border: 0; background: var(--ink); color: var(--surface); font-size: 12.5px; cursor: pointer">Aprovar</button></sc-if></div>
+                </div>
+                <sc-if value="{{ a.pronto }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.assinar }}" class="btn" style="height: 38px; margin-top: 12px; font-size: 14px">Enviar para assinatura eletrônica</button></sc-if>
+                <sc-if value="{{ a.assinado }}" hint-placeholder-val="{{ false }}"><div style="margin-top: 12px; font-size: 13.5px; color: var(--ok); font-weight: 500">Assinado pelas partes · vigente · vinculado ao CNPJ no ERP</div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ITENS -->
+    <sc-if value="{{ isItens }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Itens" style="animation: vowUp .25s ease">
+        <div style="margin-bottom: 20px"><h1 style="font-size: 34px; margin-bottom: 4px">Itens</h1><p style="color: var(--muted); font-size: 15px; margin: 0; max-width: 60em">Qual a alíquota certa de cada produto? É esta resposta que alimenta o crédito em risco (Fornecedores) e o valor de cada contrato. Alíquota cheia sobre tudo produz número falso.</p></div>
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 14px; margin-bottom: 16px">
+          <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px 24px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Itens saneados</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 32px; line-height: 1; margin-top: 12px">61%</div><div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 12px"><div style="width: 61%; background: var(--ok)"></div><div style="width: 27%; background: var(--risk)"></div><div style="width: 12%; background: var(--track)"></div></div><div style="font-size: 12.5px; color: var(--muted); margin-top: 8px">61% conferem · 27% divergem · 12% peso variável (curadoria VOW)</div></div>
+          <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px 24px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Itens divergentes</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 32px; line-height: 1; margin-top: 12px; color: var(--risk)">2.116</div><div style="font-size: 12.5px; color: var(--muted); margin-top: 10px">NCM, CST ou cClassTrib fora da base mestre</div></div>
+          <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px 24px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Identificado nos divergentes</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 32px; line-height: 1; margin-top: 12px">R$ 291 mil<span style="font-size: 16px; color: var(--faint)">/mês</span></div><div style="font-size: 12.5px; color: var(--muted); margin-top: 10px">base: vendas de 12 meses × alíquota certa · vale a partir de 2027</div></div>
+          <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px 24px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted)">Cesta básica no faturamento</div><div class="tnum" style="font-family: var(--sans); font-weight: 700; letter-spacing: 0; white-space: nowrap; font-size: 32px; line-height: 1; margin-top: 12px">42%</div><div style="font-size: 12.5px; color: var(--muted); margin-top: 10px">a alíquota zero: origem do saldo credor estrutural</div></div>
+        </div>
+        <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden">
+          <div style="padding: 16px 22px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: baseline"><h2 style="font-size: 22px">Fila de correção · por impacto</h2><span class="fine">confiança abaixo de 95% vai à curadoria humana</span></div>
+          <div style="display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr 0.9fr 0.6fr auto; gap: 12px; padding: 10px 22px; border-bottom: 1px solid var(--line); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted)"><div>Item</div><div>cClassTrib atual → certo</div><div>Alíquota atual → certa</div><div style="text-align: right">Impacto / mês</div><div>Embasamento</div><div>Conf.</div><div></div></div>
+          <sc-for list="{{ itens }}" as="i" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr 0.9fr 0.6fr auto; gap: 12px; padding: 12px 22px; border-bottom: 1px solid var(--line); font-size: 13.5px; align-items: center; opacity: {{ i.op }}">
+              <div><div style="font-weight: 500">{{ i.desc }}</div><div class="tnum" style="font-size: 12px; color: var(--muted)">SKU {{ i.sku }} · {{ i.forn }}</div></div>
+              <div class="tnum" style="font-family: var(--mono); font-size: 12.5px; color: var(--dim)">{{ i.ctA }} → <b style="color: var(--ink); font-weight: 500">{{ i.ctS }}</b></div>
+              <div class="tnum" style="font-size: 13px; color: var(--dim)">{{ i.alA }} → <b style="color: var(--ink); font-weight: 500">{{ i.alS }}</b></div>
+              <div class="tnum" style="text-align: right; font-weight: 500; color: var(--gold)">{{ i.impF }}</div>
+              <div style="font-size: 12px; color: var(--muted)">{{ i.base }}</div>
+              <div class="tnum" style="font-size: 13px; color: {{ i.confCor }}">{{ i.conf }}</div>
+              <div style="display: flex; justify-content: flex-end"><sc-if value="{{ i.aberto }}" hint-placeholder-val="{{ true }}"><button onClick="{{ i.aprovar }}" style="height: 30px; padding: 0 12px; border-radius: var(--r-pill); border: 0; background: var(--ink); color: var(--surface); font-size: 12.5px; cursor: pointer">{{ i.acaoRot }}</button></sc-if><sc-if value="{{ i.feito }}" hint-placeholder-val="{{ false }}"><span style="font-size: 12.5px; color: var(--muted)">{{ i.feitoRot }}</span></sc-if></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- PORTAL DO FORNECEDOR -->
+    <sc-if value="{{ isPortal }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Portal do fornecedor" style="animation: vowUp .25s ease">
+        <div style="display: grid; grid-template-columns: minmax(0,1fr) 400px; gap: 32px; align-items: start">
+          <div>
+            <h1 style="font-size: 34px; margin-bottom: 8px">Portal do fornecedor · <em style="color: var(--gold)">/f/:token</em></h1>
+            <p style="color: var(--muted); font-size: 15px; line-height: 1.6; max-width: 46em">A única tela externa do SaaS. Sem login: o link chega por e-mail ou WhatsApp com token de uso único. Feita para o celular de um vendedor de câmara fria, em sinal ruim: texto, três toques, sem imagem, sem script pesado. Funciona com a página parcialmente carregada.</p>
+            <div class="rule" style="margin: 18px 0"><p><b style="font-weight: 500; color: var(--ink)">Por que existe.</b> A opção do Simples pelo regime regular de IBS/CBS não é consultável por terceiros. Só quem fez a opção pode declarar, com data. A plataforma guarda, carimba e revalida nas janelas de março e setembro. A partir de 2027 a nota confirma sozinha: quem optou destaca por fora.</p></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px">O que o fornecedor vê</div><div style="font-size: 13.5px; line-height: 1.6; color: var(--dim)">Quem está pedindo (a rede), o motivo, o prazo, a pendência em uma frase. Nunca o score nem o valor comprado.</div></div>
+              <div style="background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px"><div style="font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px">O que a plataforma guarda</div><div style="font-size: 13.5px; line-height: 1.6; color: var(--dim)">Regime declarado, data, IP, comprovante (PDF ou foto), validade até a próxima janela. Registro append-only na coleção <code style="font-family: var(--mono); font-size: 12px">verificacao</code>.</div></div>
+            </div>
+            <div style="margin-top: 18px; display: flex; gap: 8px"><button onClick="{{ portalReset }}" class="btn ghost" style="height: 38px">Reiniciar demonstração</button><button onClick="{{ goForn }}" class="btn ghost" style="height: 38px">← Voltar à carteira</button></div>
+          </div>
+          <div style="width: 390px; background: #e8e8e8; border: 1px solid var(--line-2); border-radius: 28px; padding: 14px 12px 18px; box-sizing: border-box; color: #000000; font-size: 16px">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #707070; padding: 0 10px 10px"><span>14:32</span><span>▂▄ · 3G</span></div>
+            <div style="padding: 6px 10px 14px; border-bottom: 1px solid rgba(0,0,0,.12); display: flex; align-items: center; gap: 10px"><span style="width: 30px; height: 30px; border: 1px solid rgba(0,0,0,.32); border-radius: 9px; display: grid; place-items: center; font-family: var(--sans); font-weight: 700; letter-spacing: 0; color: #3d3d3d">V</span><div><div style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #3d3d3d">A pedido de</div><div style="font-weight: 500; font-size: 15px">Supermercados Horizonte</div></div></div>
+            <sc-if value="{{ pStep1 }}" hint-placeholder-val="{{ true }}">
+              <div style="padding: 18px 10px 0">
+                <div style="font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #707070; margin-bottom: 6px">Frigorífico Vale Verde · 22.871.409/0001-15</div>
+                <h2 style="font-size: 28px; line-height: 1.1; margin-bottom: 10px">Qual é o seu regime de IBS/CBS para 2027?</h2>
+                <p style="font-size: 14.5px; line-height: 1.55; color: #3d3d3d; margin: 0 0 16px">A Horizonte precisa saber quanto do imposto da sua nota volta como crédito. Essa informação não é pública; só você pode declarar. Leva um minuto.</p>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <sc-for list="{{ regimes }}" as="r" hint-placeholder-count="5"><button onClick="{{ r.pick }}" style="text-align: left; cursor: pointer; min-height: 56px; padding: 12px 14px; border-radius: 4px; border: 1.5px solid {{ r.borda }}; background: {{ r.bg }}; color: #000000; display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: center"><span style="width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid {{ r.borda }}; background: {{ r.dot }}; display: block"></span><span><div style="font-weight: 500; font-size: 15px">{{ r.rot }}</div><div style="font-size: 12.5px; color: #707070; line-height: 1.4">{{ r.sub }}</div></span></button></sc-for>
+                </div>
+                <button onClick="{{ pNext }}" style="width: 100%; height: 56px; margin-top: 16px; border: 0; border-radius: 4px; background: {{ pNextBg }}; color: #FFFFFF; font-size: 16px; font-weight: 500; cursor: pointer">Continuar</button>
+                <p style="font-size: 11.5px; color: #707070; line-height: 1.5; margin: 12px 0 0">Seus dados são usados apenas para a apuração de crédito da Horizonte. Você pode pedir exclusão a qualquer momento. LGPD.</p>
+              </div>
+            </sc-if>
+            <sc-if value="{{ pStep2 }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 18px 10px 0">
+                <div style="font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #707070; margin-bottom: 6px">Passo 2 de 2</div>
+                <h2 style="font-size: 28px; line-height: 1.1; margin-bottom: 10px">Comprove e confirme</h2>
+                <p style="font-size: 14.5px; line-height: 1.55; color: #3d3d3d; margin: 0 0 14px">Você declarou <b style="font-weight: 500">{{ pRegimeRot }}</b>. Anexe o comprovante do Portal da Receita, ou envie depois pelo mesmo link.</p>
+                <button onClick="{{ pAnexar }}" style="width: 100%; min-height: 72px; border: 1.5px dashed rgba(0,0,0,.3); border-radius: 4px; background: transparent; color: #000000; font-size: 14.5px; cursor: pointer; padding: 12px">{{ pAnexoRot }}</button>
+                <div style="margin-top: 14px; padding: 12px 14px; border-radius: 4px; background: rgba(0,0,0,.08); font-size: 13px; line-height: 1.5; color: #3d3d3d">Também há uma pendência: <b style="font-weight: 500">CND federal positiva desde 14/08</b>. Regularize até 10/09 para manter os pedidos liberados. Precisa de ajuda? <a href="#" style="color: #3d3d3d">Falar com a consultoria VOW</a>.</div>
+                <button onClick="{{ pEnviar }}" style="width: 100%; height: 56px; margin-top: 14px; border: 0; border-radius: 4px; background: #000000; color: #FFFFFF; font-size: 16px; font-weight: 500; cursor: pointer">Declarar e enviar</button>
+                <button onClick="{{ pBack }}" style="width: 100%; height: 44px; margin-top: 6px; border: 0; background: transparent; color: #707070; font-size: 14px; cursor: pointer">← Voltar</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ pStep3 }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 28px 10px 10px; text-align: center">
+                <div style="width: 56px; height: 56px; border-radius: 50%; border: 2px solid #2f6b45; color: #2f6b45; display: grid; place-items: center; margin: 0 auto 16px; font-size: 24px">✓</div>
+                <h2 style="font-size: 28px; line-height: 1.1; margin-bottom: 10px">Declaração registrada</h2>
+                <p style="font-size: 14.5px; line-height: 1.55; color: #3d3d3d; margin: 0 0 14px">Regime <b style="font-weight: 500">{{ pRegimeRot }}</b>, em 03/09/2026 às 14:33. Válida até a próxima janela, em <b style="font-weight: 500">março de 2027</b>; você receberá um lembrete por este mesmo canal.</p>
+                <div style="text-align: left; padding: 12px 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,.12); font-size: 13px; line-height: 1.55; color: #3d3d3d"><b style="font-weight: 500">O que a Horizonte vê a partir de agora:</b> classe de crédito {{ pClasseRot }}, declarada por você, com data. O comprovante confirma; a nota de 2027 valida.</div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}"><div style="position: fixed; right: 24px; bottom: 24px; background: var(--ink); color: var(--surface); padding: 12px 16px; border-radius: var(--r-md); font-size: 13.5px; border-left: 3px solid var(--gold); z-index: 60; max-width: 420px; line-height: 1.45; animation: vowUp .2s ease">{{ toast }}</div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { screen: 'painel', toast: null, fichaId: 's3', fornFiltro: 'Todos', contAba: 'cob', fechadas: {}, decisoes: {}, cobFeito: {}, itensFeito: {}, matrizDec: {}, aprov: {}, pStep: 1, pRegime: null, pAnexo: false, novasExc: [], rankModo: 'exp', fcaAbertos: {} };
+    const brl = (n) => 'R$ ' + Math.round(n).toLocaleString('pt-BR');
+    this.brlCurto = (v) => { const a = Math.abs(v || 0); if (a >= 1e6) return 'R$ ' + (v / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' mi'; if (a >= 1e3) return 'R$ ' + Math.round(a / 1e3).toLocaleString('pt-BR') + ' mil'; return brl(v); };
+    this.RISCOS = { verde: ['Regular', 'var(--ok)'], ambar: ['Pendente', 'var(--gold)'], vermelho: ['Irregular', 'var(--risk)'] };
+    this.CLASSES = { integral: ['Integral', 1], guia_unica: ['Guia única', 0.3], mei: ['MEI', 0], presumido: ['Presumido', 0.6], desconhecido: ['Não declarado', null] };
+    // aliquotaEfetiva vem do Sistema 3; null = incompleto
+    this.sups = [
+      { id: 's3', nome: 'Frigorífico Vale Verde', cnpj: '22.871.409/0001-15', categoria: 'Carnes', cidade: 'Passo Fundo · RS', regime: 'Lucro Real', risco: 'vermelho', classe: 'integral', compras: 9310000, aliq: 0.0, aliqNota: 'carnes: cesta básica zero', pedido: 2, pedidoValor: 412000, cobertura: '5 dias', desde: '2019', share: 0.52, alts: 2, score: 41, dims: [['Regularidade', 20], ['Consistência documental', 55], ['Reincidência', 40], ['Regime', 100], ['Materialidade', 15], ['Criticidade de abastecimento', 15]], leitura: 'Regular no regime, irregular na regularidade: CND federal positiva desde 14/08. Enquanto o débito não for extinto, o crédito das notas dele fica travado (art. 47) — a partir de 2028. Carnes é cesta básica a alíquota zero, então a exposição de imposto é baixa; o problema é ruptura, não crédito.', hist: [['03/09 06:00', 'CND federal: positiva (débito em cobrança)', 'Serpro CND'], ['03/09 06:00', 'Situação cadastral: ativa', 'RFB'], ['02/09 14:12', 'NF-e 88.412 recebida: destaque IBS/CBS presente e consistente', 'NF-e'], ['14/08 06:00', 'Mudança de faixa: Regular → Irregular (CND)', 'Serpro CND'], ['01/07 06:00', 'CEIS/CNEP: sem ocorrência', 'CGU']] },
+      { id: 's10', nome: 'Distribuidora Norte Sul', cnpj: '33.918.226/0001-64', categoria: 'Bebidas', cidade: 'Canoas · RS', regime: 'Lucro Presumido', risco: 'vermelho', classe: 'integral', compras: 3960000, aliq: 0.265, aliqNota: 'bebidas: alíquota cheia + IS em 2027', pedido: 12, pedidoValor: 186000, cobertura: '18 dias', desde: '2021', share: 0.22, alts: 3, score: 38, dims: [['Regularidade', 10], ['Consistência documental', 70], ['Reincidência', 60], ['Regime', 100], ['Materialidade', 45], ['Criticidade de abastecimento', 60]], leitura: 'CNPJ no CEIS desde 14/07: impedimento de contratar. Crédito integral pelo regime, mas o eixo de risco manda. Bebidas carregam alíquota cheia: é o maior imposto embutido em risco da carteira.', hist: [['03/09 06:00', 'CEIS: impedimento de contratar (14/07/2026)', 'CGU'], ['03/09 06:00', 'CND federal: negativa', 'Serpro CND'], ['14/07 06:00', 'Mudança de faixa: Regular → Irregular (CEIS)', 'CGU']] },
+      { id: 's8', nome: 'Padaria Industrial Dourado', cnpj: '27.334.601/0001-05', categoria: 'Padaria', cidade: 'Porto Alegre · RS', regime: 'Simples · guia única', risco: 'verde', classe: 'guia_unica', compras: 1420000, aliq: 0.106, aliqNota: 'padaria: redução 60%', pedido: 1, pedidoValor: 38000, cobertura: '2 dias', desde: '2016', share: 0.29, alts: 2, score: 74, dims: [['Regularidade', 100], ['Consistência documental', 90], ['Reincidência', 100], ['Regime', 30], ['Materialidade', 60], ['Criticidade de abastecimento', 70]], leitura: 'Perfeitamente regular e crédito limitado: transfere só o que consta na guia. Um fornecedor pode ser um problema sem ser irregular. Janela do Simples aberta até 30/09: se optar pelo regime regular, passa a integral em 2027.', hist: [['03/09 06:00', 'Simples Nacional: optante, guia única', 'Consulta Optantes'], ['01/09 09:10', 'Pedido de declaração de regime enviado pelo portal', 'Portal'], ['03/09 06:00', 'CND federal: negativa', 'Serpro CND']] },
+      { id: 's1', nome: 'Laticínios Serra Azul', cnpj: '04.512.887/0001-30', categoria: 'Laticínios', cidade: 'Lajeado · RS', regime: 'Lucro Real', risco: 'verde', classe: 'integral', compras: 6840000, aliq: 0.04, aliqNota: 'leite zero, queijos 60%', pedido: 6, pedidoValor: 520000, cobertura: '9 dias', desde: '2014', share: 0.31, alts: 2, score: 91, dims: [['Regularidade', 100], ['Consistência documental', 95], ['Reincidência', 100], ['Regime', 100], ['Materialidade', 70], ['Criticidade de abastecimento', 80]], leitura: 'Preferencial: regular, crédito integral, destaque na nota bate com o regime.', hist: [['03/09 06:00', 'Todas as verificações sem ocorrência', 'RFB · Serpro · CGU']] },
+      { id: 's2', nome: 'Bebidas Planalto', cnpj: '11.203.554/0001-08', categoria: 'Bebidas', cidade: 'Caxias do Sul · RS', regime: 'Lucro Real', risco: 'verde', classe: 'integral', compras: 5120000, aliq: 0.265, aliqNota: 'bebidas: alíquota cheia', pedido: 9, pedidoValor: 390000, cobertura: '14 dias', desde: '2012', share: 0.44, alts: 1, score: 86, dims: [['Regularidade', 100], ['Consistência documental', 90], ['Reincidência', 100], ['Regime', 100], ['Materialidade', 40], ['Criticidade de abastecimento', 55]], leitura: 'Regular e integral. Atenção fora do S1: verba de 3% paga sem nota (Contratos › Verbas).', hist: [['03/09 06:00', 'Todas as verificações sem ocorrência', 'RFB · Serpro · CGU']] },
+      { id: 's4', nome: 'Hortifrúti Santa Clara', cnpj: '19.440.112/0001-77', categoria: 'Hortifrúti', cidade: 'Feliz · RS', regime: 'Produtor rural PJ', risco: 'verde', classe: 'presumido', compras: 2380000, aliq: 0.0, aliqNota: 'hortifrúti in natura: zero', pedido: 1, pedidoValor: 61000, cobertura: '3 dias', desde: '2018', share: 0.38, alts: 3, score: 79, dims: [['Regularidade', 100], ['Consistência documental', 80], ['Reincidência', 100], ['Regime', 60], ['Materialidade', 75], ['Criticidade de abastecimento', 65]], leitura: 'Regular, crédito presumido. 1º da curva ABC e quase zero de imposto embutido. Sem contrato formal (Contratos › Cobertura).', hist: [['03/09 06:00', 'Todas as verificações sem ocorrência', 'RFB · Serpro']] },
+      { id: 's16', nome: 'Mercearia Sul Distribuidora', cnpj: '41.226.019/0001-70', categoria: 'Mercearia', cidade: 'Canoas · RS', regime: 'Simples · regime regular', risco: 'verde', classe: 'integral', compras: 2150000, aliq: 0.14, aliqNota: 'mix mercearia', pedido: 5, pedidoValor: 144000, cobertura: '15 dias', desde: '2020', share: 0.27, alts: 4, score: 88, dims: [['Regularidade', 100], ['Consistência documental', 85], ['Reincidência', 100], ['Regime', 100], ['Materialidade', 55], ['Criticidade de abastecimento', 60]], leitura: 'Simples que optou pelo regime regular: declarou pelo portal em 02/09, comprovante anexado. Crédito integral.', hist: [['02/09 16:40', 'Regime declarado pelo portal: regular de IBS/CBS · comprovante anexado', 'Portal'], ['03/09 06:00', 'Todas as verificações sem ocorrência', 'RFB · Serpro']] },
+      { id: 's12', nome: 'Manutenção Predial Ferraz', cnpj: '36.118.942/0001-57', categoria: 'Serviços', cidade: 'Porto Alegre · RS', regime: 'Não declarado', risco: 'ambar', classe: 'desconhecido', compras: 310000, aliq: 0.265, aliqNota: 'serviço: alíquota cheia', pedido: 45, pedidoValor: 26000, cobertura: '—', desde: '2022', share: 0.6, alts: 2, score: 58, dims: [['Regularidade', 80], ['Consistência documental', 40], ['Reincidência', 80], ['Regime', 0], ['Materialidade', 90], ['Criticidade de abastecimento', 90]], leitura: 'CNDT vence em 8 dias e o regime nunca foi declarado — não é consultável por terceiros. Sem regime, crédito esperado sai como incompleto, não estimado.', hist: [['03/09 06:00', 'CNDT: válida até 11/09', 'TST'], ['01/09 09:10', 'Pedido de declaração de regime enviado · sem resposta', 'Portal']] },
+      { id: 's20', nome: 'Limpeza Total MEI', cnpj: '48.002.117/0001-33', categoria: 'Serviços', cidade: 'Gravataí · RS', regime: 'MEI', risco: 'verde', classe: 'mei', compras: 76000, aliq: 0.265, aliqNota: 'serviço: alíquota cheia', pedido: 30, pedidoValor: 6300, cobertura: '—', desde: '2023', share: 0.1, alts: 3, score: 66, dims: [['Regularidade', 100], ['Consistência documental', 100], ['Reincidência', 100], ['Regime', 0], ['Materialidade', 95], ['Criticidade de abastecimento', 95]], leitura: 'Regular e não transfere crédito. Verde em risco, zero em crédito.', hist: [['03/09 06:00', 'Todas as verificações sem ocorrência', 'RFB']] },
+      { id: 's21', nome: 'Conecta Fibra Telecom', cnpj: '44.019.552/0001-08', categoria: 'Serviços', cidade: 'Porto Alegre · RS', regime: 'Lucro Real', risco: 'ambar', classe: 'integral', compras: 268000, aliq: null, aliqNota: null, pedido: 20, pedidoValor: 22300, cobertura: '—', desde: '2017', share: 1, alts: 2, score: 72, dims: [['Regularidade', 90], ['Consistência documental', 50], ['Reincidência', 100], ['Regime', 100], ['Materialidade', 90], ['Criticidade de abastecimento', 40]], leitura: 'Nota de agosto sem destaque de IBS/CBS no novo leiaute — inconsistência documental. Alíquota efetiva pendente do Sistema 3.', hist: [['28/08 10:05', 'NFS-e 1.204: destaque IBS/CBS ausente', 'NFS-e'], ['03/09 06:00', 'CND federal: negativa', 'Serpro CND']] },
+    ];
+    this.excecoes = [
+      { id: 'e1', fato: 'Frigorífico Vale Verde com CND positiva e pedido de R$ 412 mil previsto para 05/09', causa: 'Débito de PIS/Cofins em cobrança desde 14/08; crédito de IBS/CBS travado até a extinção (a partir de 2028)', acao: 'Decidir entre bloquear (2 alternativas), liberar sob RAD ou exceção com alçada', origem: 'Fornecedores', responsavel: 'Controladoria', prazo: '2026-09-04', tela: 'ficha', sup: 's3' },
+      { id: 'e2', fato: 'Verba de 3% da Bebidas Planalto paga sem documento fiscal', causa: 'Acordo comercial de 2024 sem cláusula de natureza; depósito mensal sem nota', origem: 'Contratos · Verbas', acao: 'Classificar (utilidade econômica) e levar recomposição ao acordo 2027', responsavel: 'Comercial', prazo: '2026-09-01', tela: 'verbas' },
+      { id: 'e3', fato: 'Hortifrúti Santa Clara: R$ 2,38 mi pagos em 12 meses sem contrato vinculado', causa: 'Relação antiga por pedido avulso; produtor rural PJ sem minuta', acao: 'Gerar minuta produtor rural / cooperativa e enviar para alçadas', origem: 'Contratos · Cobertura', responsavel: 'Suprimentos', prazo: '2026-09-12', tela: 'cob' },
+      { id: 'e4', fato: '6 itens de cesta básica tributados integralmente no cadastro', causa: 'cClassTrib 000001 onde a LC 214 Anexo I prevê alíquota zero', acao: 'Aprovar correção; vale a partir de 01/2027', origem: 'Itens', responsavel: 'Fiscal', prazo: '2026-09-15', tela: 'itens' },
+      { id: 'e5', fato: 'Padaria Industrial Dourado não respondeu à declaração de regime', causa: 'Janela do Simples fecha em 30/09; opção não consultável por terceiros', acao: 'Reenviar pelo portal e ligar do Comercial: se optar, crédito passa a integral', origem: 'Fornecedores', responsavel: 'Suprimentos', prazo: '2026-09-20', tela: 'ficha', sup: 's8' },
+      { id: 'e6', fato: 'Conecta Fibra emitiu NFS-e sem destaque de IBS/CBS', causa: 'Prestador ainda no leiaute municipal; nota inconsistente desde 03/08 é sinal legítimo', acao: 'Notificar pelo portal; reter próximo título até nota reemitida', origem: 'Fornecedores', responsavel: 'Fiscal', prazo: '2026-09-08', tela: 'ficha', sup: 's21' },
+    ];
+  }
+  toast(m) { clearTimeout(this._t); this.setState({ toast: m }); this._t = setTimeout(() => this.setState({ toast: null }), 3400); }
+  go(screen, extra) { this.setState({ screen, ...(extra || {}) }); }
+  sup(id) { return this.sups.find(s => s.id === id); }
+  exposicao(s) { if (s.aliq == null) return null; const ap = this.CLASSES[s.classe][1]; if (ap == null) return null; return s.compras * s.aliq * ap; }
+  renderVals() {
+    const S = this.state; const bc = this.brlCurto;
+    const hoje = '2026-09-03';
+    const abasDef = [['painel', 'Painel', 'O dia'], ['forn', 'Fornecedores', 'Sistema 1'], ['mapa', 'Mapa', 'Sistema 1'], ['cont', 'Contratos', 'Sistema 2'], ['itens', 'Itens', 'Sistema 3'], ['portal', 'Portal do fornecedor', 'Externo']];
+    const abas = abasDef.map(([k, rotulo, grupo], i) => ({ rotulo, grupo, sep: i > 0 && abasDef[i - 1][2] !== grupo, cls: (S.screen === k || (k === 'forn' && S.screen === 'ficha')) ? 'on' : '', go: (e) => { e && e.preventDefault && e.preventDefault(); this.go(k); } }));
+    // painel
+    const abertas = this.excecoes.concat(S.novasExc).filter(e => !S.fechadas[e.id]);
+    const emRisco = this.sups.filter(s => s.risco !== 'verde');
+    const credRisco = emRisco.reduce((a, s) => a + (this.exposicao(s) || 0), 0);
+    const credTotal = this.sups.reduce((a, s) => a + (this.exposicao(s) || 0), 0);
+    const semAliq = this.sups.filter(s => s.aliq == null).length;
+    const semRegime = this.sups.filter(s => s.classe === 'desconhecido').length;
+    const cobRaw = [['p1', 's4', 'Revenda · produtor rural', 148, 2380000, 'rural'], ['p2', null, 'Revenda · grãos (cooperativa)', 61, 2910000, 'rural', 'Cooperativa Agro Três Passos', '88.201.375/0001-40', 'Cooperativa', 'verde', 'presumido'], ['p3', 's8', 'Revenda · padaria', 96, 1420000, 'revenda'], ['p4', 's12', 'Serviço · manutenção', 24, 310000, 'servico'], ['p5', 's21', 'Serviço · telecom 14 lojas', 168, 268000, 'servico'], ['p6', 's2', 'Acordo comercial · verba sem nota', 12, 154000, 'acordo'], ['p7', null, 'Financeiro · empréstimo', 12, 1860000, 'fin', 'Banco Regional · CCB 4471', '92.702.067/0001-96', 'Instituição financeira', 'verde', 'desconhecido']];
+    const semContrato = cobRaw.filter(r => !S.cobFeito[r[0]] && r[5] !== 'fin');
+    const semValor = semContrato.reduce((a, r) => a + r[4], 0);
+    const pagos = 1197; const semN = 6 - Object.keys(S.cobFeito).filter(k => k !== 'p7').length;
+    const cobPct = Math.round((1 - semN / pagos) * 100 * 10) / 10;
+    const quatro = [
+      { rot: 'Crédito em risco', v: bc(credRisco), cor: 'var(--risk)', pe: `${emRisco.length} fornecedores sem a extinção do débito garantida, de ${bc(credTotal)} de crédito esperado no ano.`, falta: `Passa a valer em 2028 (art. 48 dispensa o requisito até lá). Número parcial: ${semAliq} fornecedor sem alíquota efetiva calculada.`, go: () => this.go('mapa') },
+      { rot: 'Cobertura contratual', v: cobPct.toLocaleString('pt-BR') + '%', cor: 'var(--ink)', pe: `${semN} de ${pagos.toLocaleString('pt-BR')} CNPJs pagos estão sem contrato vigente.`, falta: `${bc(semValor)} pagos em 12 meses sem contrato que os ampare.`, go: () => this.go('cont', { contAba: 'cob' }) },
+      { rot: 'Itens saneados', v: '61%', cor: 'var(--ink)', pe: '7.612 de 12.480 itens conferem com a base mestre.', falta: 'R$ 291 mil/mês identificados nos itens que ainda divergem. 1.204 de peso variável na curadoria.', go: () => this.go('itens') },
+      { rot: 'Saldo credor na fila', v: 'R$ 3,4 mi', cor: 'var(--ink)', pe: 'Preso por 180 dias — a rede não está em programa de conformidade.', falta: 'Entrar no programa devolveria o saldo em 30 dias e valeria R$ 196 mil/ano em custo de capital. Hipótese a validar: diligência sobre fornecedores como critério.', go: () => this.go('itens') },
+    ];
+    const fila = abertas.slice().sort((a, b) => a.prazo.localeCompare(b.prazo)).slice(0, 6).map(e => { const venceu = e.prazo < hoje; return { ...e, prazoTxt: (venceu ? 'venceu ' : 'prazo ') + e.prazo.slice(5).split('-').reverse().join('/'), prazoBg: venceu ? 'rgba(138,49,35,.10)' : 'var(--bg-deep)', prazoFg: venceu ? 'var(--risk)' : 'var(--muted)', abrir: () => { if (e.tela === 'ficha') this.go('ficha', { fichaId: e.sup }); else if (e.tela === 'itens') this.go('itens'); else this.go('cont', { contAba: e.tela === 'verbas' ? 'verbas' : 'cob' }); }, fechar: () => { this.setState(s => ({ fechadas: { ...s.fechadas, [e.id]: true } })); this.toast('Exceção fechada. Registrada na trilha com data e responsável.'); } }; });
+    const momentos = [['1', 'Cadastrar o item', 'Sistema 3', 'itens'], ['2', 'Cotar', 'Sistema 2 · custo líquido', 'cont', 'serv'], ['3', 'Emitir o pedido', 'Sistema 1 · semáforo', 'forn'], ['4', 'Receber a nota', 'Sistema 1 · destaque IBS/CBS', 'forn'], ['5', 'Pagar', 'Sistema 2 · gate', 'cont', 'cob'], ['6', 'Fechar acordo com a indústria', 'Sistema 2 · verbas', 'cont', 'verbas']].map(([n, t, sist, tela, aba]) => ({ n, t, sist, go: () => this.go(tela, aba ? { contAba: aba } : {}) }));
+    // carteira
+    const fornFiltros = ['Todos', 'Irregular ou pendente', 'Crédito limitado ou nulo', 'Regime não declarado', 'Pedido em até 3 dias'].map(f => ({ rotulo: f, on: S.fornFiltro === f ? 'true' : 'false', pick: () => this.setState({ fornFiltro: f }) }));
+    const deco = (s) => { const [riscoRot, riscoCor] = this.RISCOS[s.risco]; const [classeRot, ap] = this.CLASSES[s.classe]; const exp = this.exposicao(s); return { ...s, riscoRot, riscoCor, classeRot, aprovF: ap == null ? 'aproveitamento desconhecido' : Math.round(ap * 100) + '% do imposto volta', comprasF: bc(s.compras), exp, expF: exp == null ? '—' : bc(exp), expCor: exp == null ? 'var(--faint)' : s.risco !== 'verde' ? 'var(--risk)' : 'var(--ink)', pedF: s.pedido <= 3 ? 'em ' + s.pedido + ' dias' : s.pedido + ' dias', pedCor: s.pedido <= 3 ? 'var(--risk)' : 'var(--dim)', abrir: () => this.go('ficha', { fichaId: s.id }) }; };
+    const fornRows = this.sups.filter(s => S.fornFiltro === 'Todos' || (S.fornFiltro === 'Irregular ou pendente' && s.risco !== 'verde') || (S.fornFiltro === 'Crédito limitado ou nulo' && ['guia_unica', 'mei', 'presumido'].includes(s.classe)) || (S.fornFiltro === 'Regime não declarado' && s.classe === 'desconhecido') || (S.fornFiltro === 'Pedido em até 3 dias' && s.pedido <= 3)).map(deco).sort((a, b) => (b.risco !== 'verde') - (a.risco !== 'verde') || (b.exp || 0) - (a.exp || 0));
+    const riscoResumo = [['1.163', 'Regular', 'var(--ok)'], ['31', 'Pendente', 'var(--gold)'], ['3', 'Irregular', 'var(--risk)']].map(([n, rot, cor]) => ({ n, rot, cor }));
+    const classeResumo = [['842', 'Integral'], ['219', 'Guia única'], ['48', 'MEI / presumido'], ['88', 'Não declarado']].map(([n, rot]) => ({ n, rot }));
+    // ficha
+    const raw = this.sup(S.fichaId); const d = deco(raw);
+    const rad = raw.pedidoValor * (raw.aliq == null ? 0.265 : raw.aliq);
+    const blocosBase = {
+      s3: [['1', 'Identidade e existência', 'ok', [['Situação cadastral', 'Ativa', 'var(--ink)'], ['Abertura · capital', '2009 · R$ 4,2 mi', 'var(--ink)'], ['CNAE × mercadoria', 'Abate de bovinos · coerente', 'var(--ink)'], ['UF de origem', 'RS · destino RS/SC', 'var(--ink)']], null], ['2', 'Regime tributário', 'ok', [['Regime', 'Lucro Real', 'var(--ink)'], ['Classe de crédito', 'Integral · 100%', 'var(--ok)'], ['Consultável por terceiros', 'Sim (agregador)', 'var(--ink)']], 'O regime está certo. O problema deste fornecedor é o eixo de risco, não o de crédito.'], ['3', 'Regularidade fiscal', 'risco', [['CND federal', 'Positiva desde 14/08', 'var(--risk)'], ['CNDT', 'Negativa', 'var(--ink)'], ['CRF FGTS', 'Regular', 'var(--ink)'], ['CEIS / CNEP', 'Sem ocorrência', 'var(--ink)'], ['Extinção do débito IBS/CBS', 'Consulta oficial inexistente', 'var(--faint)']], null], ['4', 'Comportamento documental', 'ok', [['Destaque IBS/CBS na nota', 'Presente · consistente', 'var(--ink)'], ['cClassTrib × NCM', 'Coerente (cesta básica zero)', 'var(--ink)'], ['Regime declarado × nota', 'Sem divergência', 'var(--ink)'], ['Cancelamentos 90 d', '2 de 214 · normal', 'var(--ink)']], 'Camada que sustenta a leitura antes da consulta oficial. Desde 03/08 a nota inconsistente é rejeitada na origem.'], ['5', 'Materialidade e exposição', 'risco', [['Compras 12 m', bc(raw.compras) + ' · 52% de Carnes', 'var(--ink)'], ['Imposto embutido', 'quase zero · cesta básica', 'var(--ink)'], ['Cobertura de estoque', '5 dias', 'var(--risk)'], ['Alternativas homologadas', '2 · Serrano, Pampa Carnes', 'var(--ink)'], ['Prazo médio de pagamento', '28 dias', 'var(--ink)']], 'Exposição é de ruptura, não de crédito: 52% da categoria com 5 dias de estoque.'], ['6', 'Saúde e continuidade', 'ambar', [['Protestos · RJ', 'Nenhum', 'var(--ink)'], ['Reincidência', 'CND positiva também em 11/2025', 'var(--gold)'], ['Mudança societária', 'Sócio novo em 03/2026', 'var(--gold)'], ['Relacionamento', '7 anos', 'var(--ink)']], 'Reincidência pesa mais que pendência isolada: quem regularizou uma vez tende a irregularizar de novo.']],
+    };
+    const generic = (s) => [['1', 'Identidade e existência', 'ok', [['Situação cadastral', 'Ativa', 'var(--ink)'], ['CNAE × fornecimento', 'Coerente', 'var(--ink)'], ['UF de origem', s.cidade.split('·')[1] || 'RS', 'var(--ink)']], null], ['2', 'Regime tributário', s.classe === 'desconhecido' ? 'risco' : s.classe === 'integral' ? 'ok' : 'ambar', [['Regime', s.regime, 'var(--ink)'], ['Classe de crédito', d.classeRot + ' · ' + d.aprovF, s.classe === 'integral' ? 'var(--ok)' : 'var(--gold)'], ['Declarado pelo portal', s.id === 's16' ? '02/09/2026 · comprovante' : s.classe === 'desconhecido' ? 'Pendente desde 01/09' : 'Não necessário', s.classe === 'desconhecido' ? 'var(--risk)' : 'var(--ink)']], s.classe === 'guia_unica' ? 'Janela do Simples aberta até 30/09. Opção não consultável por terceiros: só ele pode declarar.' : null], ['3', 'Regularidade fiscal', s.risco === 'verde' ? 'ok' : 'risco', [['CND federal', 'Negativa', 'var(--ink)'], ['CNDT', s.id === 's12' ? 'Válida até 11/09' : 'Negativa', s.id === 's12' ? 'var(--gold)' : 'var(--ink)'], ['CEIS / CNEP', s.id === 's10' ? 'Impedimento desde 14/07' : 'Sem ocorrência', s.id === 's10' ? 'var(--risk)' : 'var(--ink)'], ['Extinção do débito IBS/CBS', 'Consulta oficial inexistente', 'var(--faint)']], null], ['4', 'Comportamento documental', s.id === 's21' ? 'risco' : 'ok', [['Destaque IBS/CBS na nota', s.id === 's21' ? 'Ausente na NFS-e 1.204' : 'Presente · consistente', s.id === 's21' ? 'var(--risk)' : 'var(--ink)'], ['Regime declarado × nota', 'Sem divergência', 'var(--ink)'], ['Padrão de emissão', 'Normal', 'var(--ink)']], null], ['5', 'Materialidade e exposição', 'ok', [['Compras 12 m', bc(s.compras) + ' · ' + Math.round(s.share * 100) + '% da categoria', 'var(--ink)'], ['Imposto embutido', d.expF, 'var(--ink)'], ['Alíquota efetiva (S3)', s.aliq == null ? 'pendente' : (s.aliq * 100).toLocaleString('pt-BR') + '% · ' + s.aliqNota, s.aliq == null ? 'var(--faint)' : 'var(--ink)'], ['Cobertura de estoque', s.cobertura, 'var(--ink)']], null], ['6', 'Saúde e continuidade', 'ok', [['Protestos · RJ', 'Nenhum', 'var(--ink)'], ['Relacionamento', 'desde ' + s.desde, 'var(--ink)'], ['Mudança recente', 'Nenhuma', 'var(--ink)']], null]];
+    const tagMap = { ok: ['Sem ocorrência', 'rgba(47,107,69,.10)', 'var(--ok)'], ambar: ['Atenção', 'var(--gold-wash)', 'var(--gold)'], risco: ['Pendência', 'rgba(138,49,35,.10)', 'var(--risk)'] };
+    const blocos = (blocosBase[raw.id] || generic(raw)).map(([n, t, tag, linhas, nota]) => ({ n, t, tag: tagMap[tag][0], tagBg: tagMap[tag][1], tagFg: tagMap[tag][2], linhas: linhas.map(([k, v, cor]) => ({ k, v, cor })), nota }));
+    const sinaisMap = { s3: [['Fornecedor crítico em risco', '52% de Carnes, 5 dias de estoque, faixa vermelha. Está na lista de cinco nomes que o diretor precisa ver.', 'var(--risk)'], ['Deriva', 'Estava verde até 14/08; escorregou de faixa. O alerta é a mudança, não o estado.', 'var(--gold)'], ['Concentração por sócio', 'Sócio novo (03/2026) também no QSA de Pampa Carnes, uma das alternativas. Duas fontes, um dono.', 'var(--gold)']], s10: [['Exposição concentrada', 'Maior imposto embutido em risco da carteira: alíquota cheia + Imposto Seletivo em 2027.', 'var(--risk)'], ['Sinal de inidoneidade', 'CEIS + volume acima do capital declarado. Bloqueio sugerido independe do regime.', 'var(--risk)']], s8: [['Custo líquido enganoso', 'Melhor preço bruto em padaria, crédito limitado. Ponto de virada: 2,1% de desconto empata com Padaria Real (integral).', 'var(--gold)'], ['Mapa da janela do Simples', 'Ainda não respondeu. Se optar até 30/09: renegociar preço; se não: pressionar ou substituir.', 'var(--gold)']] };
+    const sinais = (sinaisMap[raw.id] || [['Nenhum sinal composto', 'Nada aparece no cruzamento com QSA, notas e projeção de compra.', 'var(--ok)']]).map(([t, dsc, cor]) => ({ t, d: dsc, cor }));
+    const registrar = (dec, exc) => { this.setState(s => ({ decisoes: { ...s.decisoes, [raw.id]: dec }, novasExc: exc ? [...s.novasExc, exc] : s.novasExc })); this.toast(dec + ' · registrado na trilha de auditoria.'); };
+    const sup = { ...d, scoreCor: raw.score >= 75 ? 'var(--ok)' : raw.score >= 50 ? 'var(--gold)' : 'var(--risk)', dims: raw.dims.map(([rot, v]) => ({ rot, v, w: v + '%', cor: v >= 75 ? 'var(--ok)' : v >= 40 ? 'var(--gold)' : 'var(--risk)' })), pedidoValorF: bc(raw.pedidoValor), radF: bc(rad), altsN: raw.alts, blocos, sinais, hist: raw.hist.map(([ts, o, fonte]) => ({ ts, o, fonte })), decisao: S.decisoes[raw.id] || '', bloquear: () => registrar('Bloqueio sugerido à Controladoria', { id: 'x' + Date.now(), fato: 'Bloqueio de ' + raw.nome + ' aguardando aprovação', causa: d.riscoRot + ' · ' + raw.leitura.split('.')[0], acao: 'Controladoria aprova, rejeita ou converte em RAD', origem: 'Fornecedores', responsavel: 'Controladoria', prazo: '2026-09-05', tela: 'ficha', sup: raw.id }), rad: () => registrar('Liberado sob RAD · ' + bc(rad) + ' recolhidos pela Horizonte'), excecao: () => registrar('Liberado com exceção · alçada Fiscal', { id: 'x' + Date.now(), fato: 'Exceção aberta para pedido de ' + raw.nome, causa: d.riscoRot, acao: 'Fiscal revisa em 7 dias', origem: 'Fornecedores', responsavel: 'Fiscal', prazo: '2026-09-10', tela: 'ficha', sup: raw.id }) };
+    // mapa
+    const cols = ['Crédito quase nulo', 'Crédito limitado', 'Crédito integral'];
+    const colIdx = (c) => c === 'integral' ? 2 : c === 'mei' || c === 'desconhecido' ? 0 : 1;
+    const orient = [['Só se não houver alternativa', 'Aceitável com desconto compensatório', 'Fornecedor preferencial'], ['Substituir', 'Renegociar ou substituir', 'Monitorar de perto; exigir regularização'], ['Bloqueio', 'Bloqueio', 'Bloqueio sugerido, mesmo com bom crédito']];
+    const rowsMap = [['verde', 'Risco baixo'], ['ambar', 'Risco médio'], ['vermelho', 'Risco alto']];
+    const maxExp = Math.max(...this.sups.map(s => this.exposicao(s) || 0));
+    const mapaLinhas = rowsMap.map(([r, rot], ri) => ({ rot, cor: this.RISCOS[r][1], celulas: cols.map((c, ci) => { const items = this.sups.filter(s => s.risco === r && colIdx(s.classe) === ci); return { orient: orient[ri][ci], bg: r === 'vermelho' ? 'rgba(138,49,35,.06)' : ci === 2 && r === 'verde' ? 'rgba(47,107,69,.06)' : 'transparent', bolhas: items.map(s => { const e = this.exposicao(s); const dpx = e == null ? 30 : Math.max(30, Math.round(30 + 66 * Math.sqrt(e / maxExp))); return { d: dpx + 'px', ini: s.nome.split(' ').map(w => w[0]).slice(0, 2).join(''), title: s.nome + ' · ' + (e == null ? 'exposição pendente' : bc(e)), borda: e == null ? 'var(--line-2)' : this.RISCOS[s.risco][1], fill: e == null ? 'transparent' : r === 'vermelho' ? 'rgba(138,49,35,.14)' : r === 'ambar' ? 'var(--gold-wash)' : 'rgba(47,107,69,.10)', abrir: () => this.go('ficha', { fichaId: s.id }) }; }) }; }) }));
+    const modos = { exp: ['Exposição', 'imposto em risco (R$)', 'Por imposto embutido, não por faturamento. Vale Verde e Santa Clara (1º e 3º da curva ABC) não aparecem: cesta básica a alíquota zero.'], risco: ['Risco', 'menor score primeiro', 'Ordem pelo score decomposto. Aqui aparecem os de cesta básica: o problema deles é ruptura, não crédito.'], compras: ['Compras', 'volume 12 meses', 'A curva ABC clássica. Compare com Exposição: a lista muda.'] };
+    const rankModos = Object.entries(modos).map(([k, [rotulo]]) => ({ rotulo, on: S.rankModo === k ? 'true' : 'false', pick: () => this.setState({ rankModo: k }) }));
+    const allDeco = this.sups.map(deco);
+    const rankBase = S.rankModo === 'exp' ? allDeco.filter(s => s.exp != null && s.exp > 0).sort((a, b) => b.exp - a.exp) : S.rankModo === 'risco' ? allDeco.slice().sort((a, b) => a.score - b.score) : allDeco.slice().sort((a, b) => b.compras - a.compras);
+    const ranking = rankBase.slice(0, 5).map((s, i) => { const aberto = S.fcaAbertos[s.id]; return { ...s, n: i + 1, cor: s.risco !== 'verde' ? 'var(--risk)' : 'var(--ink)', valorF: S.rankModo === 'exp' ? s.expF : S.rankModo === 'risco' ? s.score + ' / 100' : s.comprasF, fcaRot: aberto ? 'FCA aberto' : 'Abrir FCA', fcaTitle: aberto ? 'Já está na fila do Painel' : 'Criar exceção: fato, causa, ação, responsável e prazo', fcaBorda: aberto ? 'var(--line)' : 'var(--line-2)', fcaBg: aberto ? 'var(--gold-wash)' : 'transparent', fcaFg: aberto ? 'var(--gold)' : 'var(--ink)', fca: () => { if (aberto) { this.go('painel'); return; } const causa = s.risco !== 'verde' ? s.riscoRot + ' no eixo de risco · ' + s.leitura.split('.')[0] : s.classe !== 'integral' ? 'Crédito ' + s.classeRot.toLowerCase() + ' · ' + s.leitura.split('.')[0] : 'Exposição de ' + s.expF + ' concentrada em um só CNPJ'; const acao = s.risco !== 'verde' ? 'Decidir entre bloquear, RAD ou exceção; cobrar regularização pelo portal' : s.classe !== 'integral' ? 'Renegociar preço pelo custo líquido ou cobrar declaração de regime' : 'Homologar alternativa e revisar cláusula RAD no contrato'; const exc = { id: 'f' + Date.now(), fato: s.nome + ' · ' + (S.rankModo === 'exp' ? 'exposição de ' + s.expF + ' em imposto' : S.rankModo === 'risco' ? 'score ' + s.score + ' / 100' : 'compras de ' + s.comprasF + ' em 12 m'), causa, acao, origem: 'Mapa da carteira', responsavel: s.risco !== 'verde' ? 'Controladoria' : 'Suprimentos', prazo: '2026-09-' + String(10 + i * 2).padStart(2, '0'), tela: 'ficha', sup: s.id }; this.setState(st => ({ fcaAbertos: { ...st.fcaAbertos, [s.id]: true }, novasExc: [...st.novasExc, exc] })); this.toast('FCA aberto para ' + s.nome + ' · ' + exc.responsavel + ' até ' + exc.prazo.slice(5).split('-').reverse().join('/') + '. Está na fila do Painel.'); } }; });
+    const rankTitulo = modos[S.rankModo][1]; const rankNota = modos[S.rankModo][2];
+    // contratos
+    const contAbas = [['cob', 'Cobertura'], ['serv', 'Serviços e indiretos'], ['verbas', 'Verbas comerciais · JBP'], ['aprov', 'Aprovações e assinatura']].map(([k, rotulo]) => ({ rotulo, on: S.contAba === k ? 'true' : 'false', pick: () => this.setState({ contAba: k }) }));
+    const cobRows = cobRaw.map(([id, supId, natureza, titulos, valor, tipo, nome, cnpj, regime, risco, classe]) => { const s = supId ? this.sup(supId) : null; const feito = S.cobFeito[id]; const fin = tipo === 'fin'; return { nome: s ? s.nome : nome, cnpj: s ? s.cnpj : cnpj, regime: s ? s.regime : regime, natureza, titulos, valorF: bc(valor), riscoRot: this.RISCOS[s ? s.risco : risco][0], riscoCor: this.RISCOS[s ? s.risco : risco][1], classeRot: this.CLASSES[s ? s.classe : classe][0], aberto: !feito, feito: !!feito, op: feito ? 0.55 : 1, agirRot: fin ? 'Enviar à consultoria' : 'Gerar minuta', feitoRot: fin ? 'Na consultoria · regime específico' : 'Minuta em aprovação', agir: () => { this.setState(st => ({ cobFeito: { ...st.cobFeito, [id]: true }, aprov: fin ? st.aprov : { ...st.aprov, ['N-' + id]: { numero: 'CT-04' + (50 + Object.keys(st.aprov).length), objeto: natureza, forn: s ? s.nome : nome, tipo: tipo === 'rural' ? 'Produtor rural / cooperativa' : tipo === 'servico' ? 'Serviços' : tipo === 'acordo' ? 'Acordo comercial' : 'Revenda direta', score: 84 } } })); this.toast(fin ? 'Encaminhado à consultoria VOW: financeiros têm regime específico na LC 214.' : 'Minuta gerada pelo tipo e pelo regime. Fiscal e Jurídico notificados.'); } }; });
+    const cob = { pct: cobPct.toLocaleString('pt-BR') + '%', semF: bc(semValor), semN, fin: 1 };
+    const familias = [['Ocupação', 'locação, condomínio, shopping', 4200000, '0%', '~8%', '14 contratos', 'Locador PF em 3 lojas: sem crédito', 'var(--risk)'], ['Utilidades', 'energia, água, telecom', 3100000, '0%', '~26%', 'Adesão', 'Conecta Fibra sem destaque', 'var(--risk)'], ['Facilities e manutenção', 'limpeza, segurança, refrigeração', 2400000, '0%', '~18%', '9 de 14', '2 MEI · 1 sem regime', 'var(--gold)'], ['Logística e frota', 'frete, armazenagem, veículos', 3240000, '0%', '~26%', 'RFP-031 aberta', 'Cotar por custo líquido', 'var(--gold)'], ['Pessoas terceirizadas', 'mão de obra, temporários', 1900000, '0%', '~12%', '3 de 3', 'Sem pendência', 'var(--muted)'], ['Tecnologia', 'ERP, SaaS, cloud, automação', 1150000, '0%', '~26%', '6 de 7', 'SaaS estrangeiro: regra própria', 'var(--gold)'], ['Serviços profissionais', 'contábil, jurídico, agência', 640000, '0%', '~18%', '2 de 5', '3 sem contrato', 'var(--risk)']].map(([nome, ex, gasto, hoje, cred, contratos, pend, pendCor]) => ({ nome, ex, gastoF: bc(gasto), hoje, cred, credCor: 'var(--ok)', contratos, pend, pendCor }));
+    const props = [{ nome: 'Transportes Pampa', regime: 'Lucro Real · Pix segrega', bruto: 3380000, cp: 1 }, { nome: 'Frete Sul Express', regime: 'Lucro Real · boleto simples', bruto: 3240000, cp: 0.98 }, { nome: 'Rota Certa Log', regime: 'Simples · guia única', bruto: 3050000, cp: 0.3 }].map(p => ({ ...p, credN: p.bruto * 0.265 * p.cp / 1.265, liqN: p.bruto - p.bruto * 0.265 * p.cp / 1.265 })).sort((a, b) => a.liqN - b.liqN);
+    const propostas = props.map((p, i) => ({ nome: p.nome, regime: p.regime, bruto: bc(p.bruto), cred: bc(p.credN), liq: bc(p.liqN), borda: i === 0 ? 'var(--gold)' : 'var(--line)', bg: i === 0 ? 'var(--gold-wash)' : 'transparent', rank: i === 0 ? '1º · melhor custo líquido' : (i + 1) + 'º' + (p.cp === 0.3 ? ' · menor bruto, crédito limitado' : ''), rankCor: i === 0 ? 'var(--gold)' : 'var(--muted)' }));
+    // verbas
+    const matrizRaw = [['Logística', 'abatimento em fatura', 1900000, 'Utilidade econômica', 'Sim', 'Contrato-mãe · sem cláusula', 'Recompor · nota do varejo'], ['Marketing', 'nota de débito', 1400000, 'Utilidade econômica', 'Sim', 'Vigente', 'Recompor · CNAE compatível'], ['Comercial (mãe)', 'condições gerais', 0, '—', '—', 'Vigente · sem RAD/emissão', 'Aditar cláusulas novas'], ['Crescimento', 'meta apurada no fim', 1300000, 'Depende da forma', 'Se apurado depois', 'Vigente', 'Migrar p/ desconto na nota'], ['Troca', 'planilha, nota às vezes', 700000, 'Indenizatória se documentada', 'Só sem documento', 'Sem contrato', 'Documentar'], ['Perecíveis', '% de quebra, documentação precária', 950000, 'Indenizatória se documentada', 'Só sem documento', 'Sem contrato', 'Documentar · saldo credor'], ['Fidelidade', 'patrocínio ao clube', 800000, 'Utilidade econômica', 'Sim', 'Vigente · sem LGPD', 'Recompor · base legal LGPD'], ['Mídia Kit', 'nota de débito ou nada', 600000, 'Serviço de mídia', 'Sim', 'Sem contrato', 'Recompor · CNAE publicidade'], ['CRM', 'projeto, raramente tributado', 350000, 'Cessão de dado · serviço', 'Sim', 'Sem contrato', 'Recompor · LGPD'], ['Campanha', 'verba por ação', 500000, 'Utilidade econômica', 'Sim', 'Sem contrato', 'Recompor'], ['Inauguração', 'pacote misto', 300000, 'Misto', 'Parte', 'Vigente', 'Separar ativação de desconto'], ['Ecommerce', 'misturada com comissão', 200000, 'Serviço do varejo', 'Sim', 'Marketplace · regra própria', 'Separar as pontas · recompor']];
+    const matriz = matrizRaw.map(([nome, hoje, valor, natureza, trib, contrato, acao]) => ({ nome, hoje, valorF: valor ? bc(valor) : '—', natureza, trib, tribCor: trib === 'Sim' ? 'var(--risk)' : trib.startsWith('Só') || trib === 'Se apurado depois' || trib === 'Parte' ? 'var(--gold)' : 'var(--muted)', contrato, contCor: contrato.startsWith('Sem') || contrato.includes('sem') ? 'var(--risk)' : 'var(--dim)', acao, dec: S.matrizDec[nome] || '', onDec: (e) => this.setState(s => ({ matrizDec: { ...s.matrizDec, [nome]: e.target.value } })) }));
+    const vbTotal = 9000000, vbTrib = vbTotal * 0.705, recomp = vbTrib * 0.265, perda = vbTrib * 0.2095;
+    const vb = { totalF: bc(vbTotal), pctFat: '3%', tribF: bc(vbTrib), tribPct: '70,5%', recompF: bc(recomp), perdaF: bc(perda), perdaLucro: '22%', decididas: Object.values(S.matrizDec).filter(Boolean).length, linhas: matrizRaw.length };
+    // aprovações
+    const aprovBase = { 'CT-0440': { numero: 'CT-0440', objeto: 'Locação · loja Centro', forn: 'Imobiliária Vale (PJ)', tipo: 'Locação e ocupação', score: 66 }, 'CT-0428': { numero: 'CT-0428', objeto: 'Aditivo · verba comercial com nota', forn: 'Bebidas Planalto', tipo: 'Acordo comercial', score: 79 } };
+    const aprovAll = { ...aprovBase, ...Object.fromEntries(Object.entries(S.aprov).filter(([k]) => k.startsWith('N-'))) };
+    const aprov = Object.entries(aprovAll).map(([key, c]) => { const st = S.aprov[key] && S.aprov[key].st || {}; const fis = st.fis || 'Pendente', jur = st.jur || 'Pendente'; const both = fis === 'Aprovado' && jur === 'Aprovado'; const upd = (p) => this.setState(s => ({ aprov: { ...s.aprov, [key]: { ...(s.aprov[key] || c), st: { ...((s.aprov[key] || {}).st || {}), ...p } } } })); return { ...c, fis, jur, fisOpen: fis !== 'Aprovado', jurOpen: jur !== 'Aprovado', pronto: both && !st.signed, assinado: !!st.signed, status: st.signed ? 'Vigente' : both ? 'Aguardando assinatura' : 'Em aprovação', okFis: () => { upd({ fis: 'Aprovado' }); this.toast('Aprovação fiscal registrada.'); }, okJur: () => { upd({ jur: 'Aprovado' }); this.toast('Aprovação jurídica registrada.'); }, assinar: () => { upd({ signed: true }); this.toast(c.numero + ' assinado (assinador de mercado, marca VOW). Vigente e vinculado ao CNPJ no ERP.'); } }; });
+    // itens
+    const itensRaw = [['10482', 'Arroz branco tipo 1 · 5 kg', 'Mercearia Sul', '000001', '200003', '26,5%', '0%', 48600, 'LC 214 Anexo I', 98], ['20117', 'Leite UHT integral 1 L', 'Laticínios Serra Azul', '000001', '200003', '26,5%', '0%', 45500, 'LC 214 Anexo I', 99], ['41230', 'Óleo de soja 900 ml', 'Mercearia Sul', '000001', '200003', '26,5%', '0%', 32000, 'LC 214 Anexo I', 97], ['11305', 'Feijão carioca 1 kg', 'Mercearia Sul', '000001', '200003', '26,5%', '0%', 26400, 'LC 214 Anexo I', 98], ['30455', 'Café torrado e moído 500 g', 'Mercearia Sul', '000001', '200034', '26,5%', '10,6%', 21100, 'LC 214 Anexo VII', 96], ['22890', 'Queijo mussarela fatiado', 'Laticínios Serra Azul', '000001', '200034', '26,5%', '10,6%', 12400, 'LC 214 Anexo VII', 94], ['52077', 'Carne bovina acém · kg', 'Frigorífico Vale Verde', '000001', '—', '26,5%', '—', 0, 'peso variável', 0]];
+    const itens = itensRaw.map(([sku, desc, forn, ctA, ctS, alA, alS, imp, base, conf]) => { const feito = S.itensFeito[sku]; const cur = conf === 0 || conf < 95; return { sku, desc, forn, ctA, ctS, alA, alS, impF: imp ? bc(imp) : '—', base, conf: conf ? conf + '%' : '—', confCor: conf >= 95 ? 'var(--ok)' : conf ? 'var(--gold)' : 'var(--faint)', aberto: !feito, feito: !!feito, op: feito ? 0.55 : 1, acaoRot: cur ? 'Curadoria VOW' : 'Aprovar', feitoRot: cur ? 'Na curadoria' : 'Aprovado · book · ERP', aprovar: () => { this.setState(s => ({ itensFeito: { ...s.itensFeito, [sku]: true } })); this.toast(cur ? 'Enviado à curadoria humana VOW.' : 'Correção aprovada: entra no book com embasamento e volta ao ERP. Alíquota efetiva dos fornecedores recalculada.'); } }; });
+    // portal
+    const regimesDef = [['regular', 'Lucro Real ou Presumido', 'Regime regular de IBS/CBS · crédito integral', 'Integral'], ['hibrido', 'Simples Nacional, com opção pelo regime regular', 'Optei no Portal da Receita entre 01 e 30/09 · crédito integral', 'Integral'], ['guia', 'Simples Nacional, na guia única', 'Não optei · transfiro só o que consta na guia', 'Guia única'], ['mei', 'MEI', 'Não transfiro crédito', 'MEI'], ['rural', 'Produtor rural ou cooperativa', 'Crédito presumido', 'Presumido']];
+    const regimes = regimesDef.map(([k, rot, sub]) => ({ rot, sub, pick: () => this.setState({ pRegime: k }), borda: S.pRegime === k ? '#000000' : 'rgba(0,0,0,.18)', bg: S.pRegime === k ? 'rgba(0,0,0,.08)' : '#FFFFFF', dot: S.pRegime === k ? '#000000' : 'transparent' }));
+    const pr = regimesDef.find(r => r[0] === S.pRegime);
+    return {
+      abas, goPainel: (e) => { e && e.preventDefault && e.preventDefault(); this.go('painel'); }, goForn: () => this.go('forn'), goMapa: () => this.go('mapa'), goPortalDemo: () => this.go('portal', { pStep: 1, pRegime: null, pAnexo: false }),
+      isPainel: S.screen === 'painel', isForn: S.screen === 'forn', isFicha: S.screen === 'ficha', isMapa: S.screen === 'mapa', isCont: S.screen === 'cont', isItens: S.screen === 'itens', isPortal: S.screen === 'portal',
+      ontem: { novas: 2 + S.novasExc.length, fechadas: 1 + Object.keys(S.fechadas).length, vencidas: abertas.filter(e => e.prazo < hoje).length }, quatro, fila, filaTotal: abertas.length, falta: { semAliq, semRegime, semContrato: semN }, momentos,
+      fornFiltros, fornRows, riscoResumo, classeResumo, sup,
+      mapaCols: cols, mapaLinhas, ranking, rankModos, rankTitulo, rankNota, janela: { optou: 41, nao: 90, falta: 88 },
+      contAbas, contCob: S.contAba === 'cob', contServ: S.contAba === 'serv', contVerbas: S.contAba === 'verbas', contAprov: S.contAba === 'aprov', cob, cobRows, familias, propostas, contratarVencedor: () => { this.setState(s => ({ aprov: { ...s.aprov, 'N-rfp': { numero: 'CT-0452', objeto: 'Frete dedicado CD → 14 lojas', forn: props[0].nome, tipo: 'Serviços', score: 88 } }, contAba: 'aprov' })); this.toast('Minuta gerada para ' + props[0].nome + ' pelo custo líquido. Fornecedor vermelho seria inelegível.'); }, matriz, vb, gerarJBP: () => { if (!vb.decididas) { this.toast('Decida ao menos uma linha antes: classificar antes de renegociar.'); return; } this.setState(s => ({ aprov: { ...s.aprov, 'N-jbp': { numero: 'CT-0455', objeto: 'Acordo comercial 2027 · ' + vb.decididas + ' linhas com natureza declarada', forn: 'Indústria · JBP 2027', tipo: 'Acordo comercial', score: 82 } }, contAba: 'aprov' })); this.toast('Cláusulas geradas por linha. Fiscal, Jurídico e Comercial validam em paralelo.'); }, aprov,
+      itens,
+      pStep1: S.pStep === 1, pStep2: S.pStep === 2, pStep3: S.pStep === 3, regimes, pNextBg: S.pRegime ? '#000000' : '#707070', pNext: () => { if (S.pRegime) this.setState({ pStep: 2 }); }, pBack: () => this.setState({ pStep: 1 }), pAnexar: () => this.setState({ pAnexo: true }), pAnexoRot: S.pAnexo ? 'comprovante-regime-2027.pdf · 212 KB ✓' : 'Anexar comprovante (PDF ou foto) · opcional agora', pEnviar: () => { this.setState({ pStep: 3 }); this.toast('Declaração registrada em verificacao (append-only). Ficha do fornecedor atualizada.'); }, pRegimeRot: pr ? pr[1] : '', pClasseRot: pr ? pr[3] : '', portalReset: () => this.setState({ pStep: 1, pRegime: null, pAnexo: false }),
+      toast: S.toast, hasToast: !!S.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

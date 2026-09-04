@@ -30,8 +30,8 @@ export async function montarNav(atual) {
   el.className = 'appbar'
   el.innerHTML = `
     <a class="marca" href="/app/pipeline" style="text-decoration:none;color:inherit">
-      <span class="caduceu">V</span>
-      <span><span class="nome">VOW</span><span class="sob">Plataforma</span></span>
+      <span class="caduceu"></span>
+      <span><span class="nome">GRUPO VOW</span><span class="sob">Plataforma</span></span>
     </a>
     <nav class="abas">
       ${ABAS.map((a, i) => {

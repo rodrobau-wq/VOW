@@ -85,7 +85,7 @@ async function carregar() {
 function pintar() {
   $('numeros').innerHTML = `
     <div class="n"><div class="r">Oportunidades abertas</div><div class="v">${dados.totalAbertos}</div>
-      <div class="p">nas cinco fases do funil</div></div>
+      <div class="p">nas ${dados.colunas.length} fases do funil</div></div>
     <div class="n ${dados.foraDoSla ? 'alerta' : ''}"><div class="r">Fora do prazo de contato</div>
       <div class="v">${dados.foraDoSla}</div>
       <div class="p">${dados.foraDoSla ? 'capturados há mais de 48 h sem ninguém falar' : 'nenhum atrasado'}</div></div>

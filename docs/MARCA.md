@@ -1,6 +1,10 @@
 # Identidade visual — o que manda
 
-> **Fonte única: `Marca/[Grupo Vow] Brandguide 2026.pdf`.**
+> **Fonte da verdade do desenho: `public/abras/*.dc.html`** — os protótipos do
+> Claude Design, servidos em `/abras` e `/plataforma`. Quando o produto e eles
+> divergirem, quem está errado é o produto.
+>
+> **Fonte da marca: `Marca/[Grupo Vow] Brandguide 2026.pdf`.**
 > Antes de mexer em cor, fonte ou logotipo, abra o manual. Nada aqui é
 > escolha de design: cada valor tem página citada. O que não estiver no
 > manual não entra sem aprovação dos gestores da marca.
@@ -66,15 +70,17 @@ bastão (poder), asas (zelo), serpentes (sabedoria).
 - Proibido: outras cores, gradiente, sombra, ou qualquer efeito que
   descaracterize a marca.
 
-Arquivos em `public/marca/`, copiados de `Marca/`.
+Arquivos em `public/marca/`, com o `README.md` que descreve cada variação.
+O símbolo também existe como máscara SVG embutida no `tokens.css`, na classe
+`.caduceu` — é o que a barra do app usa, herdando a cor do texto.
 
 ## Pendências da marca
 
-1. **Logotipo vetorial ou PNG transparente.** Os arquivos são JPG com fundo
-   branco. Sobre fundo escuro não há mesclagem que resolva sem transparência,
-   e aplicar `invert` deixaria a marca ilegível — o que a pág. 29 proíbe. Por
-   isso todas as telas usam fundo claro. Com um SVG na versão SILVER, a
-   combinação 03 fica disponível.
+1. ~~Logotipo vetorial ou PNG transparente~~ — **resolvido.** Chegaram em
+   `public/marca/`: PNG transparente do logotipo, do logotipo com slogan e do
+   símbolo, em preto, piano, storm, concrete, silver e branco, mais
+   `simbolo.svg`. A combinação 03 (peça escura) está disponível: use
+   `*-silver.png` sobre fundo PIANO, com `.escuro` no `<body>`.
 2. **Kit do Adobe Fonts** para a Obviously.
 3. **Cor de estado.** Um CRM precisa distinguir atrasado de em dia, e o manual
    não prevê cor de sinalização. `--risco` e `--ok` estão isolados e

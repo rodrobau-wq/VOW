@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="/abras/">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="/tokens.css" />
+<link rel="icon" href="/icone.svg" />
+<style>
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font-family: var(--fonte); }
+  a { color: var(--ink); } a:hover { color: var(--muted); }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 4px; background: var(--concrete); outline: none; margin: 0; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 32px; height: 32px; border-radius: 50%; background: var(--preto); border: 5px solid var(--silver); box-shadow: 0 0 0 1.5px var(--preto); cursor: pointer; }
+  input[type=range]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--preto); border: 4px solid var(--silver); cursor: pointer; }
+  input[type=text], input[type=email], input[type=tel] { height: 52px; border-radius: 4px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); padding: 0 16px; font: 400 16px/1 var(--fonte); width: 100%; box-sizing: border-box; }
+  input:focus { border-color: var(--preto); outline: none; }
+  input::placeholder { color: var(--storm); }
+  @keyframes up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+
+<div data-screen-label="VOW ABRAS" style="min-height: 100vh; display: flex; flex-direction: column">
+
+  <nav style="position: sticky; top: 0; z-index: 40; background: var(--surface); border-bottom: 1px solid var(--line)">
+    <div style="max-width: 1120px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 16px">
+      <a href="#" onClick="{{ irHome }}" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit">
+        <img src="/marca/simbolo-storm.png" alt="" style="display: block; height: 18px; width: auto" />
+        <span style="display: flex; flex-direction: column; line-height: 1.1">
+          <b style="font-size: 15px; font-weight: 600; letter-spacing: 0">GRUPO VOW</b>
+          <span class="eyebrow" style="font-size: 10px">A inteligência tributária que alimenta o Brasil</span>
+        </span>
+      </a>
+      <div style="flex: 1"></div>
+      <sc-if value="{{ naoHome }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; gap: 6px; align-items: center" aria-hidden="true">
+          <sc-for list="{{ pinos }}" as="p" hint-placeholder-count="4">
+            <span style="height: 6px; border-radius: 3px; transition: width .3s, background .3s; width: {{ p.w }}; background: {{ p.bg }}"></span>
+          </sc-for>
+        </div>
+        <button class="btn ghost sm" onClick="{{ recomecar }}">Recomeçar</button>
+      </sc-if>
+      <sc-if value="{{ ehHome }}" hint-placeholder-val="{{ true }}">
+        <a href="#" style="font-size: 14px; color: var(--dim); text-decoration: none">O que é a VOW</a>
+        <a href="#" style="font-size: 14px; color: var(--dim); text-decoration: none">CRM</a>
+      </sc-if>
+    </div>
+  </nav>
+
+  <main style="flex: 1; max-width: 1120px; width: 100%; margin: 0 auto; padding: 48px 24px 80px; box-sizing: border-box">
+
+    <!-- HOME -->
+    <sc-if value="{{ ehHome }}" hint-placeholder-val="{{ true }}">
+      <section style="animation: up .4s ease both">
+        <div class="eyebrow" style="margin-bottom: 22px">JBP 2027 · IBS/CBS · LC 214/2025</div>
+        <h1 style="margin-bottom: 24px; max-width: 18ch">Já fez o seu JBP? <span style="font-weight: 300">Planejou com as novas regras tributárias?</span></h1>
+        <p style="font-size: clamp(17px, 2vw, 23px); color: var(--dim); max-width: 60ch; margin: 0 0 34px; line-height: 1.5">A reforma já está no seu contrato com a indústria e nos seus contratos de serviço. Em três minutos você vê o que muda, quanto custa e o que levar para a mesa.</p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
+          <button class="btn lg" onClick="{{ irEscolha }}">Fazer o diagnóstico gratuito</button>
+          <span style="font-size: 13.5px; color: var(--muted)">Três minutos, sem compromisso. O diagnóstico chega no seu e-mail ao final.</span>
+        </div>
+
+        <div style="margin-top: 72px; padding-top: 48px; border-top: 1px solid var(--line)">
+          <h2 style="margin-bottom: 12px; font-size: clamp(24px, 3vw, 36px)">A operação física não muda. Muda de quem depende o imposto que você recupera.</h2>
+          <p style="color: var(--muted); max-width: 66ch; font-size: 16px; margin: 0 0 32px">O pedido, o recebimento e a gôndola continuam iguais. Três documentos que ninguém olhava passam a definir margem.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px">
+            <div class="card"><div class="eyebrow" style="margin-bottom: 12px">01 · Cadastro do item</div><h3 style="font-size: 22px; margin-bottom: 10px; font-weight: 500">A classificação define a alíquota</h3><p style="color: var(--dim); font-size: 15px; margin: 0">Cesta básica a zero, alimentos com redução, bebida com Imposto Seletivo. NCM errado é imposto a mais em cada cupom.</p></div>
+            <div class="card"><div class="eyebrow" style="margin-bottom: 12px">02 · Cadastro do fornecedor</div><h3 style="font-size: 22px; margin-bottom: 10px; font-weight: 500">Seu crédito depende dele</h3><p style="color: var(--dim); font-size: 15px; margin: 0">O crédito de IBS/CBS só existe depois que o fornecedor paga o imposto dele. Fornecedor irregular é crédito travado no seu balanço.</p></div>
+            <div class="card"><div class="eyebrow" style="margin-bottom: 12px">03 · Contrato</div><h3 style="font-size: 22px; margin-bottom: 10px; font-weight: 500">O acordo comercial virou operação tributada</h3><p style="color: var(--dim); font-size: 15px; margin: 0">Bonificação, verba, gôndola, serviço: tudo precisa de nota e de contrato. Sem isso, o crédito não se sustenta.</p></div>
+          </div>
+        </div>
+
+        <div style="margin-top: 72px; padding-top: 48px; border-top: 1px solid var(--line)">
+          <div class="eyebrow">Gratuito · três minutos</div>
+          <h2 style="margin: 12px 0 12px; font-size: clamp(24px, 3vw, 36px)">Dois diagnósticos, dois números</h2>
+          <p style="color: var(--muted); max-width: 66ch; font-size: 16px; margin: 0 0 32px">Escolha o lado do seu negócio. Dois números bastam, e podem ser aproximados — na tela do resultado você marca quais contratos realmente tem.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+            <sc-for list="{{ produtos }}" as="p" hint-placeholder-count="2">
+              <button onClick="{{ p.escolher }}" class="card" style="text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 28px; padding: 32px; color: var(--ink); font-family: inherit" style-hover="border-color: var(--preto)">
+                <div>
+                  <div class="eyebrow" style="margin-bottom: 12px">{{ p.rotulo }}</div>
+                  <h3 style="font-size: 30px; margin: 0 0 12px; font-weight: 500">{{ p.sub }}</h3>
+                  <p style="color: var(--dim); font-size: 15px; margin: 0; line-height: 1.6">{{ p.pergunta }}</p>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid var(--line); padding-top: 18px; font-size: 14px; font-weight: 500">
+                  <span>{{ p.acao }}</span>
+                  <span style="width: 40px; height: 40px; border-radius: 50%; background: var(--preto); color: var(--silver); display: grid; place-items: center; font-size: 18px">→</span>
+                </div>
+              </button>
+            </sc-for>
+          </div>
+          <a href="#" onClick="{{ irEscolhaAbras }}" style="display: flex; align-items: center; gap: 22px; margin-top: 16px; padding: 22px 28px; border: 1px solid var(--line-2); border-radius: 4px; background: var(--surface); color: var(--ink); text-decoration: none" style-hover="border-color: var(--preto)">
+            <span style="flex: none; width: 64px; height: 64px; border-radius: 50%; border: 1px solid var(--preto); display: grid; place-items: center; font-size: 14px; font-weight: 600">ABRAS</span>
+            <span style="flex: 1; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 17px; font-weight: 500">Você nos encontrou na ABRAS?</strong><span style="font-size: 14.5px; color: var(--dim); line-height: 1.45">Entre por aqui. O diagnóstico é o mesmo do estande e o seu contato chega marcado como visitante da feira — a gente responde primeiro.</span></span>
+            <span style="font-size: 24px">→</span>
+          </a>
+          <p class="fine" style="margin-top: 22px">Estimativa com as premissas do estudo VOW × ABRAS: alíquota de referência 26,5%, mix padrão do varejo por família e margem líquida de 2%. Os valores da sua rede dependem do inventário. Aritmética a validar com o time fiscal da VOW.</p>
+        </div>
+
+        <div style="margin-top: 72px; padding-top: 48px; border-top: 1px solid var(--line)">
+          <div class="eyebrow">A plataforma</div>
+          <h2 style="margin: 12px 0 12px; font-size: clamp(24px, 3vw, 36px)">Três sistemas que se alimentam</h2>
+          <p style="color: var(--muted); max-width: 66ch; font-size: 16px; margin: 0 0 32px">O diagnóstico mostra o tamanho. A plataforma é o que resolve, e continua rodando depois que o projeto acaba.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px">
+            <div class="card" style="border-top: 3px solid var(--preto); display: flex; flex-direction: column"><div class="eyebrow" style="margin-bottom: 12px">Sistema 1</div><h3 style="font-size: 24px; margin-bottom: 10px; font-weight: 500">Fornecedores</h3><div style="color: var(--dim); font-size: 15px; margin-bottom: 16px">Este CNPJ está regular, e quanto do imposto que eu pago a ele volta como crédito?</div><ul style="margin: 0 0 18px; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.7"><li>Todo CNPJ do ERP verificado todo dia</li><li>Semáforo dentro do pedido, com alçada</li><li>Alerta de ruptura antes de faltar na gôndola</li><li>Aviso ao fornecedor antes do bloqueio</li></ul><div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted)">Assinatura por carteira monitorada</div></div>
+            <div class="card" style="border-top: 3px solid var(--preto); display: flex; flex-direction: column"><div class="eyebrow" style="margin-bottom: 12px">Sistema 2</div><h3 style="font-size: 24px; margin-bottom: 10px; font-weight: 500">Contratos</h3><div style="color: var(--dim); font-size: 15px; margin-bottom: 16px">Meus contratos sustentam o crédito que estou tomando?</div><ul style="margin: 0 0 18px; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.7"><li>Revenda, verbas comerciais e indiretos</li><li>Minutas por tipo e por regime</li><li>Score de risco e wizard de adequação</li><li>Nenhum título pago sem contrato vinculado</li></ul><div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted)">Assinatura por contrato ativo</div></div>
+            <div class="card" style="border-top: 3px solid var(--preto); display: flex; flex-direction: column"><div class="eyebrow" style="margin-bottom: 12px">Sistema 3</div><h3 style="font-size: 24px; margin-bottom: 10px; font-weight: 500">Itens</h3><div style="color: var(--dim); font-size: 15px; margin-bottom: 16px">Qual a alíquota certa de cada produto que eu vendo?</div><ul style="margin: 0 0 18px; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.7"><li>Classificação com embasamento por SKU</li><li>Ganho da correção sobre a venda histórica</li><li>Recuperação retroativa de até cinco anos</li><li>Base mestre que melhora a cada cliente</li></ul><div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted)">Projeto mais success fee</div></div>
+          </div>
+          <p style="color: var(--muted); max-width: 66ch; font-size: 16px; margin: 28px 0 0"><strong style="color: var(--ink); font-weight: 500">A ordem importa:</strong> o Sistema 3 define a alíquota de cada item, e é ela que diz quanto crédito está em risco em cada fornecedor e quanto vale cada contrato. Alíquota cheia sobre tudo produz número falso.</p>
+        </div>
+
+        <div style="margin-top: 72px; padding-top: 48px; border-top: 1px solid var(--line)">
+          <div class="eyebrow">Como funciona</div>
+          <h2 style="margin: 12px 0 32px; font-size: clamp(24px, 3vw, 36px)">Do diagnóstico à operação</h2>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line)">
+            <div style="background: var(--surface); padding: 26px 24px"><div class="num" style="font-size: 28px; color: var(--muted); margin-bottom: 12px">01</div><h4 style="font-size: 16px; margin: 0 0 6px; font-weight: 600">Diagnóstico</h4><p style="font-size: 14px; color: var(--muted); margin: 0">Gratuito, na sua base. Mostra o tamanho do que muda, sem promessa de número.</p></div>
+            <div style="background: var(--surface); padding: 26px 24px"><div class="num" style="font-size: 28px; color: var(--muted); margin-bottom: 12px">02</div><h4 style="font-size: 16px; margin: 0 0 6px; font-weight: 600">Inventário</h4><p style="font-size: 14px; color: var(--muted); margin: 0">Extrato de fornecedores e doze meses de notas. Qualquer ERP exporta.</p></div>
+            <div style="background: var(--surface); padding: 26px 24px"><div class="num" style="font-size: 28px; color: var(--muted); margin-bottom: 12px">03</div><h4 style="font-size: 16px; margin: 0 0 6px; font-weight: 600">Classificação</h4><p style="font-size: 14px; color: var(--muted); margin: 0">A inteligência da VOW aplicada à sua carteira, com curadoria humana.</p></div>
+            <div style="background: var(--surface); padding: 26px 24px"><div class="num" style="font-size: 28px; color: var(--muted); margin-bottom: 12px">04</div><h4 style="font-size: 16px; margin: 0 0 6px; font-weight: 600">Operação</h4><p style="font-size: 14px; color: var(--muted); margin: 0">Integrado ao ERP, nos seis momentos em que a decisão acontece.</p></div>
+          </div>
+          <div style="margin-top: 40px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center">
+            <button class="btn lg" onClick="{{ irEscolha }}">Começar pelo diagnóstico</button>
+            <span style="font-size: 14px; color: var(--muted)">ou fale com a gente: <a href="mailto:contato@grupovow.com.br">contato@grupovow.com.br</a></span>
+          </div>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- ESCOLHA -->
+    <sc-if value="{{ ehEscolha }}" hint-placeholder-val="{{ false }}">
+      <section style="animation: up .4s ease both">
+        <div class="eyebrow">JBP 2027 · IBS/CBS · LC 214/2025</div>
+        <h1 style="margin: 16px 0 16px">Escolha um <span style="font-weight: 300">diagnóstico</span></h1>
+        <p style="font-size: clamp(16px, 1.9vw, 20px); color: var(--dim); max-width: 64ch; margin: 0 0 34px">São os dois lados da mesma conta. Em três minutos você vê o que muda, quanto custa e o que levar para a mesa do JBP. O diagnóstico chega no seu e-mail ao final.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px">
+          <sc-for list="{{ produtos }}" as="p" hint-placeholder-count="2">
+            <button onClick="{{ p.escolher }}" class="card" style="text-align: left; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; gap: 28px; padding: 32px; color: var(--ink); font-family: inherit" style-hover="border-color: var(--preto)">
+              <div>
+                <div class="eyebrow" style="margin-bottom: 12px">{{ p.rotulo }}</div>
+                <h3 style="font-size: 34px; margin: 0 0 12px; font-weight: 500">{{ p.sub }}</h3>
+                <p style="color: var(--dim); font-size: 15px; margin: 0; line-height: 1.6">{{ p.pergunta }}</p>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 14px; border-top: 1px solid var(--line); padding-top: 18px; font-size: 14px; font-weight: 500">
+                <span>{{ p.acao }}</span>
+                <span style="width: 40px; height: 40px; border-radius: 50%; background: var(--preto); color: var(--silver); display: grid; place-items: center; font-size: 18px">→</span>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- CADASTRO -->
+    <sc-if value="{{ ehCadastro }}" hint-placeholder-val="{{ false }}">
+      <section style="animation: up .4s ease both">
+        <h1 style="margin-bottom: 16px">Antes de simular, <span style="font-weight: 300">quem é você?</span></h1>
+        <p style="font-size: clamp(16px, 1.9vw, 20px); color: var(--dim); max-width: 64ch; margin: 0 0 34px">O diagnóstico vai para o seu e-mail ao final. O CNPJ é opcional, mas preenche o resto sozinho.</p>
+        <div class="card" style="max-width: 680px">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px">
+            <input style="grid-column: 1 / -1" type="text" placeholder="Seu nome" autoComplete="name" value="{{ nome }}" onInput="{{ setNome }}" />
+            <input style="grid-column: 1 / -1" type="text" placeholder="CNPJ da rede (opcional)" inputMode="numeric" value="{{ cnpj }}" onInput="{{ setCnpj }}" />
+            <input type="email" placeholder="E-mail" autoComplete="email" inputMode="email" value="{{ email }}" onInput="{{ setEmail }}" />
+            <input type="tel" placeholder="Telefone" autoComplete="tel" inputMode="tel" value="{{ telefone }}" onInput="{{ setTelefone }}" />
+          </div>
+          <sc-if value="{{ temCnpjStatus }}" hint-placeholder-val="{{ false }}">
+            <div style="font-size: 13px; color: var(--muted); margin: -4px 0 12px; display: flex; gap: 8px; align-items: center"><span style="width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: {{ cnpjCor }}"></span><span>{{ cnpjStatus }}</span></div>
+          </sc-if>
+          <p class="fine" style="margin: 0">Usamos seus dados só para enviar este diagnóstico e falar com você sobre ele.</p>
+        </div>
+        <div style="font-size: 14px; margin-top: 12px; min-height: 20px; color: var(--risco)">{{ msgCad }}</div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; align-items: center">
+          <button class="btn lg" onClick="{{ continuar }}">Continuar para a simulação</button>
+          <button class="btn ghost" onClick="{{ irEscolha }}">Voltar</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- SIMULAR -->
+    <sc-if value="{{ ehSimular }}" hint-placeholder-val="{{ false }}">
+      <section style="animation: up .4s ease both">
+        <h1 style="margin-bottom: 16px">Dois números <span style="font-weight: 300">bastam</span></h1>
+        <p style="font-size: clamp(16px, 1.9vw, 20px); color: var(--dim); max-width: 64ch; margin: 0 0 34px">Pode ser aproximado. Na tela seguinte você marca quais contratos tem de verdade e ajusta linha a linha.</p>
+        <div style="display: grid; gap: 16px; max-width: 760px">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 14px"><label style="font-size: 15px; color: var(--muted)">Faturamento anual da rede</label><span class="num" style="font-size: 40px">{{ fatFmt }}</span></div>
+            <input type="range" min="0" max="1000" step="1" value="{{ fatSlider }}" onInput="{{ setFatSlider }}" />
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px">
+              <sc-for list="{{ chipsFat }}" as="c" hint-placeholder-count="5"><button class="chip" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}">{{ c.label }}</button></sc-for>
+            </div>
+          </div>
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 14px"><label style="font-size: 15px; color: var(--muted)">{{ campoPct }}</label><span class="num" style="font-size: 40px">{{ pctFmt }}</span></div>
+            <input type="range" min="{{ pctMin }}" max="{{ pctMax }}" step="{{ pctStep }}" value="{{ pct }}" onInput="{{ setPct }}" />
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px">
+              <sc-for list="{{ chipsPct }}" as="c" hint-placeholder-count="5"><button class="chip" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}">{{ c.label }}</button></sc-for>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; padding: 20px 0 0; border-top: 1px solid var(--line); margin-top: 6px">
+            <span style="font-size: 14px; color: var(--muted)">{{ resumoRot }}</span>
+            <span class="num" style="font-size: 30px">{{ resumoVal }}</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; align-items: center">
+          <button class="btn lg" onClick="{{ verResultado }}">Ver o diagnóstico</button>
+          <button class="btn ghost" onClick="{{ irEscolha }}">Voltar</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- RESULTADO -->
+    <sc-if value="{{ ehResultado }}" hint-placeholder-val="{{ false }}">
+      <section style="animation: up .4s ease both">
+        <div class="eyebrow">{{ prodSub }}</div>
+        <div style="margin: 8px 0 38px">
+          <div style="font-size: 15px; color: var(--dim); margin-bottom: 8px">{{ heroRot }}</div>
+          <div class="num" style="font-size: clamp(56px, 10vw, 112px); line-height: .95; color: {{ heroCor }}">{{ heroNum }}</div>
+          <div style="font-size: 16px; color: var(--dim); margin-top: 12px; max-width: 60ch">{{ heroSub }}</div>
+          <span class="tag {{ heroTag }}" style="margin-top: 12px">{{ heroTagTexto }}</span>
+        </div>
+
+        <div style="margin-top: 52px">
+          <h2 style="font-size: clamp(24px, 3.2vw, 36px); margin-bottom: 8px">O antes e o <span style="font-weight: 300">depois</span></h2>
+          <p style="color: var(--muted); font-size: 15px; margin: 0 0 22px">Três cenários sobre os mesmos números.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px">
+            <sc-for list="{{ cenarios }}" as="c" hint-placeholder-count="3">
+              <div class="card" style="border-top: 4px solid {{ c.topo }}">
+                <div class="eyebrow" style="margin-bottom: 14px">{{ c.t }}</div>
+                <sc-for list="{{ c.ln }}" as="l" hint-placeholder-count="3">
+                  <div style="display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; font-size: 14px; color: var(--dim); border-bottom: 1px solid var(--line)"><span>{{ l.a }}</span><b class="tnum" style="color: var(--ink); font-weight: 500">{{ l.b }}</b></div>
+                </sc-for>
+                <div style="margin-top: 16px">
+                  <div class="eyebrow">{{ c.l }}</div>
+                  <div class="num" style="font-size: 32px; margin-top: 6px">{{ c.v }}</div>
+                  <div class="fine" style="margin-top: 6px">{{ c.n }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div class="rule" style="margin-top: 20px"><p>{{ callout }}</p></div>
+        </div>
+
+        <div style="margin-top: 52px">
+          <h2 style="font-size: clamp(24px, 3.2vw, 36px); margin-bottom: 8px">O que muda no <span style="font-weight: 300">caixa</span></h2>
+          <p style="color: var(--muted); font-size: 15px; margin: 0 0 16px; max-width: 70ch">{{ caixaLeg }}</p>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 0 0 16px">
+            <span class="fine" style="margin-right: 6px">{{ caixaChipRot }}:</span>
+            <sc-for list="{{ chipsCaixa }}" as="c" hint-placeholder-count="4"><button class="chip" aria-pressed="{{ c.on }}" onClick="{{ c.pick }}">{{ c.label }}</button></sc-for>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px">
+            <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="4">
+              <div class="kpi {{ t.cls }}"><div class="eyebrow">{{ t.l }}</div><div class="num" style="font-size: 30px; margin-top: 8px">{{ t.v }}</div><div class="fine" style="margin-top: 6px">{{ t.n }}</div></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="margin-top: 52px">
+          <h2 style="font-size: clamp(24px, 3.2vw, 36px); margin-bottom: 8px">Linha a <span style="font-weight: 300">linha</span></h2>
+          <p style="color: var(--muted); font-size: 15px; margin: 0 0 14px; max-width: 70ch">Toque nas linhas que <b>você não tem</b> para tirá-las da conta, e use <b>− +</b> para calibrar cada uma. Cada linha é independente: ajustar uma não mexe nas outras.</p>
+          <div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: center; font-size: 13.5px; color: var(--muted); margin: 0 0 16px">
+            <span>{{ famConta }}</span>
+            <span style="display: flex; gap: 8px; align-items: center">Referência inicial: <b class="tnum">{{ baseRefFmt }}</b> · Total calibrado: <b class="tnum">{{ baseFmt }}</b>
+              <sc-if value="{{ calibrado }}" hint-placeholder-val="{{ false }}"><button class="chip" onClick="{{ resetCal }}">Voltar à referência</button></sc-if>
+            </span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <sc-for list="{{ familias }}" as="f" hint-placeholder-count="6">
+              <div class="card" style="padding: 18px 20px; cursor: pointer; opacity: {{ f.op }}; background: {{ f.bg }}" onClick="{{ f.toggle }}">
+                <div style="display: flex; align-items: flex-start; gap: 14px">
+                  <div style="width: 24px; height: 24px; border-radius: 4px; border: 2px solid {{ f.cxBorda }}; background: {{ f.cxBg }}; flex: 0 0 auto; display: grid; place-items: center; font-size: 14px; color: var(--silver); margin-top: 2px">{{ f.check }}</div>
+                  <div style="flex: 1; min-width: 0">
+                    <div style="font-size: 17px; font-weight: 500">{{ f.nome }}</div>
+                    <span class="tag {{ f.tagCls }}" style="margin-top: 6px">{{ f.tag }}</span>
+                  </div>
+                  <div style="text-align: right; flex: 0 0 auto">
+                    <div class="num" style="font-size: 24px">{{ f.valorFmt }}</div>
+                    <sc-if value="{{ f.on }}" hint-placeholder-val="{{ true }}">
+                      <div style="display: flex; gap: 6px; justify-content: flex-end; margin-top: 8px; align-items: center">
+                        <button class="btn ghost sm" style="width: 32px; padding: 0" onClick="{{ f.menos }}" aria-label="Diminuir">−</button>
+                        <button class="btn ghost sm" style="width: 32px; padding: 0" onClick="{{ f.mais }}" aria-label="Aumentar">+</button>
+                        <span class="fine tnum" style="min-width: 104px; text-align: right">{{ f.pesoTxt }}</span>
+                      </div>
+                    </sc-if>
+                  </div>
+                </div>
+                <sc-if value="{{ f.on }}" hint-placeholder-val="{{ true }}">
+                  <div style="height: 8px; border-radius: 4px; background: var(--concrete); margin-top: 14px; overflow: hidden"><div style="height: 100%; border-radius: 4px; width: {{ f.barW }}; background: linear-gradient(90deg, var(--piano) {{ f.fracPct }}, var(--storm) {{ f.fracPct }})"></div></div>
+                  <div style="font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5"><b style="color: var(--dim); font-weight: 500">Hoje:</b> {{ f.hoje }} <b style="color: var(--dim); font-weight: 500">· Muda:</b> {{ f.muda }}</div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ ehIndiretos }}" hint-placeholder-val="{{ false }}"><p class="fine" style="margin-top: 14px">Serviços financeiros têm regime específico na LC 214 e ficam fora deste cálculo — entram na análise da consultoria.</p></sc-if>
+        </div>
+
+        <div style="margin-top: 52px">
+          <h2 style="font-size: clamp(24px, 3.2vw, 36px); margin-bottom: 8px">Como ficar em <span style="font-weight: 300">conformidade</span></h2>
+          <p style="color: var(--muted); font-size: 15px; margin: 0 0 22px; max-width: 70ch">{{ ordem }}</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px">
+            <sc-for list="{{ etapas }}" as="e" hint-placeholder-count="5">
+              <div style="border-top: 1px solid var(--line-2); padding-top: 16px"><div class="num" style="font-size: 30px; color: var(--muted)">{{ e.n }}</div><div style="font-size: 17px; font-weight: 500; margin: 8px 0 6px">{{ e.t }}</div><div style="font-size: 13.5px; color: var(--muted); line-height: 1.55">{{ e.d }}</div></div>
+            </sc-for>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 22px">
+            <sc-for list="{{ mecanismos }}" as="m" hint-placeholder-count="3"><span class="chip" style="cursor: default; display: inline-flex; align-items: center">{{ m }}</span></sc-for>
+          </div>
+        </div>
+
+        <div style="margin-top: 52px">
+          <h2 style="font-size: clamp(24px, 3.2vw, 36px); margin-bottom: 8px">Leve o diagnóstico <span style="font-weight: 300">com você</span></h2>
+          <p style="color: var(--muted); font-size: 15px; margin: 0 0 22px">Chega por e-mail já com as linhas que você marcou.</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; align-items: start">
+            <div class="card">
+              <p style="margin: 0 0 16px; color: var(--dim); font-size: 15px">Vai para <b>{{ email }}</b>, já com as linhas que você marcou.</p>
+              <button class="btn ghost" style="width: 100%; height: auto; padding: 14px 18px; text-align: left; justify-content: flex-start; line-height: 1.4; white-space: normal; border-color: {{ agendarBorda }}; color: {{ agendarBorda }}" onClick="{{ toggleAgendar }}" aria-pressed="{{ agendar }}">{{ agendarTxt }}</button>
+              <div style="font-size: 14px; margin-top: 12px; min-height: 20px; color: var(--risco)">{{ msg }}</div>
+              <button class="btn lg" style="width: 100%; margin-top: 8px" onClick="{{ enviar }}" disabled="{{ enviando }}">{{ enviarTxt }}</button>
+            </div>
+            <div class="card" style="text-align: center; border-style: dashed">
+              <div class="eyebrow">Leve no celular</div>
+              <div style="width: 180px; height: 180px; margin: 12px auto 0; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; color: var(--muted); font-size: 12px; padding: 12px; box-sizing: border-box; line-height: 1.4">QR code gerado pelo servidor ao enviar (/d/:id)</div>
+              <p class="fine" style="margin-top: 12px">Aponte a câmera para abrir este diagnóstico no celular.</p>
+            </div>
+          </div>
+          <p class="fine" style="margin-top: 22px">{{ disclaimer }}</p>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; align-items: center">
+          <button class="btn ghost" onClick="{{ irSimular }}">← Voltar e ajustar os números</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <!-- FIM -->
+    <sc-if value="{{ ehFim }}" hint-placeholder-val="{{ false }}">
+      <section style="animation: up .4s ease both">
+        <div class="eyebrow">Diagnóstico registrado · demonstração</div>
+        <h1 style="margin: 16px 0 16px">{{ fimTit }}</h1>
+        <p style="font-size: clamp(16px, 1.9vw, 20px); color: var(--dim); max-width: 64ch; margin: 0 0 34px">{{ fimSub }}</p>
+        <sc-if value="{{ faltaOutro }}" hint-placeholder-val="{{ false }}">
+          <div class="card" style="max-width: 640px">
+            <div class="eyebrow">Falta a outra metade</div>
+            <h3 style="font-size: 30px; font-weight: 500; margin: 10px 0 10px">{{ outroNome }}</h3>
+            <p style="color: var(--dim); font-size: 15px; margin-bottom: 18px">{{ outroTxt }}</p>
+            <button class="btn" onClick="{{ fazerOutro }}">Fazer o outro com os mesmos dados</button>
+          </div>
+        </sc-if>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px; align-items: center">
+          <button class="btn ghost" onClick="{{ irHome }}">Voltar ao site</button>
+        </div>
+      </section>
+    </sc-if>
+  </main>
+
+  <footer style="border-top: 1px solid var(--line); padding: 40px 24px 56px; color: var(--muted); font-size: 13.5px">
+    <div style="max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 32px">
+      <div style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap">
+        <span>Grupo VOW · Consultoria para o varejo · Porto Alegre · São Paulo · Brasília</span>
+        <span>Estimativas sobre premissas declaradas. Não constituem apuração fiscal.</span>
+      </div>
+      <img src="/marca/logo-horizontal-slogan-storm.png" alt="Grupo VOW — a inteligência tributária que alimenta o Brasil" style="display: block; height: 115px; width: auto; margin: 0 auto; max-width: 100%; object-fit: contain" />
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;telaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;escolha&quot;,&quot;simular&quot;,&quot;resultado&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;'home'|'escolha'|'simular'|'resultado'&quot;,&quot;section&quot;:&quot;Demonstração&quot;}}">
+class Component extends DCLogic {
+  state = { M: null, tela: 'home', produto: null, fat: 300e6, pct: 3, ativas: null, pesos: {}, dReceb: 45, prazo: 60, agendar: false, nome: '', cnpj: '', email: '', telefone: '', cnpjStatus: '', cnpjCor: '', empresa: null, msgCad: '', msg: '', enviando: false, feitos: {}, origem: 'site' };
+  componentDidMount() {
+    import('/motor.js').then(M => {
+      const t = this.props.telaInicial ?? 'home';
+      const demo = t !== 'home' && t !== 'escolha' ? { produto: 'revenda', email: 'demo@rede.com.br', nome: 'Demonstração', feitos: t === 'resultado' ? { revenda: true } : {} } : {};
+      this.setState({ M, tela: t, ...demo });
+    });
+  }
+  ir(tela) { this.setState({ tela }); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} }
+  fatDe(v) { const bruto = 5e6 * Math.pow(10000, v / 1000); const mag = Math.pow(10, Math.floor(Math.log10(bruto)) - 1); return Math.round(bruto / mag) * mag; }
+  fatPara(f) { return Math.round(1000 * Math.log(f / 5e6) / Math.log(10000)); }
+  escolher(id) { const p = this.state.M.PRODUTOS[id]; this.setState({ produto: id, pct: p.pctDefault, ativas: null, pesos: {} }); this.ir(this.state.email ? 'simular' : 'cadastro'); }
+  calc() { const { M, produto, fat, pct, ativas, pesos } = this.state; return M.simular(produto, fat, pct, ativas, pesos); }
+  renderVals() {
+    const s = this.state, M = s.M;
+    const tela = s.tela;
+    const ORDEM = ['escolha', 'cadastro', 'simular', 'resultado'];
+    const i = ORDEM.indexOf(tela);
+    const out = {
+      ehHome: tela === 'home', naoHome: tela !== 'home', ehEscolha: tela === 'escolha', ehCadastro: tela === 'cadastro', ehSimular: tela === 'simular', ehResultado: tela === 'resultado', ehFim: tela === 'fim',
+      pinos: ORDEM.map((_, k) => ({ w: k <= i ? '30px' : '12px', bg: k <= i ? 'var(--preto)' : 'var(--concrete)' })),
+      irHome: (e) => { e && e.preventDefault(); this.ir('home'); },
+      irEscolha: () => this.ir('escolha'),
+      irEscolhaAbras: (e) => { e && e.preventDefault(); this.setState({ origem: 'abras' }); this.ir('escolha'); },
+      irSimular: () => this.ir('simular'),
+      recomecar: () => { this.setState({ produto: null, fat: 300e6, pct: 3, ativas: null, pesos: {}, agendar: false, feitos: {}, nome: '', cnpj: '', email: '', telefone: '', cnpjStatus: '', empresa: null, msg: '', msgCad: '' }); this.ir('escolha'); },
+      nome: s.nome, cnpj: s.cnpj, email: s.email, telefone: s.telefone, msgCad: s.msgCad, msg: s.msg,
+      temCnpjStatus: !!s.cnpjStatus, cnpjStatus: s.cnpjStatus, cnpjCor: s.cnpjCor,
+      setNome: (e) => this.setState({ nome: e.target.value }),
+      setEmail: (e) => this.setState({ email: e.target.value }),
+      setTelefone: (e) => this.setState({ telefone: M ? M.fmtFone(e.target.value) : e.target.value }),
+      setCnpj: (e) => this.buscarCnpj(e.target.value),
+      continuar: () => { if (!M || !M.emailOk(s.email)) { this.setState({ msgCad: 'Confira o e-mail — é para onde o diagnóstico vai.' }); return; } this.setState({ msgCad: '' }); this.ir('simular'); },
+      produtos: [], agendar: s.agendar, enviando: s.enviando,
+      enviarTxt: s.enviando ? 'Enviando…' : 'Enviar para o meu e-mail',
+      agendarTxt: s.agendar ? '✓ Conversa com a VOW solicitada. Entramos em contato.' : 'Quero conversar com a VOW sobre este diagnóstico',
+      agendarBorda: s.agendar ? 'var(--ok)' : 'var(--line-2)',
+      toggleAgendar: () => this.setState({ agendar: !s.agendar }),
+    };
+    if (!M) return out;
+    out.produtos = Object.values(M.PRODUTOS).map((p, k) => ({ rotulo: `Diagnóstico 0${k + 1}/02`, sub: p.sub, pergunta: p.pergunta, acao: s.feitos[p.id] ? '✓ já feito' : p.curto, escolher: () => this.escolher(p.id) }));
+    if (!s.produto) return out;
+    const p = M.PRODUTOS[s.produto], rev = s.produto === 'revenda';
+    const CHIPS_FAT = [50e6, 300e6, 1e9, 5e9, 20e9], CHIPS_PCT = rev ? [1.5, 2, 3, 4, 6] : [4, 6, 8, 10, 12];
+    Object.assign(out, {
+      campoPct: p.campoPct, pctMin: p.pctMin, pctMax: p.pctMax, pctStep: p.pctStep, pct: s.pct,
+      fatSlider: this.fatPara(s.fat), fatFmt: M.fmtBRLc(s.fat), pctFmt: M.fmtPct(s.pct / 100),
+      setFatSlider: (e) => this.setState({ fat: this.fatDe(+e.target.value) }),
+      setPct: (e) => this.setState({ pct: +e.target.value }),
+      chipsFat: CHIPS_FAT.map(v => ({ label: M.fmtBRLc(v), on: v === s.fat, pick: () => this.setState({ fat: v }) })),
+      chipsPct: CHIPS_PCT.map(v => ({ label: M.fmtPct(v / 100), on: v === s.pct, pick: () => this.setState({ pct: v }) })),
+      resumoRot: rev ? 'Verba estimada no ano' : 'Gasto estimado com indiretos no ano',
+      resumoVal: M.fmtBRL(s.fat * s.pct / 100),
+      verResultado: () => { this.setState(st => ({ feitos: { ...st.feitos, [st.produto]: true } })); this.ir('resultado'); },
+      prodSub: p.sub, ehIndiretos: !rev,
+    });
+    if (tela !== 'resultado' && tela !== 'fim') return out;
+    const r = this.calc();
+    const fB = M.fmtBRL, fC = M.fmtBRLc, fP = M.fmtPct;
+    out.heroRot = rev ? 'Perda anual se a verba não for recomposta' : 'Crédito que passa a voltar por ano';
+    out.heroNum = fC(rev ? r.perda : r.ganho);
+    out.heroCor = rev ? 'var(--risco)' : 'var(--ok)';
+    out.heroTag = rev ? 'risk' : 'ok';
+    out.heroTagTexto = rev ? 'Perda · premissas em validação fiscal' : 'Ganho · premissas em validação fiscal';
+    out.heroSub = rev ? `${fP(r.pctLucro)} do lucro anual · ${fP(r.pctTributavel)} da verba passa a ser tributada.` : `Sobre um gasto de ${fB(r.base)} por ano em serviços e indiretos.`;
+    const mk = (t, topo, ln, l, v, n) => ({ t, topo, ln: ln.map(([a, b]) => ({ a, b })), l, v, n });
+    out.cenarios = rev ? [
+      mk('Hoje', 'var(--concrete)', [['Verba negociada', fB(r.base)], ['Tributo sobre a verba', fB(0)], ['Custo para a indústria', fB(r.base)]], 'Fica com o varejo', fB(r.base), 'A verba entra como abatimento, sem tributo próprio.'),
+      mk('Depois, sem mexer no acordo', 'var(--risco)', [['Verba negociada', fB(r.base)], ['Tributo sobre a verba', fB(r.perda)], ['Custo para a indústria', fB(r.base)]], 'Fica com o varejo', fB(r.base - r.perda), 'O tributo sai do bolso do varejo. A indústria paga o mesmo.'),
+      mk('Depois, com a verba recomposta', 'var(--preto)', [['Verba negociada', fB(r.base + r.recomposicao)], ['Tributo sobre a verba', fB(r.recomposicao)], ['Custo para a indústria', fB(r.base)]], 'Fica com o varejo', fB(r.base), 'A indústria credita integralmente o imposto — o custo líquido dela não muda.'),
+    ] : [
+      mk('Hoje', 'var(--concrete)', [['Gasto com indiretos', fB(r.base)], ['Crédito recuperado', fB(r.creditoHoje)], ['Critério de compra', 'Preço']], 'Custo líquido', fB(r.base - r.creditoHoje), 'ISS não credita e PIS/Cofins vive preso ao conceito de insumo.'),
+      mk('Depois, sem revisar a carteira', 'var(--risco)', [['Gasto com indiretos', fB(r.base)], ['Crédito recuperado', fB(r.creditoDepois * 0.6)], ['Critério de compra', 'Preço']], 'Custo líquido', fB(r.base - r.creditoDepois * 0.6), 'Crédito parcial: parte da carteira está em regime que devolve pouco.'),
+      mk('Depois, com a carteira revisada', 'var(--preto)', [['Gasto com indiretos', fB(r.base)], ['Crédito recuperado', fB(r.creditoDepois)], ['Critério de compra', 'Custo líquido']], 'Custo líquido', fB(r.base - r.creditoDepois), 'Regime declarado, nota correta e contrato com gatilho de mudança.'),
+    ];
+    out.callout = rev
+      ? 'Leia a linha custo para a indústria: no cenário 3 a verba sobe, mas a indústria credita integralmente o imposto que paga. O custo líquido dela é o mesmo — não se está pedindo dinheiro a mais, e sim que o tributo novo não saia do bolso do varejo.'
+      : 'Duas propostas com o mesmo preço não são mais a mesma proposta. Sobre o mesmo líquido ao prestador, o de crédito integral sai na frente por cerca de 2% — um desconto de pouco mais de 2% já empata a disputa. Estreito demais para decidir de cabeça.';
+    out.caixaLeg = rev ? 'A verba deixa de ser abatimento e vira nota emitida pelo varejo: surge um recebível, e um tributo que vence antes de ele entrar.' : 'Crédito alto na entrada com saída a alíquota zero gera saldo credor. Ele volta, mas pela fila de ressarcimento.';
+    out.caixaChipRot = rev ? 'Prazo para receber a verba' : 'Prazo de ressarcimento';
+    const opcoes = rev ? [30, 45, 60, 90] : [30, 60, 180], atual = rev ? s.dReceb : s.prazo;
+    out.chipsCaixa = opcoes.map(d => ({ label: `${d} dias`, on: d === atual, pick: () => this.setState(rev ? { dReceb: d } : { prazo: d }) }));
+    if (rev) { const c = M.caixaRevenda(r, { dReceb: s.dReceb }); out.tiles = [['Tributo a recolher por mês', fB(c.tribMes), 'Vence no dia 25 do mês seguinte.'], ['Defasagem', `${c.gap} dias`, `Receber em ${c.dReceb} contra recolher em ${c.dTrib}.`], ['Capital de giro imobilizado', fB(c.giro), 'Dinheiro parado só por causa do descasamento.'], ['Custo anual do carrego', fB(c.carrego), `A ${fP(c.cc, 0)} ao ano.`]].map(([l, v, n], k) => ({ l, v, n, cls: k === 3 ? 'on' : '' })); }
+    else { const c = M.caixaIndiretos(r, { prazo: s.prazo }); out.tiles = [['Crédito acumulado por mês', fB(c.credMes), 'Entra como saldo, não como caixa.'], ['Prazo de ressarcimento', `${c.prazo} dias`, 'LC 214: 30 em conformidade, 180 fora dela.'], ['Saldo preso na fila', fB(c.preso), 'Seu dinheiro aguardando devolução.'], ['Custo anual do carrego', fB(c.carrego), `A ${fP(c.cc, 0)} ao ano.`]].map(([l, v, n], k) => ({ l, v, n, cls: k === 3 ? 'on' : '' })); }
+    const ativas = s.ativas || p.familias.map(f => f.nome);
+    const maior = Math.max(...r.familias.map(f => f.valor), 1);
+    out.famConta = ativas.length === p.familias.length ? `Todas as ${p.familias.length} famílias na conta.` : `${ativas.length} de ${p.familias.length} famílias na conta.`;
+    out.baseRefFmt = fB(r.baseRef); out.baseFmt = fB(r.base);
+    out.calibrado = Math.round(r.base) !== Math.round(r.baseRef);
+    out.resetCal = (e) => { e.stopPropagation(); this.setState({ ativas: null, pesos: {} }); };
+    out.familias = p.familias.map(f => {
+      const on = ativas.includes(f.nome), d = r.familias.find(x => x.nome === f.nome), peso = s.pesos[f.nome] ?? f.peso, frac = rev ? f.trib : f.cred;
+      const tag = rev ? (f.trib === 1 ? ['Tributa', 'risk'] : f.trib === 0 ? ['Não tributa', 'ok'] : ['Depende do documento', 'warn']) : (f.cred === 1 ? ['Crédito integral', 'ok'] : f.cred >= 0.8 ? ['Crédito alto', 'ok'] : ['Depende do regime', 'warn']);
+      const ajustar = (delta) => (e) => { e.stopPropagation(); this.setState(st => ({ pesos: { ...st.pesos, [f.nome]: Math.max(1, Math.min(100, (st.pesos[f.nome] ?? f.peso) + delta)) } })); };
+      return { nome: f.nome, on, op: on ? 1 : .5, bg: on ? 'var(--surface)' : 'transparent', check: on ? '✓' : '', cxBorda: on ? 'var(--preto)' : 'var(--line-2)', cxBg: on ? 'var(--preto)' : 'transparent',
+        tag: on ? tag[0] : 'Não tenho', tagCls: on ? tag[1] : 'off', valorFmt: on && d ? fB(d.valor) : '—', pesoTxt: `${peso}% · ${fC(d ? d.valor : 0)}`,
+        barW: `${Math.max(2, ((d ? d.valor : 0) / maior) * 100)}%`, fracPct: `${frac * 100}%`, hoje: f.hoje, muda: f.muda,
+        toggle: () => { if (on && ativas.length === 1) return; this.setState({ ativas: on ? ativas.filter(n => n !== f.nome) : [...ativas, f.nome] }); },
+        menos: ajustar(-1), mais: ajustar(1) };
+    });
+    out.ordem = rev ? 'Classificar antes de renegociar. Quem senta com a indústria sem saber a natureza de cada linha negocia no escuro.' : 'Classificar antes de sentar. Quem negocia sem saber o regime do prestador está negociando preço bruto, que é o número errado.';
+    out.etapas = p.etapas.map((e, k) => ({ n: `0${k + 1}`, t: e.t, d: e.d }));
+    out.mecanismos = p.mecanismos;
+    out.disclaimer = `Ordem de grandeza com alíquota de referência de ${fP(M.ALIQUOTA)}, mix padrão do varejo alimentar e margem líquida de 2%. Não é parecer: as premissas ainda estão em validação pelo time fiscal da VOW, e o número da sua rede depende do seu mix e dos seus contratos.`;
+    out.enviar = () => { this.setState({ enviando: true, msg: '' }); setTimeout(() => { this.setState({ enviando: false }); this.ir('fim'); }, 700); };
+    const primeiro = (s.nome.trim().split(' ')[0]) || '';
+    out.fimTit = primeiro ? `Obrigado, ${primeiro}.` : 'Está a caminho.';
+    out.fimSub = `Nesta demonstração o e-mail não é disparado. Em produção, o diagnóstico vai para ${s.email} com as linhas que você marcou.` + (s.agendar ? ' A VOW entra em contato sobre a conversa que você pediu.' : '');
+    const falta = Object.keys(M.PRODUTOS).find(id => !s.feitos[id]);
+    out.faltaOutro = !!falta;
+    if (falta) { out.outroNome = M.PRODUTOS[falta].sub; out.outroTxt = falta === 'revenda' ? 'Você viu quanto de crédito entra. Falta ver quanto de verba sai — e essa é a metade que dói.' : 'Você viu quanto de verba sai. Falta ver quanto de crédito entra — e essa é a metade que devolve.'; out.fazerOutro = () => { this.setState({ produto: falta, pct: M.PRODUTOS[falta].pctDefault, ativas: null, pesos: {} }); this.ir('simular'); }; }
+    return out;
+  }
+  async buscarCnpj(v) {
+    const M = this.state.M; if (!M) return;
+    const val = M.fmtCNPJ(v), d = M.soDigitos(val);
+    if (d.length !== 14) { this.setState({ cnpj: val, cnpjStatus: '', empresa: null }); return; }
+    this.setState({ cnpj: val, cnpjStatus: 'Buscando dados da empresa…', cnpjCor: 'var(--storm)' });
+    try { const emp = await M.buscarCNPJ(d); this.setState({ empresa: emp, cnpjStatus: `${emp.razao} · ${emp.municipio}/${emp.uf}`, cnpjCor: 'var(--ok)' }); }
+    catch (e) { this.setState({ empresa: null, cnpjStatus: 'CNPJ não encontrado. Pode seguir sem ele.', cnpjCor: 'var(--risco)' }); }
+  }
+}
+</script>
+</body>
+</html>

@@ -11,12 +11,12 @@
 <link rel="stylesheet" href="/tokens.css">
 <style>
   /* Camada pública: escala escura, a mesma da landing e do totem. */
-  nav{position:sticky;top:0;z-index:40;background:rgba(14,27,20,.92);backdrop-filter:blur(10px);
+  nav{position:sticky;top:0;z-index:40;background:var(--surface);backdrop-filter:blur(10px);
       border-bottom:1px solid var(--line)}
   nav .row{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:16px}
   nav .sp{flex:1}
   .passos{display:flex;gap:6px;align-items:center}
-  .pino{height:8px;width:14px;border-radius:4px;background:rgba(243,238,226,.18);transition:width .3s,background .3s}
+  .pino{height:6px;width:14px;border-radius:3px;background:var(--line-2);transition:width .3s,background .3s}
   .pino.on{width:34px;background:var(--gold)}
   .recomecar{background:none;border:1px solid var(--line-2);color:var(--dim);border-radius:var(--r-pill);
              padding:8px 16px;font:400 13px/1 var(--sans);cursor:pointer}
@@ -74,7 +74,7 @@
   .cen{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);padding:24px;
        position:relative;overflow:hidden}
   .cen::before{content:'';position:absolute;inset:0 0 auto;height:5px}
-  .cen.c1{background:#122019}.cen.c1::before{background:var(--faint)}
+  .cen.c1{background:var(--bg-deep)}.cen.c1::before{background:var(--faint)}
   .cen.c2::before{background:var(--risk)}
   .cen.c3::before{background:var(--gold)}
   .cen .t{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
@@ -114,7 +114,7 @@
              color:var(--ink);font:400 17px/1 var(--sans);cursor:pointer}
   .pm button:hover{border-color:var(--gold);color:var(--gold)}
   .pm span{font-size:12px;color:var(--faint);min-width:104px;text-align:right}
-  .barra{height:10px;border-radius:5px;background:#2A3D33;margin-top:14px;overflow:hidden}
+  .barra{height:10px;border-radius:5px;background:var(--concrete);margin-top:14px;overflow:hidden}
   .barra i{display:block;height:100%;border-radius:5px}
   .fam .mud{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5}
   .fam .mud b{color:var(--dim);font-weight:500}
@@ -151,7 +151,13 @@
 </head>
 <body>
 <nav><div class="row">
-  <a href="/" class="logo">VOW</a>
+  <a href="/" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit">
+    <img src="/marca/simbolo-storm.png" alt="" style="display:block;height:18px;width:auto">
+    <span style="display:flex;flex-direction:column;line-height:1.1">
+      <b style="font-size:15px;font-weight:600">GRUPO VOW</b>
+      <span class="eyebrow" style="font-size:10px">A inteligência tributária que alimenta o Brasil</span>
+    </span>
+  </a>
   <div class="sp"></div>
   <div class="passos" id="passos" aria-hidden="true"></div>
   <button class="recomecar" id="recomecar" hidden>Recomeçar</button>
@@ -560,7 +566,7 @@ function pintarFamilias(r) {
             <span>${peso}% · ${fmtBRLc(d ? d.valor : 0)}</span></div>` : ''}
         </div>
       </div>
-      ${on ? `<div class="barra"><i style="width:${Math.max(2, (d.valor / maior) * 100)}%;background:linear-gradient(90deg,${tag[1]} ${frac * 100}%,#3A4F42 ${frac * 100}%)"></i></div>
+      ${on ? `<div class="barra"><i style="width:${Math.max(2, (d.valor / maior) * 100)}%;background:linear-gradient(90deg,${tag[1]} ${frac * 100}%,var(--concrete) ${frac * 100}%)"></i></div>
       <div class="mud"><b>Hoje:</b> ${esc(f.hoje)} <b>·  Muda:</b> ${esc(f.muda)}</div>` : ''}
     </div>`
   }).join('')

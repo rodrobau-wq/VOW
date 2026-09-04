@@ -2,122 +2,210 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VOW · Reforma tributária no varejo</title>
 <meta name="description" content="Dois diagnósticos gratuitos: quanto da sua verba com a indústria passa a ser tributada e quanto do seu gasto com serviços volta como crédito.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/tokens.css">
+<link rel="icon" href="/icone.svg">
 <style>
-  /* Tela única, sem rolagem: é o que fica no painel do estande e no monitor
-     da recepção. O site completo (produto, como funciona, rodapé) vive em
-     /site — esta aqui só precisa fazer uma pergunta e abrir o diagnóstico. */
-  html,body{height:100%}
-  body{overflow:hidden}
-  #tela{height:100dvh;display:flex;flex-direction:column}
+  /* Estrutura e copy vêm de public/abras/abras.dc.html, o protótipo do
+     Claude Design — fonte da verdade do desenho. Aqui ele está ligado ao
+     backend: os cartões abrem o diagnóstico real, que grava o lead. */
+  nav{position:sticky;top:0;z-index:40;background:var(--surface);border-bottom:1px solid var(--line)}
+  nav .row{max-width:1120px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:16px}
+  nav .sp{flex:1}
+  nav a.lnk{font-size:14px;color:var(--dim);text-decoration:none}
+  nav a.lnk:hover{color:var(--ink)}
+  .assin{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+  .assin b{font-size:15px;font-weight:600;line-height:1.1;display:block}
 
-  header{display:flex;align-items:center;gap:20px;flex:0 0 auto;
-         padding:20px 40px;border-bottom:1px solid var(--line)}
-  header .sp{flex:1}
-  .marca{display:flex;align-items:baseline;gap:14px}
-  .marca .sub{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
-
-  /* Seletor de orientação — canto superior esquerdo, ao lado da marca. */
-  .orient{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--line-2);border-radius:var(--r-pill)}
-  .orient button{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;
-                 border:0;border-radius:var(--r-pill);background:transparent;color:var(--muted);
-                 font:400 12.5px/1 var(--sans);cursor:pointer}
-  .orient button[aria-pressed="true"]{background:var(--gold);color:var(--bg)}
-  .orient i{display:block;border:1.5px solid currentColor;border-radius:2px}
-  .orient .iv{width:11px;height:17px}
-  .orient .ih{width:17px;height:11px}
-  .orient .rot{display:none}
-
-  main{flex:1 1 auto;display:grid;align-content:center;padding:40px 40px 48px;min-height:0}
-  .eyebrow{margin-bottom:22px}
-  h1{font-size:clamp(40px,6.6vw,84px);margin-bottom:26px}
-  h1 em{font-style:italic;color:var(--gold)}
-  .lead{font-size:clamp(17px,2vw,23px);color:var(--dim);max-width:60ch;margin-bottom:34px;line-height:1.5}
+  main{max-width:1120px;width:100%;margin:0 auto;padding:48px 24px 80px}
+  h1{margin-bottom:24px;max-width:18ch}
+  h1 .leve{font-weight:300}
+  .lead{font-size:clamp(17px,2vw,23px);color:var(--dim);max-width:60ch;margin:0 0 34px;line-height:1.5}
   .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .nota{font-size:13.5px;color:var(--faint);margin:22px 0 0}
+  .cta .nota{font-size:13.5px;color:var(--muted)}
 
-  /* ---------------------------------------------------------- vertical */
-  /* Retrato: coluna única, tipografia maior, conteúdo centrado na altura. */
-  body[data-orient="vertical"] main{max-width:920px;margin:0 auto;width:100%}
-  body[data-orient="vertical"] h1{font-size:clamp(44px,7.4vw,92px)}
+  .bloco{margin-top:72px;padding-top:48px;border-top:1px solid var(--line)}
+  .bloco h2{margin-bottom:12px;font-size:clamp(24px,3vw,36px)}
+  .bloco .sub{color:var(--muted);max-width:66ch;font-size:16px;margin:0 0 32px}
+  .grade{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+  .grade.larga{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .card h3{font-size:22px;margin-bottom:10px;font-weight:500}
+  .card p{color:var(--dim);font-size:15px;margin:0}
 
-  /* -------------------------------------------------------- horizontal */
-  /* Paisagem: texto à esquerda, ações à direita, para o olho não varrer a
-     tela inteira num monitor largo. */
-  body[data-orient="horizontal"] main{
-    grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;
-    max-width:1360px;margin:0 auto;width:100%}
-  body[data-orient="horizontal"] .col-b{border-left:1px solid var(--line);padding-left:56px}
-  body[data-orient="horizontal"] .lead{margin-bottom:0}
-  body[data-orient="horizontal"] .cta{flex-direction:column;align-items:stretch}
-  body[data-orient="horizontal"] .cta .btn{width:100%}
-  body[data-orient="horizontal"] .orient .rot{display:inline}
+  /* cartões de diagnóstico */
+  a.prod{display:flex;flex-direction:column;justify-content:space-between;gap:28px;
+         padding:32px;text-decoration:none;color:var(--ink)}
+  a.prod:hover{border-color:var(--preto)}
+  a.prod h3{font-size:30px;margin:0 0 12px;font-weight:500}
+  a.prod .ir{display:flex;align-items:center;justify-content:space-between;gap:14px;
+             border-top:1px solid var(--line);padding-top:18px;font-size:14px;font-weight:500}
+  a.prod .seta{width:40px;height:40px;border-radius:50%;background:var(--preto);color:var(--silver);
+               display:grid;place-items:center;font-size:18px}
 
-  /* Numa tela estreita a escolha some: só cabe o retrato. */
-  @media(max-width:900px){
-    .orient{display:none}
-    body[data-orient="horizontal"] main{grid-template-columns:1fr;gap:0}
-    body[data-orient="horizontal"] .col-b{border-left:0;padding-left:0;margin-top:30px}
-    body[data-orient="horizontal"] .cta{flex-direction:row}
-    header{padding:16px 22px} main{padding:24px 22px 32px}
-  }
+  a.abras{display:flex;align-items:center;gap:22px;margin-top:16px;padding:22px 28px;
+          border:1px solid var(--line-2);border-radius:4px;background:var(--surface);
+          color:var(--ink);text-decoration:none}
+  a.abras:hover{border-color:var(--preto)}
+  a.abras .selo{flex:none;width:64px;height:64px;border-radius:50%;border:1px solid var(--preto);
+                display:grid;place-items:center;font-size:14px;font-weight:600}
+  a.abras .txt{flex:1;display:flex;flex-direction:column;gap:4px}
+  a.abras .txt strong{font-size:17px;font-weight:500}
+  a.abras .txt span{font-size:14.5px;color:var(--dim);line-height:1.45}
+
+  .sistema{border-top:3px solid var(--preto);display:flex;flex-direction:column}
+  .sistema h3{font-size:24px}
+  .sistema ul{margin:0 0 18px;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.7}
+  .sistema .rodape{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);
+                   font-size:13px;color:var(--muted)}
+
+  .passos{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;
+          background:var(--line);border:1px solid var(--line)}
+  .passo{background:var(--surface);padding:26px 24px}
+  .passo h4{font-size:16px;margin:0 0 6px;font-weight:600}
+  .passo p{font-size:14px;color:var(--muted);margin:0}
+
+  footer{border-top:1px solid var(--line);padding:48px 24px;text-align:center;background:var(--surface)}
+  /* Redução mínima do logotipo: 115 px de altura (Brandguide, pág. 22). */
+  footer img{display:block;height:115px;width:auto;margin:0 auto;max-width:100%;object-fit:contain}
 </style>
 </head>
-<body data-orient="vertical">
-<div id="tela">
-  <header>
-    <div class="marca">
-      <span class="logo">VOW</span>
-      <span class="sub">Reforma tributária no varejo</span>
+<body>
+<nav><div class="row">
+  <a class="assin" href="/">
+    <img src="/marca/simbolo-storm.png" alt="" style="display:block;height:18px;width:auto">
+    <span style="display:flex;flex-direction:column;line-height:1.1">
+      <b>GRUPO VOW</b>
+      <span class="eyebrow" style="font-size:10px">A inteligência tributária que alimenta o Brasil</span>
+    </span>
+  </a>
+  <div class="sp"></div>
+  <a class="lnk" href="/site">O que é a VOW</a>
+  <a class="lnk" href="/app/pipeline">CRM</a>
+</div></nav>
+
+<main>
+  <div class="eyebrow" style="margin-bottom:22px">JBP 2027 · IBS/CBS · LC 214/2025</div>
+  <h1>Já fez o seu JBP? <span class="leve">Planejou com as novas regras tributárias?</span></h1>
+  <p class="lead">A reforma já está no seu contrato com a indústria e nos seus contratos de
+  serviço. Em três minutos você vê o que muda, quanto custa e o que levar para a mesa.</p>
+  <div class="cta">
+    <a class="btn lg" href="/diagnostico">Fazer o diagnóstico gratuito</a>
+    <span class="nota">Três minutos, sem compromisso. O diagnóstico chega no seu e-mail ao final.</span>
+  </div>
+
+  <section class="bloco">
+    <h2>A operação física não muda. Muda de quem depende o imposto que você recupera.</h2>
+    <p class="sub">O pedido, o recebimento e a gôndola continuam iguais. Três documentos que
+    ninguém olhava passam a definir margem.</p>
+    <div class="grade">
+      <div class="card"><div class="eyebrow" style="margin-bottom:12px">01 · Cadastro do item</div>
+        <h3>A classificação define a alíquota</h3>
+        <p>Cesta básica a zero, alimentos com redução, bebida com Imposto Seletivo. NCM errado
+        é imposto a mais em cada cupom.</p></div>
+      <div class="card"><div class="eyebrow" style="margin-bottom:12px">02 · Cadastro do fornecedor</div>
+        <h3>Seu crédito depende dele</h3>
+        <p>O crédito de IBS/CBS só existe depois que o fornecedor paga o imposto dele.
+        Fornecedor irregular é crédito travado no seu balanço.</p></div>
+      <div class="card"><div class="eyebrow" style="margin-bottom:12px">03 · Contrato</div>
+        <h3>O acordo comercial virou operação tributada</h3>
+        <p>Bonificação, verba, gôndola, serviço: tudo precisa de nota e de contrato. Sem isso,
+        o crédito não se sustenta.</p></div>
     </div>
-    <div class="orient" role="group" aria-label="Orientação da tela">
-      <button data-o="vertical" aria-pressed="true"><i class="iv"></i><span class="rot">Vertical</span></button>
-      <button data-o="horizontal" aria-pressed="false"><i class="ih"></i><span class="rot">Horizontal</span></button>
+  </section>
+
+  <section class="bloco">
+    <div class="eyebrow">Gratuito · três minutos</div>
+    <h2 style="margin-top:12px">Dois diagnósticos, dois números</h2>
+    <p class="sub">Escolha o lado do seu negócio. Dois números bastam, e podem ser aproximados
+    — na tela do resultado você marca quais contratos realmente tem.</p>
+    <div class="grade larga">
+      <a class="card prod" href="/diagnostico?d=revenda">
+        <div>
+          <div class="eyebrow" style="margin-bottom:12px">Diagnóstico 01/02</div>
+          <h3>Verbas com a indústria</h3>
+          <p>Quanto do que você recebe passa a ser tributado?</p>
+        </div>
+        <div class="ir"><span>Revenda</span><span class="seta">→</span></div>
+      </a>
+      <a class="card prod" href="/diagnostico?d=indiretos">
+        <div>
+          <div class="eyebrow" style="margin-bottom:12px">Diagnóstico 02/02</div>
+          <h3>Serviços e indiretos</h3>
+          <p>Quanto de cada real que você paga volta como crédito?</p>
+        </div>
+        <div class="ir"><span>Indiretos</span><span class="seta">→</span></div>
+      </a>
     </div>
-    <div class="sp"></div>
-    <a class="lnk" href="/site" style="font-size:14px;color:var(--dim)">O que é a VOW</a>
-    <a class="lnk" href="/app/pipeline" style="font-size:14px;color:var(--dim)">CRM</a>
-  </header>
+    <a class="abras" href="/diagnostico?e=abras">
+      <span class="selo">ABRAS</span>
+      <span class="txt">
+        <strong>Você nos encontrou na ABRAS?</strong>
+        <span>Entre por aqui. O diagnóstico é o mesmo do estande e o seu contato chega marcado
+        como visitante da feira — a gente responde primeiro.</span>
+      </span>
+      <span style="font-size:24px">→</span>
+    </a>
+    <p class="fine" style="margin-top:22px">Estimativa com as premissas do estudo VOW × ABRAS:
+    alíquota de referência 26,5%, mix padrão do varejo por família e margem líquida de 2%. Os
+    valores da sua rede dependem do inventário. Aritmética a validar com o time fiscal da VOW.</p>
+  </section>
 
-  <main>
-    <div class="col-a">
-      <div class="eyebrow">JBP 2027 · IBS/CBS · LC 214/2025</div>
-      <h1>Já fez o seu JBP? <em>Planejou com as novas regras tributárias?</em></h1>
-      <p class="lead">A reforma já está no seu contrato com a indústria e nos seus contratos de
-      serviço. Em três minutos você vê o que muda, quanto custa e o que levar para a mesa.</p>
+  <section class="bloco">
+    <div class="eyebrow">A plataforma</div>
+    <h2 style="margin-top:12px">Três sistemas que se alimentam</h2>
+    <p class="sub">O diagnóstico mostra o tamanho. A plataforma é o que resolve, e continua
+    rodando depois que o projeto acaba.</p>
+    <div class="grade larga">
+      <div class="card sistema"><div class="eyebrow" style="margin-bottom:12px">Sistema 1</div>
+        <h3>Fornecedores</h3>
+        <p style="margin-bottom:16px">Este CNPJ está regular, e quanto do imposto que eu pago a ele volta como crédito?</p>
+        <ul><li>Todo CNPJ do ERP verificado todo dia</li><li>Semáforo dentro do pedido, com alçada</li>
+        <li>Alerta de ruptura antes de faltar na gôndola</li><li>Aviso ao fornecedor antes do bloqueio</li></ul>
+        <div class="rodape">Assinatura por carteira monitorada</div></div>
+      <div class="card sistema"><div class="eyebrow" style="margin-bottom:12px">Sistema 2</div>
+        <h3>Contratos</h3>
+        <p style="margin-bottom:16px">Meus contratos sustentam o crédito que estou tomando?</p>
+        <ul><li>Revenda, verbas comerciais e indiretos</li><li>Minutas por tipo e por regime</li>
+        <li>Score de risco e wizard de adequação</li><li>Nenhum título pago sem contrato vinculado</li></ul>
+        <div class="rodape">Assinatura por contrato ativo</div></div>
+      <div class="card sistema"><div class="eyebrow" style="margin-bottom:12px">Sistema 3</div>
+        <h3>Itens</h3>
+        <p style="margin-bottom:16px">Qual a alíquota certa de cada produto que eu vendo?</p>
+        <ul><li>Classificação com embasamento por SKU</li><li>Ganho da correção sobre a venda histórica</li>
+        <li>Recuperação retroativa de até cinco anos</li><li>Base mestre que melhora a cada cliente</li></ul>
+        <div class="rodape">Projeto mais success fee</div></div>
     </div>
-    <div class="col-b">
-      <div class="cta">
-        <a class="btn lg" href="/diagnostico">Fazer o diagnóstico gratuito</a>
-      </div>
-      <p class="nota">Três minutos, sem compromisso. O diagnóstico chega no seu e-mail ao final.</p>
+    <p class="sub" style="margin:28px 0 0"><strong style="color:var(--ink);font-weight:500">A ordem
+    importa:</strong> o Sistema 3 define a alíquota de cada item, e é ela que diz quanto crédito
+    está em risco em cada fornecedor e quanto vale cada contrato. Alíquota cheia sobre tudo
+    produz número falso.</p>
+  </section>
+
+  <section class="bloco">
+    <div class="eyebrow">Como funciona</div>
+    <h2 style="margin:12px 0 32px">Do diagnóstico à operação</h2>
+    <div class="passos">
+      <div class="passo"><div class="num" style="font-size:28px;color:var(--muted);margin-bottom:12px">01</div>
+        <h4>Diagnóstico</h4><p>Gratuito, na sua base. Mostra o tamanho do que muda, sem promessa de número.</p></div>
+      <div class="passo"><div class="num" style="font-size:28px;color:var(--muted);margin-bottom:12px">02</div>
+        <h4>Inventário</h4><p>Extrato de fornecedores e doze meses de notas. Qualquer ERP exporta.</p></div>
+      <div class="passo"><div class="num" style="font-size:28px;color:var(--muted);margin-bottom:12px">03</div>
+        <h4>Classificação</h4><p>A inteligência da VOW aplicada à sua carteira, com curadoria humana.</p></div>
+      <div class="passo"><div class="num" style="font-size:28px;color:var(--muted);margin-bottom:12px">04</div>
+        <h4>Operação</h4><p>Integrado ao ERP, nos seis momentos em que a decisão acontece.</p></div>
     </div>
-  </main>
-</div>
+    <div class="cta" style="margin-top:40px">
+      <a class="btn lg" href="/diagnostico">Começar pelo diagnóstico</a>
+      <span class="nota">ou fale com a gente: <a href="mailto:contato@grupovow.com.br">contato@grupovow.com.br</a></span>
+    </div>
+  </section>
+</main>
 
-<script>
-  const CHAVE = 'vow_abras_orientacao'
-  const botoes = document.querySelectorAll('.orient button')
-
-  function aplicar(o, guardar) {
-    document.body.dataset.orient = o
-    for (const b of botoes) b.setAttribute('aria-pressed', String(b.dataset.o === o))
-    if (guardar) { try { localStorage.setItem(CHAVE, o) } catch {} }
-  }
-
-  // Preferência do operador vence. Sem preferência, a própria tela decide:
-  // no estande o painel é retrato, num monitor de recepção é paisagem.
-  let inicial = null
-  try { inicial = localStorage.getItem(CHAVE) } catch {}
-  aplicar(inicial || (innerWidth > innerHeight ? 'horizontal' : 'vertical'), false)
-
-  for (const b of botoes) b.addEventListener('click', () => aplicar(b.dataset.o, true))
-</script>
+<footer>
+  <img src="/marca/logo-horizontal-slogan-storm.png"
+       alt="Grupo VOW — a inteligência tributária que alimenta o Brasil">
+</footer>
 </body>
 </html>
