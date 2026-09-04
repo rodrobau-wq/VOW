@@ -4,24 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Escolher rede · Plataforma VOW</title>
-
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/tokens.css">
 <style>
   h1{font-size:40px;margin-bottom:6px}
-  h1 em{font-style:italic;color:var(--acento)}
+  h1 em{font-style:italic;color:var(--gold)}
   .sub{color:var(--muted);margin-bottom:28px}
   .lista{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
   .rede-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
              padding:26px;text-align:left;cursor:pointer;transition:border-color .2s,transform .2s;color:var(--ink)}
-  .rede-card:hover{border-color:var(--acento-borda);transform:translateY(-2px)}
+  .rede-card:hover{border-color:var(--gold-edge);transform:translateY(-2px)}
   .rede-card h2{font-size:26px;margin-bottom:6px}
   .rede-card .cnpj{font-size:13px;color:var(--faint);font-variant-numeric:tabular-nums}
   .rede-card .meta{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
-  .pill{padding:4px 11px;border-radius:var(--r-sm);background:var(--bg-deep);
+  .pill{padding:4px 11px;border-radius:var(--r-pill);background:var(--bg-deep);
         color:var(--muted);font-size:11.5px}
-  .pill.casa{background:var(--acento-suave);color:var(--ink);border:1px solid var(--acento-borda)}
-  .msg{color:var(--risco);margin-top:16px;min-height:20px}
+  .pill.casa{background:var(--gold-wash);color:var(--gold-deep);border:1px solid var(--gold-edge)}
+  .msg{color:var(--risk);margin-top:16px;min-height:20px}
   .nova{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
         padding:24px;margin-top:16px;max-width:620px}
   .nova h2{font-size:23px;margin:0 0 6px}
@@ -29,16 +30,16 @@
   .ff{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
   .ff .full{grid-column:1/-1}
   .ff input{height:50px;border-radius:var(--r-sm);border:1px solid var(--line-2);
-            background:var(--raised);color:var(--ink);padding:0 15px;font:400 15px/1 var(--fonte);width:100%}
-  .ff input:focus{border-color:var(--acento);outline:none}
+            background:var(--raised);color:var(--ink);padding:0 15px;font:400 15px/1 var(--sans);width:100%}
+  .ff input:focus{border-color:var(--gold);outline:none}
   @media(max-width:560px){.ff{grid-template-columns:1fr}}
   .saida{margin-top:22px;font-size:14px;color:var(--muted)}
-  .saida a{color:var(--acento)}
+  .saida a{color:var(--gold)}
 </style>
 </head>
-<body>
+<body class="paper">
   <div class="appbar">
-    <div class="marca"><img class="marca-caduceu" src="/marca/caduceu.jpg" alt="Grupo VOW">
+    <div class="marca"><div class="caduceu">V</div>
       <div><span class="nome">VOW</span><span class="sob">Plataforma</span></div></div>
     <div class="sp"></div>
     <div class="quem" id="quem"></div>

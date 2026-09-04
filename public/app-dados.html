@@ -4,12 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Base de dados · Plataforma VOW</title>
-
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/tokens.css">
 <style>
   main{padding:24px 28px 60px;max-width:900px;margin:0 auto}
-  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--acento)}
+  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--gold)}
   .sub{color:var(--muted);font-size:15px;margin:0 0 24px;max-width:70ch}
   .bloco{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
          padding:22px 24px;margin-bottom:14px}
@@ -19,23 +20,23 @@
          border-bottom:1px solid var(--line);font-size:14px;color:var(--dim);align-items:baseline}
   .linha:last-child{border-bottom:0}
   .linha b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums;text-align:right}
-  .mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--acento)}
+  .mono{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--gold)}
   .estado{display:flex;gap:10px;align-items:center;padding:14px 16px;border-radius:var(--r-md);
           margin-bottom:16px;font-size:14px;line-height:1.5}
   .estado.ok{background:rgba(47,122,85,.1);border:1px solid rgba(47,122,85,.35);color:var(--ok)}
-  .estado.risco{background:rgba(162,74,44,.1);border:1px solid rgba(162,74,44,.35);color:var(--risco)}
+  .estado.risco{background:rgba(162,74,44,.1);border:1px solid rgba(162,74,44,.35);color:var(--risk)}
   .acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-  .acoes a{height:42px;display:inline-flex;align-items:center;padding:0 18px;border-radius:var(--r-sm);
+  .acoes a{height:42px;display:inline-flex;align-items:center;padding:0 18px;border-radius:var(--r-pill);
            border:1px solid var(--line-2);color:var(--ink);text-decoration:none;font-size:14px}
-  .acoes a:hover{border-color:var(--acento);color:var(--acento)}
+  .acoes a:hover{border-color:var(--gold);color:var(--gold)}
   .aviso{font-size:13px;color:var(--faint);line-height:1.6;margin-top:14px}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
   .cx{border:1px solid var(--line);border-radius:var(--r-sm);padding:14px}
-  .cx .n{font-family:var(--fonte-titulo);font-size:26px;line-height:1;font-variant-numeric:tabular-nums}
+  .cx .n{font-family:var(--serif);font-size:26px;line-height:1;font-variant-numeric:tabular-nums}
   .cx .r{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:5px}
 </style>
 </head>
-<body>
+<body class="paper">
 <main>
   <h1>A <em>base</em></h1>
   <p class="sub">Onde os dados moram, e o que existe lá dentro.</p>

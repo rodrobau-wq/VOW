@@ -4,19 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Carteira · Plataforma VOW</title>
-
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/tokens.css">
 <style>
   main{padding:24px 28px 60px;max-width:1320px;margin:0 auto}
-  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--acento)}
+  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--gold)}
   .sub{color:var(--muted);font-size:15px;margin:0 0 22px}
   .barra{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
-  input[type=search]{height:38px;padding:0 15px;border:1px solid var(--line-2);border-radius:var(--r-sm);
-    background:var(--surface);color:var(--ink);font:400 14px/1 var(--fonte);min-width:250px;outline:0}
-  input[type=search]:focus{border-color:var(--acento)}
+  input[type=search]{height:38px;padding:0 15px;border:1px solid var(--line-2);border-radius:var(--r-pill);
+    background:var(--surface);color:var(--ink);font:400 14px/1 var(--sans);min-width:250px;outline:0}
+  input[type=search]:focus{border-color:var(--gold)}
   a.csv{margin-left:auto;height:38px;display:inline-flex;align-items:center;padding:0 18px;
-        border-radius:var(--r-sm);background:var(--acento);color:var(--surface);font-size:13px;font-weight:500;text-decoration:none}
+        border-radius:var(--r-pill);background:var(--gold);color:var(--surface);font-size:13px;font-weight:500;text-decoration:none}
   .tab{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
   .rol{overflow-x:auto}
   table{width:100%;border-collapse:collapse;font-size:14px;min-width:900px}
@@ -26,20 +27,20 @@
   td{padding:13px 16px;border-top:1px solid var(--line);color:var(--dim)}
   tr:hover td{background:var(--bg-deep)}
   a.lead{color:var(--ink);font-weight:500;text-decoration:none}
-  a.lead:hover{color:var(--acento)}
+  a.lead:hover{color:var(--gold)}
   .det{font-size:12px;color:var(--faint);margin-top:2px}
   .selo{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:500}
-  .selo.f{background:var(--acento-suave);color:var(--ink)}
+  .selo.f{background:var(--gold-wash);color:var(--gold-deep)}
   .selo.g{background:rgba(47,122,85,.12);color:var(--ok)}
-  .selo.p{background:rgba(162,74,44,.12);color:var(--risco)}
+  .selo.p{background:rgba(162,74,44,.12);color:var(--risk)}
   .selo.n{background:var(--bg-deep);color:var(--muted)}
   .vazio{padding:56px;text-align:center;color:var(--faint)}
-  .chip.perigo{border-color:var(--risco);color:var(--risco)}
+  .chip.perigo{border-color:var(--risk);color:var(--risk)}
   .chip.perigo:hover{background:rgba(162,74,44,.1)}
-  input[type=checkbox]{width:17px;height:17px;accent-color:var(--acento);cursor:pointer}
+  input[type=checkbox]{width:17px;height:17px;accent-color:var(--gold);cursor:pointer}
 </style>
 </head>
-<body>
+<body class="paper">
 <main>
   <h1>A <em>carteira</em></h1>
   <p class="sub">Todo lead capturado, em qualquer fase.</p>

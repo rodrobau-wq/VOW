@@ -6,25 +6,15 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#3d3d3d",
-  "theme_color": "#3d3d3d",
+  "background_color": "#0E1B14",
+  "theme_color": "#0E1B14",
   "lang": "pt-BR",
   "icons": [
-    {
-      "src": "/marca/caduceu.jpg",
-      "sizes": "1000x520",
-      "type": "image/jpeg",
-      "purpose": "any"
-    }
+    { "src": "/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
   ],
   "shortcuts": [
-    {
-      "name": "Agora",
-      "url": "/app/hoje"
-    },
-    {
-      "name": "Jornada",
-      "url": "/app/pipeline"
-    }
+    { "name": "Agora", "url": "/app/hoje" },
+    { "name": "Jornada", "url": "/app/pipeline" }
   ]
 }

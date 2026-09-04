@@ -4,21 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Funil · Plataforma VOW</title>
-
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/tokens.css">
 <style>
   main{padding:24px 28px 40px}
   .cab{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:20px}
   h1{font-size:36px;margin:0 0 4px}
-  h1 em{font-style:italic;color:var(--acento)}
+  h1 em{font-style:italic;color:var(--gold)}
   .cab p{color:var(--muted);font-size:15px;margin:0}
 
   .topo-num{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:22px}
   .n{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px}
   .n .r{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-  .n .v{font-family:var(--fonte-titulo);font-size:30px;line-height:1;margin-top:7px;font-variant-numeric:tabular-nums}
-  .n.alerta .v{color:var(--risco)}
+  .n .v{font-family:var(--serif);font-size:30px;line-height:1;margin-top:7px;font-variant-numeric:tabular-nums}
+  .n.alerta .v{color:var(--risk)}
   .n .p{font-size:12.5px;color:var(--faint);margin-top:5px;line-height:1.4}
 
   .rolagem{overflow-x:auto;margin:0 -28px;padding:0 28px 8px}
@@ -28,37 +29,37 @@
            grid-template-columns:repeat(var(--n,6),minmax(252px,1fr));
            min-width:calc(var(--n,6) * 264px)}
   .col{background:var(--bg-deep);border:1px solid var(--line);border-radius:var(--r-md);padding:14px}
-  .col.alvo{border-color:var(--acento);background:var(--acento-suave)}
-  .col h2{font-family:var(--fonte);font-size:14.5px;font-weight:600;margin:0}
+  .col.alvo{border-color:var(--gold);background:var(--gold-wash)}
+  .col h2{font-family:var(--sans);font-size:14.5px;font-weight:600;margin:0}
   .col .cabc{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:4px}
-  .col .qt{font-family:var(--fonte-titulo);font-size:22px;color:var(--acento);line-height:1}
+  .col .qt{font-family:var(--serif);font-size:22px;color:var(--gold);line-height:1}
   .col .saida{font-size:11.5px;color:var(--faint);line-height:1.45;margin:6px 0 12px;
               padding-bottom:12px;border-bottom:1px solid var(--line)}
   .col .soma{font-size:12px;color:var(--muted);margin-bottom:6px;font-variant-numeric:tabular-nums}
   .conv{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--ok);
         padding:5px 8px;border-radius:6px;background:rgba(47,122,85,.09);margin-bottom:10px}
-  .conv.baixa{color:var(--risco);background:rgba(162,74,44,.1)}
+  .conv.baixa{color:var(--risk);background:rgba(162,74,44,.1)}
   .conv .det{color:var(--faint)}
 
   .cartao{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;
           margin-bottom:9px;cursor:grab;display:block;text-decoration:none;color:inherit}
-  .cartao:hover{border-color:var(--acento-borda)}
+  .cartao:hover{border-color:var(--gold-edge)}
   .cartao.arrastando{opacity:.4}
   .cartao .emp{font-weight:500;font-size:14.5px;line-height:1.35}
   .cartao .pes{font-size:12.5px;color:var(--faint);margin-top:2px}
   .cartao .vals{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-top:10px}
-  .cartao .jogo{font-family:var(--fonte-titulo);font-size:19px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .cartao .jogo{font-family:var(--serif);font-size:19px;color:var(--dim);font-variant-numeric:tabular-nums}
   .cartao .hon{font-size:12.5px;color:var(--ok);font-weight:500;font-variant-numeric:tabular-nums}
   .cartao .rod{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:11px}
   .marca-t{padding:3px 8px;border-radius:999px;background:var(--bg-deep);color:var(--muted)}
-  .marca-t.atras{background:rgba(162,74,44,.12);color:var(--risco)}
-  .marca-t.sla{background:rgba(162,74,44,.16);color:var(--risco);font-weight:500}
-  .marca-t.feira{background:var(--acento-suave);color:var(--ink)}
+  .marca-t.atras{background:rgba(162,74,44,.12);color:var(--risk)}
+  .marca-t.sla{background:rgba(162,74,44,.16);color:var(--risk);font-weight:500}
+  .marca-t.feira{background:var(--gold-wash);color:var(--gold-deep)}
   .vazia{font-size:12.5px;color:var(--faint);padding:14px 4px;text-align:center}
   .dica{font-size:12.5px;color:var(--faint);margin-top:14px}
 </style>
 </head>
-<body>
+<body class="paper">
 <main>
   <div class="cab">
     <div><h1>O <em>funil</em></h1><p>Arraste um cartão para mudar de fase.</p></div>
@@ -84,7 +85,7 @@ async function carregar() {
 function pintar() {
   $('numeros').innerHTML = `
     <div class="n"><div class="r">Oportunidades abertas</div><div class="v">${dados.totalAbertos}</div>
-      <div class="p">nas ${dados.colunas.length} fases do funil</div></div>
+      <div class="p">nas cinco fases do funil</div></div>
     <div class="n ${dados.foraDoSla ? 'alerta' : ''}"><div class="r">Fora do prazo de contato</div>
       <div class="v">${dados.foraDoSla}</div>
       <div class="p">${dados.foraDoSla ? 'capturados há mais de 48 h sem ninguém falar' : 'nenhum atrasado'}</div></div>

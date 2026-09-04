@@ -4,26 +4,29 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Primeiro acesso · Plataforma VOW</title>
-
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/tokens.css">
 <style>
   body{min-height:100dvh;display:grid;place-items:center;padding:24px}
   .caixa{width:100%;max-width:440px}
   .topo{display:flex;align-items:center;gap:12px;margin-bottom:30px}
+  .caduceu{width:38px;height:38px;border:1px solid var(--gold-edge);border-radius:var(--r-sm);
+           display:grid;place-items:center;color:var(--gold);font-family:var(--serif);font-size:19px}
   h1{font-size:34px;margin-bottom:10px}
-  h1 em{font-style:italic;color:var(--acento)}
+  h1 em{font-style:italic;color:var(--gold)}
   .sub{color:var(--muted);font-size:15px;margin-bottom:26px;line-height:1.55}
   label{display:block;font-size:13px;color:var(--muted);margin:0 0 8px}
   .campo{margin-bottom:16px}
   input{height:52px;width:100%;border-radius:var(--r-sm);border:1px solid var(--line-2);
-        background:var(--surface);color:var(--ink);padding:0 16px;font:400 16px/1 var(--fonte)}
-  input:focus{border-color:var(--acento);outline:none}
+        background:var(--surface);color:var(--ink);padding:0 16px;font:400 16px/1 var(--sans)}
+  input:focus{border-color:var(--gold);outline:none}
   input::placeholder{color:var(--faint)}
   .regra{font-size:13px;color:var(--faint);margin:-6px 0 20px;display:flex;gap:8px}
   .regra.ok{color:var(--ok)}
   .btn{width:100%}
-  .msg{font-size:14px;margin-top:14px;min-height:20px;color:var(--risco)}
+  .msg{font-size:14px;margin-top:14px;min-height:20px;color:var(--risk)}
   .msg.ok{color:var(--ok)}
   .nota{font-size:12.5px;color:var(--faint);line-height:1.6;margin-top:22px;
         border-top:1px solid var(--line);padding-top:18px}
@@ -32,7 +35,7 @@
 <body>
   <div class="caixa">
     <div class="topo">
-      <img class="marca-caduceu" src="/marca/caduceu.jpg" alt="Grupo VOW">
+      <div class="caduceu">V</div>
       <div><span class="logo" style="font-size:21px">VOW</span>
         <div class="eyebrow" style="font-size:10px">Plataforma</div></div>
     </div>
