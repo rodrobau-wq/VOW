@@ -506,9 +506,17 @@ class Component extends DCLogic {
       });
     });
     import('/motor.js').then(M => {
+      // Os cartões do site apontam direto para um dos dois diagnósticos. Sem
+      // isto o link levaria à escolha de novo, perguntando o que já foi dito.
+      let atalho = null;
+      try {
+        const d = new URLSearchParams(location.search).get('d');
+        if (d && M.PRODUTOS[d]) atalho = d;
+      } catch (e) {}
       const t = this.props.telaInicial ?? 'home';
       const demo = t !== 'home' && t !== 'escolha' ? { produto: 'revenda', email: 'demo@rede.com.br', nome: 'Demonstração', feitos: t === 'resultado' ? { revenda: true } : {} } : {};
       this.setState({ M, tela: t, ...demo });
+      if (atalho && t === 'home') this.escolher(atalho);
     });
   }
   ir(tela) { this.setState({ tela }); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} }

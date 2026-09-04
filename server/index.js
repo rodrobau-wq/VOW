@@ -2,7 +2,8 @@
  * VOW · ABRAS — API do totem e da plataforma de leads.
  *
  *   GET  /                 landing pública com os diagnósticos gratuitos
- *   GET  /diagnostico      simulador AS IS -> TO BE (diagnóstico gratuito da landing)
+ *   GET  /                 totem: site + diagnóstico gratuito (fonte: Claude Design)
+ *   GET  /diagnostico      301 para a raiz, traduzindo ?d= e ?e=abras
  *   GET  /app/*            plataforma SaaS (ver server/app.js)
  *   GET  /leads            plataforma de leads (protegida por Basic Auth)
  *   POST /api/simular      roda o motor, sem gravar nada
@@ -341,7 +342,19 @@ app.get('/plataforma', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'ab
 // O diagnóstico gratuito da landing. Mesma tela do protótipo do totem, mas
 // adaptada à web (responsiva, não 1080x1920) e ligada ao backend de verdade:
 // usa o motor da casa, grava o lead, dispara o e-mail e gera o QR no servidor.
-app.get('/diagnostico', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'diagnostico.html')))
+/**
+ * O diagnóstico virou a raiz. Este endereço fica de pé porque está em
+ * e-mails e no site — traduzindo os parâmetros antigos em vez de descartá-los:
+ * `?e=abras` dizia de onde a pessoa vinha, `?d=` qual dos dois ela queria.
+ */
+app.get('/diagnostico', (req, res) => {
+  const p = new URLSearchParams()
+  const d = String(req.query.d || '')
+  if (d === 'revenda' || d === 'indiretos') p.set('d', d)
+  if (String(req.query.e || '') === 'abras') p.set('origem', 'abras')
+  const q = p.toString()
+  res.redirect(301, q ? `/?${q}` : '/')
+})
 app.get('/leads', protegido, (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'leads.html')))
 
 // A camada SaaS tem auth própria (sessão, tenant, papéis) e monta as suas
