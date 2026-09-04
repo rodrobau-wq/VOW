@@ -362,7 +362,7 @@
     <!-- FIM -->
     <sc-if value="{{ ehFim }}" hint-placeholder-val="{{ false }}">
       <section style="animation: up .4s ease both">
-        <div class="eyebrow">Diagnóstico registrado · demonstração</div>
+        <div class="eyebrow">{{ fimEyebrow }}</div>
         <h1 style="margin: 16px 0 16px">{{ fimTit }}</h1>
         <p style="font-size: clamp(16px, 1.9vw, 20px); color: var(--dim); max-width: 64ch; margin: 0 0 34px">{{ fimSub }}</p>
         <sc-if value="{{ faltaOutro }}" hint-placeholder-val="{{ false }}">
@@ -460,8 +460,11 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;telaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;escolha&quot;,&quot;simular&quot;,&quot;resultado&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;'home'|'escolha'|'simular'|'resultado'&quot;,&quot;section&quot;:&quot;Demonstração&quot;}}">
 class Component extends DCLogic {
-  state = { orient: null, login: null, Q: null, qrUrl: null, M: null, tela: 'home', produto: null, fat: 300e6, pct: 3, ativas: null, pesos: {}, dReceb: 45, prazo: 60, agendar: false, nome: '', cnpj: '', email: '', telefone: '', cnpjStatus: '', cnpjCor: '', empresa: null, msgCad: '', msg: '', enviando: false, feitos: {}, origem: 'site' };
-  BASE = 'https://vow-abras.onrender.com';
+  state = { orient: null, login: null, Q: null, qrUrl: null, M: null, tela: 'home', produto: null, fat: 300e6, pct: 3, ativas: null, pesos: {}, dReceb: 45, prazo: 60, agendar: false, nome: '', cnpj: '', email: '', telefone: '', cnpjStatus: '', cnpjCor: '', empresa: null, msgCad: '', msg: '', enviando: false, feitos: {}, origem: 'site', leadId: null, emailEnviado: null };
+  // O QR precisa do endereço de quem está servindo a página, não de um
+  // domínio fixo — senão o código impresso aponta para o lugar errado em
+  // qualquer ambiente que não seja produção.
+  get BASE() { try { return location.origin.startsWith('http') ? location.origin : 'https://vow-abras.onrender.com'; } catch (e) { return 'https://vow-abras.onrender.com'; } }
   qrVals() {
     const { Q, qrUrl } = this.state;
     const out = { qrAtivo: !!(Q && qrUrl) };
@@ -486,10 +489,21 @@ class Component extends DCLogic {
   componentDidMount() {
     let orient = null; try { orient = localStorage.getItem(this.ORIENT_CHAVE); } catch (e) {}
     this.setState({ orient: orient || (window.innerWidth > window.innerHeight ? 'horizontal' : 'vertical') });
+    // De onde a pessoa veio. O /q/abras devolve ?origem=qr; o resto é site.
+    try {
+      const o = new URLSearchParams(location.search).get('origem');
+      if (['abras', 'site', 'qr'].includes(o)) this.setState({ origem: o });
+    } catch (e) {}
     import('/qr.js').then(Q => {
-      // O CRM cadastra o endereço (aba QR) e o QR fica liberado aqui. Sem cadastro, o bloco não aparece.
-      let qrUrl = this.BASE; try { const s = JSON.parse(localStorage.getItem('vow.qr') || 'null'); if (s && 'url' in s) qrUrl = s.url || null; } catch (e) {}
-      this.setState({ Q, qrUrl });
+      // O CRM cadastra o endereço (aba QR) e o QR fica liberado aqui. Sem
+      // cadastro, o bloco não aparece. No editor do Design não há /api/qr:
+      // aí vale o localStorage, que é como a demonstração encena.
+      fetch('/api/qr').then(r => r.ok ? r.json() : null).then(d => {
+        this.setState({ Q, qrUrl: d ? d.url : null });
+      }).catch(() => {
+        let qrUrl = this.BASE; try { const s = JSON.parse(localStorage.getItem('vow.qr') || 'null'); if (s && 'url' in s) qrUrl = s.url || null; } catch (e) {}
+        this.setState({ Q, qrUrl });
+      });
     });
     import('/motor.js').then(M => {
       const t = this.props.telaInicial ?? 'home';
@@ -498,6 +512,49 @@ class Component extends DCLogic {
     });
   }
   ir(tela) { this.setState({ tela }); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {} }
+
+  /**
+   * O cadastro é o que existe antes do diagnóstico: sem lead gravado, quem
+   * simula no totem some quando a tela fecha. Devolve `null` quando não há
+   * servidor — é assim que o protótipo continua navegável no editor.
+   */
+  async criarLead() {
+    const s = this.state;
+    try {
+      const r = await fetch('/api/lead', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          nome: s.nome.trim(),
+          empresa: s.empresa ? (s.empresa.fantasia || s.empresa.razao) : '',
+          cnpj: s.cnpj.trim(), email: s.email.trim(), telefone: s.telefone.trim(),
+          origem: s.origem, tipos: [s.produto],
+        }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok) this.setState({ leadId: d.id });
+      return { ok: r.ok, ...d };
+    } catch (e) { return null; }
+  }
+
+  /** Grava o diagnóstico no lead e dispara o e-mail. */
+  async enviarDiagnostico() {
+    const s = this.state;
+    if (!s.leadId) return null;
+    try {
+      const corpo = {
+        tipos: Object.keys(s.feitos), faturamento: s.fat, agendar: s.agendar,
+        ativas: s.ativas || undefined,
+        pesos: Object.keys(s.pesos).length ? s.pesos : undefined,
+      };
+      if (s.produto === 'revenda') corpo.percentualVerba = s.pct / 100;
+      else corpo.percentualBase = s.pct / 100;
+      const r = await fetch(`/api/lead/${s.leadId}/diagnostico`, {
+        method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(corpo),
+      });
+      const d = await r.json().catch(() => ({}));
+      return { ok: r.ok, ...d };
+    } catch (e) { return null; }
+  }
   fatDe(v) { const bruto = 5e6 * Math.pow(10000, v / 1000); const mag = Math.pow(10, Math.floor(Math.log10(bruto)) - 1); return Math.round(bruto / mag) * mag; }
   fatPara(f) { return Math.round(1000 * Math.log(f / 5e6) / Math.log(10000)); }
   escolher(id) { const p = this.state.M.PRODUTOS[id]; this.setState({ produto: id, pct: p.pctDefault, ativas: null, pesos: {} }); this.ir(this.state.email ? 'simular' : 'cadastro'); }
@@ -589,7 +646,15 @@ class Component extends DCLogic {
       setEmail: (e) => this.setState({ email: e.target.value }),
       setTelefone: (e) => this.setState({ telefone: M ? M.fmtFone(e.target.value) : e.target.value }),
       setCnpj: (e) => this.buscarCnpj(e.target.value),
-      continuar: () => { if (!M || !M.emailOk(s.email)) { this.setState({ msgCad: 'Confira o e-mail — é para onde o diagnóstico vai.' }); return; } this.setState({ msgCad: '' }); this.ir('simular'); },
+      continuar: async () => {
+        if (!M || !M.emailOk(s.email)) { this.setState({ msgCad: 'Confira o e-mail — é para onde o diagnóstico vai.' }); return; }
+        this.setState({ msgCad: '', enviando: true });
+        const r = await this.criarLead();
+        this.setState({ enviando: false });
+        // `null` = não há servidor (editor do Design): o protótipo segue.
+        if (r && !r.ok) { this.setState({ msgCad: r.erro || 'Não foi possível continuar agora.' }); return; }
+        this.ir('simular');
+      },
       produtos: [], agendar: s.agendar, enviando: s.enviando,
       enviarTxt: s.enviando ? 'Enviando…' : 'Enviar para o meu e-mail',
       agendarTxt: s.agendar ? '✓ Conversa com a VOW solicitada. Entramos em contato.' : 'Quero conversar com a VOW sobre este diagnóstico',
@@ -661,10 +726,25 @@ class Component extends DCLogic {
     out.etapas = p.etapas.map((e, k) => ({ n: `0${k + 1}`, t: e.t, d: e.d }));
     out.mecanismos = p.mecanismos;
     out.disclaimer = `Ordem de grandeza com alíquota de referência de ${fP(M.ALIQUOTA)}, mix padrão do varejo alimentar e margem líquida de 2%. Não é parecer: as premissas ainda estão em validação pelo time fiscal da VOW, e o número da sua rede depende do seu mix e dos seus contratos.`;
-    out.enviar = () => { this.setState({ enviando: true, msg: '' }); setTimeout(() => { this.setState({ enviando: false }); this.ir('fim'); }, 700); };
+    out.enviar = async () => {
+      this.setState({ enviando: true, msg: '' });
+      const r = await this.enviarDiagnostico();
+      this.setState({ enviando: false, emailEnviado: r ? !!r.emailEnviado : null });
+      if (r && !r.ok) { this.setState({ msg: r.erro || 'Não foi possível enviar agora.' }); return; }
+      this.ir('fim');
+    };
     const primeiro = (s.nome.trim().split(' ')[0]) || '';
     out.fimTit = primeiro ? `Obrigado, ${primeiro}.` : 'Está a caminho.';
-    out.fimSub = `Nesta demonstração o e-mail não é disparado. Em produção, o diagnóstico vai para ${s.email} com as linhas que você marcou.` + (s.agendar ? ' A VOW entra em contato sobre a conversa que você pediu.' : '');
+    // Três finais diferentes, porque três coisas diferentes aconteceram.
+    // Chamar de "demonstração" o que foi gravado de verdade seria mentira.
+    out.fimEyebrow = s.emailEnviado === null ? 'Diagnóstico registrado · demonstração'
+      : s.emailEnviado ? 'Diagnóstico enviado' : 'Diagnóstico registrado';
+    out.fimSub = (s.emailEnviado === null
+      ? `Nesta demonstração o e-mail não é disparado. Em produção, o diagnóstico vai para ${s.email} com as linhas que você marcou.`
+      : s.emailEnviado
+        ? `Mandamos para ${s.email}. Se não aparecer em alguns minutos, olhe a caixa de promoções.`
+        : `Seu diagnóstico ficou registrado. O e-mail não saiu agora — a VOW envia em seguida para ${s.email}.`)
+      + (s.agendar ? ' A VOW entra em contato sobre a conversa que você pediu.' : '');
     const falta = Object.keys(M.PRODUTOS).find(id => !s.feitos[id]);
     out.faltaOutro = !!falta;
     if (falta) { out.outroNome = M.PRODUTOS[falta].sub; out.outroTxt = falta === 'revenda' ? 'Você viu quanto de crédito entra. Falta ver quanto de verba sai — e essa é a metade que dói.' : 'Você viu quanto de verba sai. Falta ver quanto de crédito entra — e essa é a metade que devolve.'; out.fazerOutro = () => { this.setState({ produto: falta, pct: M.PRODUTOS[falta].pctDefault, ativas: null, pesos: {} }); this.ir('simular'); }; }

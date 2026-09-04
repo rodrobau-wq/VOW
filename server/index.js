@@ -317,7 +317,14 @@ app.get('/q/:codigo', async (req, res, next) => {
 /* ------------------------------------------------------------------ telas */
 // `/` é a landing pública (topo de funil). O totem da feira fica em /totem,
 // e o index.html deixa de ser servido pelo static para não disputar a raiz.
-app.get('/', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'landing.html')))
+/**
+ * A raiz é o totem: uma entrada só.
+ *
+ * Havia duas landings — esta e /abras — com a mesma promessa e cópias que já
+ * tinham divergido ("Já fez o seu JBP?" contra "de 2027?"). A do Claude
+ * Design é a fonte da verdade do desenho, então é ela que fica.
+ */
+app.get('/', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'abras', 'abras.dc.html')))
 // A raiz virou uma tela só (hero, vertical ou horizontal, para o painel do
 // estande). O site completo — seções de produto, como funciona, rodapé —
 // continua inteiro aqui, e é para onde a navegação aponta.
@@ -327,7 +334,8 @@ app.get('/site', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'site.htm
  * do desenho: quando o produto e eles divergirem, quem está errado é o
  * produto. Ficam servidos para poder ser comparados lado a lado.
  */
-app.get('/abras', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'abras', 'abras.dc.html')))
+// O endereço antigo continua valendo: já foi impresso e já foi compartilhado.
+app.get('/abras', (req, res) => res.redirect(301, '/' + (req.url.split('?')[1] ? '?' + req.url.split('?')[1] : '')))
 app.get('/plataforma', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'abras', 'plataforma.dc.html')))
 
 // O diagnóstico gratuito da landing. Mesma tela do protótipo do totem, mas

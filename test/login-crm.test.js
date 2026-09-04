@@ -10,9 +10,11 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 
 const ler = (f) => fs.readFileSync(new URL(f, import.meta.url), 'utf8')
-const PAGINAS = ['../public/landing.html', '../public/site.html']
+const PAGINAS = ['../public/site.html']
 
 test('as páginas públicas abrem o modal, não pulam para o funil', () => {
+  // O totem tem o modal do Claude Design, com o mesmo desenho e as mesmas
+  // rotas — por isso ele não entra nesta lista, e sim no teste seguinte.
   for (const f of PAGINAS) {
     const html = ler(f)
     assert.match(html, /data-login-crm/, `${f} não marca o link do CRM`)
