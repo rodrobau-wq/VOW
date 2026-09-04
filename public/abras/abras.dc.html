@@ -194,6 +194,22 @@
           <sc-if value="{{ temCnpjStatus }}" hint-placeholder-val="{{ false }}">
             <div style="font-size: 13px; color: var(--muted); margin: -4px 0 12px; display: flex; gap: 8px; align-items: center"><span style="width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: {{ cnpjCor }}"></span><span>{{ cnpjStatus }}</span></div>
           </sc-if>
+          <!-- O que a Receita devolveu, à vista: quem confere corrige antes
+               de continuar, e não descobre o erro só no e-mail. -->
+          <sc-if value="{{ temEmpresa }}" hint-placeholder-val="{{ false }}">
+            <div style="border: 1px solid var(--line); background: var(--raised); padding: 14px 16px; margin: 0 0 14px">
+              <div class="eyebrow" style="margin-bottom: 8px">Dados da Receita Federal</div>
+              <div style="font-size: 15px; font-weight: 500; line-height: 1.35">{{ empRazao }}</div>
+              <sc-if value="{{ temFantasia }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size: 13.5px; color: var(--dim); margin-top: 2px">{{ empFantasia }}</div>
+              </sc-if>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: 13px; color: var(--muted)">
+                <sc-for list="{{ empLinhas }}" as="i" hint-placeholder-count="3">
+                  <span><b style="color: var(--ink); font-weight: 500">{{ i.r }}</b> {{ i.v }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
           <p class="fine" style="margin: 0">Usamos seus dados só para enviar este diagnóstico e falar com você sobre ele.</p>
         </div>
         <div style="font-size: 14px; margin-top: 12px; min-height: 20px; color: var(--risco)">{{ msgCad }}</div>
@@ -535,6 +551,12 @@ class Component extends DCLogic {
           nome: s.nome.trim(),
           empresa: s.empresa ? (s.empresa.fantasia || s.empresa.razao) : '',
           cnpj: s.cnpj.trim(), email: s.email.trim(), telefone: s.telefone.trim(),
+          // A consulta de CNPJ devolve o cadastro inteiro. Guardar só o nome
+          // seria jogar fora o resto: é isto que permite ler a carteira por
+          // estado, por porte e por atividade sem perguntar nada a mais.
+          uf: s.empresa ? s.empresa.uf : '', municipio: s.empresa ? s.empresa.municipio : '',
+          razao: s.empresa ? s.empresa.razao : '', porte: s.empresa ? s.empresa.porte : '',
+          cnae: s.empresa ? s.empresa.cnae : '',
           origem: s.origem, tipos: [s.produto],
         }),
       });
@@ -649,6 +671,15 @@ class Component extends DCLogic {
       irSimular: () => this.ir('simular'),
       recomecar: () => { this.setState({ produto: null, fat: 300e6, pct: 3, ativas: null, pesos: {}, agendar: false, feitos: {}, nome: '', cnpj: '', email: '', telefone: '', cnpjStatus: '', empresa: null, msg: '', msgCad: '' }); this.ir('escolha'); },
       nome: s.nome, cnpj: s.cnpj, email: s.email, telefone: s.telefone, msgCad: s.msgCad, msg: s.msg,
+      temEmpresa: !!s.empresa,
+      empRazao: s.empresa ? s.empresa.razao : '',
+      temFantasia: !!(s.empresa && s.empresa.fantasia),
+      empFantasia: s.empresa ? s.empresa.fantasia : '',
+      empLinhas: s.empresa ? [
+        { r: 'Onde', v: `${s.empresa.municipio}/${s.empresa.uf}` },
+        ...(s.empresa.porte ? [{ r: 'Porte', v: s.empresa.porte }] : []),
+        ...(s.empresa.cnae ? [{ r: 'Atividade', v: s.empresa.cnae }] : []),
+      ] : [],
       temCnpjStatus: !!s.cnpjStatus, cnpjStatus: s.cnpjStatus, cnpjCor: s.cnpjCor,
       setNome: (e) => this.setState({ nome: e.target.value }),
       setEmail: (e) => this.setState({ email: e.target.value }),

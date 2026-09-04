@@ -392,14 +392,7 @@ app.get('/api/app/crm/leads', async (req, res, next) => {
   } catch (e) { next(e) }
 })
 
-/**
- * Captura manual — o consultor no estande, com o cartão na mão.
- *
- * Mais permissivo que /api/lead de propósito: ali a pessoa simulou e o
- * e-mail é o que faz o diagnóstico chegar. Aqui basta um jeito de retornar,
- * e-mail ou telefone. Exigir o que não se tem faz o consultor inventar
- * endereço, e aí o lead nasce sujo.
- */
+/** Uma oportunidade com a linha do tempo que a explica. */
 app.get('/api/app/crm/leads/:id', async (req, res, next) => {
   try {
     const lead = (await lerLeads()).find((l) => l.id === req.params.id)

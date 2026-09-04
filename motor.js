@@ -142,6 +142,16 @@ export const emailOk = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e || '');
 export async function buscarCNPJ(cnpj) {
   const d = soDigitos(cnpj);
   if (d.length !== 14) return null;
+  // Pelo servidor quando existe um: ele guarda a resposta e o visitante não
+  // fala direto com o serviço externo. Sem servidor — o editor do Design —
+  // vale a chamada direta, senão a tela não teria como demonstrar nada.
+  try {
+    const r = await fetch('/api/cnpj/' + d);
+    if (r.ok) return await r.json();
+    if (r.status === 404) throw new Error('CNPJ não encontrado');
+  } catch (e) {
+    if (e && e.message === 'CNPJ não encontrado') throw e;
+  }
   const r = await fetch('https://brasilapi.com.br/api/cnpj/v1/' + d);
   if (!r.ok) throw new Error('CNPJ não encontrado');
   const j = await r.json();

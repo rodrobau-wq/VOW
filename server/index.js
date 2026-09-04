@@ -117,7 +117,8 @@ app.post('/api/simular', (req, res, next) => {
 
 app.post('/api/lead', async (req, res, next) => {
   try {
-    const { nome, empresa, email, telefone, tipos, origem, cnpj, agendar } = req.body || {}
+    const { nome, empresa, email, telefone, tipos, origem, cnpj, agendar,
+            uf, municipio, razao, porte, cnae } = req.body || {}
     if (!email || !EMAIL_RE.test(String(email))) {
       return res.status(400).json({ erro: 'e-mail inválido' })
     }
@@ -141,6 +142,16 @@ app.post('/api/lead', async (req, res, next) => {
       email: String(email).slice(0, 200),
       telefone: String(telefone || '').slice(0, 40),
       cnpj: String(cnpj || '').slice(0, 20),
+      // Vem da consulta de CNPJ, que já traz o endereço — a pessoa não digita
+      // de novo. É o que permite ler a carteira por estado; sem isso o dado
+      // se perde na hora da captura e não há como recuperar depois.
+      uf: /^[A-Z]{2}$/.test(String(uf || '').toUpperCase()) ? String(uf).toUpperCase() : '',
+      municipio: String(municipio || '').slice(0, 80),
+      // `empresa` é como a rede se chama na rua; `razao` é como ela se chama
+      // no contrato. Quem vai emitir nota precisa da segunda.
+      razao: String(razao || '').slice(0, 200),
+      porte: String(porte || '').slice(0, 40),
+      cnae: String(cnae || '').slice(0, 200),
       // Pedido de conversa é a fila comercial: vale mais que o lead cru.
       agendar: agendar === true,
       // De onde veio: 'abras' no estande, 'site' na landing. É o corte que o
@@ -363,6 +374,50 @@ app.use(rotasApp)
 
 // O motor vive na raiz e é importado pelas duas telas — mesma aritmética no
 // browser e no servidor, sem build step nem cópia que possa divergir.
+/**
+ * Consulta de CNPJ pelo servidor.
+ *
+ * A tela chamava a BrasilAPI direto do navegador do visitante — o que expõe
+ * o IP de quem está no estande a um terceiro e deixa a busca à mercê do CORS
+ * e do limite de chamadas por IP. Passando por aqui, a rede é uma só e a
+ * resposta pode ser guardada por um tempo.
+ */
+const CACHE_CNPJ = new Map()
+const CACHE_MS = 24 * 60 * 60 * 1000
+
+app.get('/api/cnpj/:cnpj', async (req, res) => {
+  const d = String(req.params.cnpj || '').replace(/\D/g, '')
+  if (d.length !== 14) return res.status(400).json({ erro: 'CNPJ precisa ter 14 dígitos' })
+
+  const guardado = CACHE_CNPJ.get(d)
+  if (guardado && Date.now() - guardado.em < CACHE_MS) return res.json(guardado.dados)
+
+  try {
+    const r = await fetch('https://brasilapi.com.br/api/cnpj/v1/' + d, {
+      signal: AbortSignal.timeout(6000),
+      // Sem User-Agent a BrasilAPI devolve 403. O fetch do Node não manda um
+      // por conta própria, e o 403 chegava aqui disfarçado de "não achei".
+      headers: { 'user-agent': 'VOW/1.0 (+https://vow-abras.onrender.com)', accept: 'application/json' },
+    })
+    // Distinguir importa: "não existe" é resposta, "não consegui perguntar"
+    // é falha nossa — e dizer a primeira quando é a segunda faz a pessoa
+    // apagar um CNPJ que estava certo.
+    if (r.status === 404) return res.status(404).json({ erro: 'CNPJ não encontrado' })
+    if (!r.ok) return res.status(503).json({ erro: 'A consulta de CNPJ está indisponível agora.' })
+    const j = await r.json()
+    const dados = {
+      razao: j.razao_social || '', fantasia: j.nome_fantasia || '',
+      municipio: j.municipio || '', uf: j.uf || '', porte: j.porte || '',
+      cnae: j.cnae_fiscal_descricao || '', abertura: j.data_inicio_atividade || '',
+    }
+    CACHE_CNPJ.set(d, { em: Date.now(), dados })
+    res.json(dados)
+  } catch (e) {
+    // Serviço externo fora do ar não pode travar a captura: o CNPJ é opcional.
+    res.status(503).json({ erro: 'A consulta de CNPJ está indisponível agora.' })
+  }
+})
+
 app.get('/motor.js', (_req, res) =>
   res.type('application/javascript').sendFile(path.join(RAIZ, 'motor.js')))
 // Gerador de QR sem dependência: o pavilhão não tem rede garantida e a

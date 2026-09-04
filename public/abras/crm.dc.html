@@ -37,7 +37,8 @@
       </sc-for>
     </nav>
     <div class="sp"></div>
-    <span class="tag off">Dados de demonstração</span>
+    <a class="tag off" href="/app/pipeline" title="Nada nesta tela sai do seu navegador. Clique para abrir o CRM com os dados reais."
+       style="text-decoration: none">Dados de demonstração · abrir o real</a>
     <div class="quem"><b>{{ eu.nome }}</b>{{ eu.papelNome }}</div>
     <button class="sair" type="button" onClick="{{ sair }}">Sair</button>
   </header>
@@ -436,6 +437,14 @@ class Component extends DCLogic {
       // Quem entrou pelo login da landing (vow.sessao) é quem aparece logado; senão, o admin da demonstração.
       let euId = 'u01'; try { const ss = JSON.parse(localStorage.getItem('vow.sessao') || 'null'); const u = ss && D.USUARIOS.find(x => x.email === ss.email); if (u) euId = u.id; } catch (e) {}
       this.setState({ C, Q, leads: D.LEADS, interacoes: D.INTERACOES, usuarios: D.USUARIOS, euId, qr, qrForm: qr.url || '', tela: this.props.telaInicial ?? 'hoje' });
+      // O QR é a única aba que mexe em produção: o número de leituras e o
+      // destino vêm do servidor, não da demonstração. Mostrar 66 leituras
+      // inventadas ao lado de um botão que grava de verdade engana.
+      fetch('/api/app/qr').then(r => r.ok ? r.json() : null).then(d => {
+        if (!d) return;
+        const real = { codigo: d.codigo, url: d.url, criadoEm: d.criadoEm, leituras: d.leituras || [], real: true };
+        this.setState({ qr: real, qrForm: d.url || '' });
+      }).catch(() => {});
     });
     // Ranking ABRAS 2026 + motor: só a aba Potencial usa, mas carregar cedo evita a tela em branco.
     import('/motor.js').then(M => this.setState({ M }));
@@ -521,7 +530,9 @@ class Component extends DCLogic {
       out.carteiraVazia = !lista.length; out.temSel = nSel > 0; out.excluirTxt = `Excluir ${nSel} selecionado${nSel === 1 ? '' : 's'}`;
       out.todosSel = lista.length > 0 && nSel === lista.length;
       out.toggleTodos = (e) => { const on = e.target.checked; this.setState({ sel: Object.fromEntries(lista.map(l => [l.id, on])) }); };
-      out.excluirSel = () => { if (!confirm(`Excluir ${nSel} lead(s)? Não há como desfazer.`)) return; this.setState(st => ({ leads: st.leads.filter(l => !st.sel[l.id]), sel: {} })); };
+      // O selo no canto não bastou: quem clica em "Excluir" acha que excluiu.
+      // O aviso precisa estar no caminho da ação, não ao lado dela.
+      out.excluirSel = () => { if (!confirm(`Demonstração: estes ${nSel} lead(s) somem só da sua tela e voltam ao recarregar. Nada é apagado de verdade — a carteira real fica em /app/leads. Continuar?`)) return; this.setState(st => ({ leads: st.leads.filter(l => !st.sel[l.id]), sel: {} })); };
       out.exportar = () => { const cab = ['nome', 'empresa', 'email', 'telefone', 'faturamento', 'fase', 'valorEmJogo', 'honorario', 'responsavel', 'criadoEm']; const csv = [cab.join(';'), ...lista.map(l => [l.nome, l.empresa, l.email, l.telefone, l.faturamento, l.estagioNome, l.valorEmJogo, l.honorario ?? '', l.responsavel ?? '', l.criadoEm].map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';'))].join('\n'); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv' })); a.download = 'leads-vow.csv'; a.click(); };
     }
     if (tela === 'resultado') {
@@ -580,9 +591,19 @@ class Component extends DCLogic {
     if (tela === 'qr' && s.qr) {
       const q = s.qr, Q = s.Q, hoje = new Date().toISOString().slice(0, 10), ativo = !!q.url;
       const curto = `${this.BASE}/q/${q.codigo}`;
-      const salvar = () => { const u = s.qrForm.trim(); if (!/^https?:\/\/[^\s]+\.[^\s]+$/i.test(u)) return this.setState({ qrMsg: 'Informe um endereço completo, com https://', qrMsgCor: 'var(--risco)' });
-        const novo = { ...q, url: u, criadoEm: q.criadoEm || new Date().toISOString() }; try { localStorage.setItem('vow.qr', JSON.stringify({ url: u, codigo: q.codigo })); } catch (e) {}
-        this.setState({ qr: novo, qrMsg: 'Salvo. O QR já aparece na landing.', qrMsgCor: 'var(--ok)' }); };
+      // Salvar tem que salvar. Enquanto isto era só localStorage, a tela dizia
+      // "o QR já aparece na landing" sem que nada tivesse saído do navegador.
+      const salvar = async () => { const u = s.qrForm.trim(); if (!/^https?:\/\/[^\s]+\.[^\s]+$/i.test(u)) return this.setState({ qrMsg: 'Informe um endereço completo, com https://', qrMsgCor: 'var(--risco)' });
+        this.setState({ qrMsg: 'Salvando…', qrMsgCor: 'var(--muted)' });
+        let servidor = null;
+        try { const r = await fetch('/api/app/qr', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ url: u }) });
+          servidor = { ok: r.ok, ...(await r.json().catch(() => ({}))) }; } catch (e) {}
+        if (servidor && !servidor.ok) return this.setState({ qrMsg: servidor.erro || 'Não deu para salvar.', qrMsgCor: 'var(--risco)' });
+        const novo = { ...q, url: u, criadoEm: (servidor && servidor.criadoEm) || q.criadoEm || new Date().toISOString() };
+        try { localStorage.setItem('vow.qr', JSON.stringify({ url: u, codigo: q.codigo })); } catch (e) {}
+        this.setState({ qr: novo,
+          qrMsg: servidor ? 'Salvo. O QR já aparece na landing.' : 'Salvo só nesta demonstração — sem servidor, nada foi gravado.',
+          qrMsgCor: servidor ? 'var(--ok)' : 'var(--risco)' }); };
       out.setQrForm = (e) => this.setState({ qrForm: e.target.value, qrMsg: '' }); out.qrEnter = (e) => { if (e.key === 'Enter') salvar(); };
       out.qrSalvar = salvar; out.qrSalvarTxt = ativo ? 'Salvar e regenerar' : 'Salvar e liberar o QR';
       out.qrAtivo = ativo; out.qrCurto = curto; out.qrUrl = q.url;
@@ -610,15 +631,15 @@ class Component extends DCLogic {
           acesso: u.status === 'ativo' ? 'ativo' : u.status === 'convidado' ? 'convite pendente' : 'desativado', acessoCls: u.status === 'ativo' ? 'ok' : u.status === 'convidado' ? 'warn' : 'off',
           ultimo: u.status === 'convidado' ? `convidado ${this.quando(u.convidadoEm)}` : u.ultimoAcesso ? `último acesso ${this.quando(u.ultimoAcesso)}` : '',
           carteira: n ? `${n} aberta${n === 1 ? '' : 's'}` : '—', podeAlternar: !souEu && !u.fixo, alternarTxt: u.status === 'inativo' ? 'Reativar' : 'Desativar',
-          alternar: () => this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, status: x.status === 'inativo' ? (x.ultimoAcesso ? 'ativo' : 'convidado') : 'inativo' } : x) })),
-          reenviar: () => this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, convidadoEm: new Date().toISOString() } : x), msgU: `Convite reenviado para ${u.email} (demonstração).`, msgUCor: 'var(--ok)' })) }; });
+          alternar: () => { if (!confirm('Demonstração: isto não muda o acesso de ninguém. A equipe de verdade fica em /app/usuarios. Continuar?')) return; this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, status: x.status === 'inativo' ? (x.ultimoAcesso ? 'ativo' : 'convidado') : 'inativo' } : x) })); },
+          reenviar: () => this.setState(st => ({ usuarios: st.usuarios.map(x => x.id === u.id ? { ...x, convidadoEm: new Date().toISOString() } : x), msgU: `Demonstração: nenhum e-mail saiu para ${u.email}. Para reenviar de verdade, use /app/usuarios.`, msgUCor: 'var(--risco)' })) }; });
       out.papeisOpc = Object.entries(this.PAPEIS).filter(([, P]) => !P.fixo).map(([id, P]) => { const on = s.novoU.papel === id; return { nome: P.nome, desc: P.desc, on, borda: on ? 'var(--ink)' : 'var(--line-2)', bg: on ? 'var(--acento-suave)' : 'transparent', pick: () => this.setState(st => ({ novoU: { ...st.novoU, papel: id } })) }; });
       out.setNovoU = { nome: (e) => { const v = e.target.value; this.setState(st => ({ novoU: { ...st.novoU, nome: v } })); }, email: (e) => { const v = e.target.value; this.setState(st => ({ novoU: { ...st.novoU, email: v } })); } };
       out.convidar = () => { const { nome, email, papel } = s.novoU; const em = email.trim().toLowerCase();
         if (!nome.trim()) return this.setState({ msgU: 'Informe o nome.', msgUCor: 'var(--risco)' });
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return this.setState({ msgU: 'Confira o e-mail.', msgUCor: 'var(--risco)' });
         if (s.usuarios.some(u => u.email === em)) return this.setState({ msgU: 'Esse e-mail já está na equipe.', msgUCor: 'var(--risco)' });
-        this.setState(st => ({ usuarios: [...st.usuarios, { id: 'u' + Date.now(), nome: nome.trim(), email: em, papel, status: 'convidado', convidadoEm: new Date().toISOString(), ultimoAcesso: null }], novoU: { nome: '', email: '', papel: 'vendedor' }, msgU: `Convite enviado para ${em} (demonstração).`, msgUCor: 'var(--ok)' })); };
+        this.setState(st => ({ usuarios: [...st.usuarios, { id: 'u' + Date.now(), nome: nome.trim(), email: em, papel, status: 'convidado', convidadoEm: new Date().toISOString(), ultimoAcesso: null }], novoU: { nome: '', email: '', papel: 'vendedor' }, msgU: `Demonstração: nenhum e-mail saiu para ${em}. Para convidar de verdade, use /app/usuarios.`, msgUCor: 'var(--risco)' })); };
     }
     if (tela === 'lead' && s.leadId && s.form) {
       const raw = s.leads.find(x => x.id === s.leadId); const l = C.comCrm(raw); const est = C.estagio(s.form.estagio);
