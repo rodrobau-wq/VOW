@@ -429,12 +429,17 @@ app.get('/qr.js', (_req, res) =>
 app.get('/crm.js', (_req, res) =>
   res.type('application/javascript').sendFile(path.join(RAIZ, 'crm.js')))
 /**
- * O mapa do potencial e o ranking que ele lê moram em `public/` porque o
- * protótipo os carrega por caminho relativo — mas contam onde estão os leads.
- * Esta guarda vem antes do `static`: sem ela o arquivo sai direto do disco.
+ * As telas de dentro moram em `public/` porque os protótipos se carregam por
+ * caminho relativo — mas o mapa conta onde estão os leads, e o CRM e a
+ * plataforma expõem a estrutura da carteira e os nomes das rotas internas.
+ * Só o totem (`abras.dc.html`) e o runtime dele são públicos.
+ *
+ * Esta guarda vem antes do `static`: sem ela o arquivo sai direto do disco,
+ * por mais rota protegida que se declare depois.
  */
 app.get(['/abras/mapa-potencial.html', '/abras/ranking-abras-2026.csv',
-         '/abras/crm-demo.js'], exigeLogin)
+         '/abras/crm-demo.js', '/abras/crm.dc.html', '/abras/plataforma.dc.html'],
+        exigeLogin)
 
 app.use(express.static(path.join(RAIZ, 'public'), { index: false }))
 
