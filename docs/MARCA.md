@@ -81,8 +81,11 @@ O símbolo também existe como máscara SVG embutida no `tokens.css`, na classe
    símbolo, em preto, piano, storm, concrete, silver e branco, mais
    `simbolo.svg`. A combinação 03 (peça escura) está disponível: use
    `*-silver.png` sobre fundo PIANO, com `.escuro` no `<body>`.
-2. **Kit do Adobe Fonts** para a Obviously.
-3. **Cor de estado.** Um CRM precisa distinguir atrasado de em dia, e o manual
+2. **Kit do Adobe Fonts** para a Obviously. **Decidido em 04/09/2026: seguir
+   com o fallback.** As telas rodam num sans neutro do sistema, e a
+   tipografia oficial do manual não está aplicada. Basta uma linha no
+   `<head>` no dia em que o kit existir.
+3. **Cor de estado — decidido em 04/09/2026: manter e levar para aprovação.** Um CRM precisa distinguir atrasado de em dia, e o manual
    não prevê cor de sinalização. `--risco` e `--ok` estão isolados e
    assinalados em `tokens.css`, nos tons mais contidos que resolvem a função,
    **pendentes de aprovação**. A interface nunca depende só da cor: todo item

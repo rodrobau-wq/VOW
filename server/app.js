@@ -9,6 +9,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import * as store from '../store.js'
+import crypto from 'node:crypto'
 import { baseUrl } from '../lib-url.js'
 import { lerLeads, atualizarLead, removerLead } from '../leads-db.js'
 import { temPostgres } from '../db.js'
@@ -25,7 +26,7 @@ import { montarPainel, CLASSES_CREDITO, RISCOS, CALENDARIO } from '../painel.js'
 import {
   abrirSessao, fecharSessao, carregaContexto, conferirSenha, hashSenha,
   exigeLogin, exigeRede, gerarLinkMagico, lerLinkMagico, lerSessao,
-  gerarLinkSenha, lerLinkSenha, SENHA_MINIMA,
+  gerarLinkSenha, lerLinkSenha, SENHA_MINIMA, PAPEIS,
 } from '../auth.js'
 
 const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -50,9 +51,11 @@ app.post('/api/app/entrar', async (req, res, next) => {
     const senha = String(req.body?.senha || '')
     const usuario = await store.achar('usuario', (u) => u.email === email)
 
-    // Mesma resposta para e-mail inexistente e senha errada: não confirma
-    // quem é cliente da VOW para quem está testando de fora.
-    if (!usuario || !conferirSenha(senha, usuario.senhaHash)) {
+    // Mesma resposta para e-mail inexistente, senha errada e conta
+    // desativada: nenhuma das três confirma quem é da VOW para quem está
+    // testando de fora. Desativar precisa fechar a porta de verdade — sem
+    // isto o botão da tela de usuários não faria nada.
+    if (!usuario || usuario.ativo === false || !conferirSenha(senha, usuario.senhaHash)) {
       return res.status(401).json({ erro: 'E-mail ou senha não conferem.' })
     }
 
@@ -75,7 +78,7 @@ app.post('/api/app/link-magico', async (req, res, next) => {
     const email = String(req.body?.email || '').trim().toLowerCase()
     const usuario = await store.achar('usuario', (u) => u.email === email)
     const resposta = { ok: true, mensagem: 'Se este e-mail tiver acesso, o link chega em instantes.' }
-    if (!usuario) return res.json(resposta)
+    if (!usuario || usuario.ativo === false) return res.json(resposta)
 
     const token = gerarLinkMagico(usuario.id)
     const base = baseUrl(req)
@@ -496,6 +499,82 @@ function soVow(req, res, next) {
   if (req.usuario.papel !== 'vow') return res.status(403).json({ erro: 'acesso restrito' })
   next()
 }
+
+/* ======================================================================
+ * Usuários da plataforma.
+ * ====================================================================== */
+
+app.get('/api/app/usuarios', soVow, async (_req, res, next) => {
+  try {
+    const us = await store.listar('usuario')
+    // O hash da senha nunca sai daqui, nem para o próprio administrador.
+    res.json(us.map(({ senhaHash, ...u }) => ({ ...u, ativo: u.ativo !== false }))
+      .sort((a, b) => String(a.nome).localeCompare(String(b.nome))))
+  } catch (e) { next(e) }
+})
+
+app.post('/api/app/usuarios', soVow, async (req, res, next) => {
+  try {
+    const nome = String(req.body?.nome || '').trim().slice(0, 120)
+    const email = String(req.body?.email || '').trim().toLowerCase().slice(0, 200)
+    const papel = String(req.body?.papel || 'vow')
+
+    if (!nome) return res.status(400).json({ erro: 'Informe o nome.' })
+    if (!EMAIL_RE_CRM.test(email)) return res.status(400).json({ erro: 'E-mail inválido.' })
+    if (!PAPEIS.includes(papel)) return res.status(400).json({ erro: 'Papel inválido.' })
+    if (await store.achar('usuario', (u) => u.email === email)) {
+      return res.status(409).json({ erro: 'Já existe alguém com este e-mail.' })
+    }
+
+    /**
+     * A senha é sorteada e nunca escolhida por quem convida: quem cria a
+     * conta não deve saber a senha de quem vai usá-la. A pessoa recebe o
+     * link para definir a dela, do mesmo jeito que no "esqueci minha senha".
+     */
+    const provisoria = crypto.randomBytes(18).toString('base64url')
+    const u = await store.inserir('usuario', {
+      nome, email, papel, senhaHash: hashSenha(provisoria), redes: [], ativo: true,
+      convidadoPor: req.usuario.nome,
+    })
+
+    const base = baseUrl(req)
+    const link = `${base}/app/senha/${gerarLinkSenha({ id: u.id, senhaHash: u.senhaHash })}`
+    const peca = emailAcesso({ nome, link, tipo: 'senha', minutos: 30 })
+    const envio = await enviarEmail({ para: email, assunto: peca.assunto, html: peca.html, texto: peca.texto })
+
+    const { senhaHash, ...limpo } = u
+    // Sem e-mail configurado, o link volta para quem convidou repassar.
+    res.json({ ...limpo, ativo: true, emailEnviado: envio.enviado, link: envio.enviado ? null : link })
+  } catch (e) { next(e) }
+})
+
+app.patch('/api/app/usuarios/:id', soVow, async (req, res, next) => {
+  try {
+    const u = await store.porId('usuario', req.params.id)
+    if (!u) return res.status(404).json({ erro: 'usuário não encontrado' })
+
+    const mudancas = {}
+    if (req.body?.papel !== undefined) {
+      if (!PAPEIS.includes(req.body.papel)) return res.status(400).json({ erro: 'Papel inválido.' })
+      // Trancar-se para fora é irreversível sem shell: o último `vow` fica.
+      if (u.id === req.usuario.id && req.body.papel !== 'vow') {
+        return res.status(409).json({ erro: 'Você não pode tirar o próprio acesso de administrador.' })
+      }
+      mudancas.papel = req.body.papel
+    }
+    if (req.body?.ativo !== undefined) {
+      if (u.id === req.usuario.id && req.body.ativo === false) {
+        return res.status(409).json({ erro: 'Você não pode desativar a própria conta.' })
+      }
+      mudancas.ativo = req.body.ativo === true
+    }
+    const salvo = await store.atualizar('usuario', u.id, mudancas)
+    const { senhaHash, ...limpo } = salvo
+    res.json({ ...limpo, ativo: limpo.ativo !== false })
+  } catch (e) { next(e) }
+})
+
+app.get('/app/usuarios', tela('usuarios'))
 
 /**
  * Exclui um lead e tudo que pende dele.

@@ -167,6 +167,14 @@ export function exigeLogin(req, res, next) {
 export async function carregaContexto(req, res, next) {
   try {
     const usuario = await store.porId('usuario', req.sessao.usuarioId)
+    // Desativar precisa valer para quem já está dentro: o cookie dura 12 h e
+    // sem esta checagem a pessoa seguiria trabalhando o dia todo.
+    if (usuario && usuario.ativo === false) {
+      fecharSessao(res)
+      return ehApi(req)
+        ? res.status(401).json({ erro: 'conta desativada' })
+        : res.redirect('/app/entrar')
+    }
     if (!usuario) {
       fecharSessao(res)
       return ehApi(req)
