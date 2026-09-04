@@ -1,0 +1,236 @@
+/**
+ * Tokens VOW — fonte única da linguagem visual.
+ *
+ * Antes disto, cada tela repetia o :root inline e as três já tinham divergido
+ * (a landing em verde escuro, o totem num preto/dourado próprio, os leads em
+ * papel). Qualquer tela nova importa este arquivo e não redeclara cor nenhuma.
+ *
+ * DUAS ESCALAS, mesmos nomes semânticos:
+ *
+ *   :root       camada pública — landing, diagnósticos, totem.
+ *               Escura e cinematográfica. É vitrine, dura minutos.
+ *
+ *   body.paper  camada interna — plataforma de leads e o SaaS.
+ *               Clara, sobre papel. É ferramenta de oito horas por dia.
+ *
+ * Um componente escrito com --surface/--ink/--line funciona nas duas sem
+ * saber em qual está. Só troque a escala no <body>, nunca dentro da tela.
+ *
+ * ACESSIBILIDADE: cor nunca decide sozinha. Vermelho de tributado contra
+ * verde de não tributado dá ΔE 7,6 em deuteranopia — indistinguíveis. Todo
+ * elemento que usa --risk ou --ok carrega o rótulo escrito junto.
+ */
+
+:root{
+  /* fundos, do mais fundo ao mais alto */
+  --bg:#0E1B14;
+  --bg-deep:#07110C;
+  --surface:#15261C;
+  --raised:#1C3225;
+
+  /* texto, do mais forte ao mais apagado */
+  --ink:#F3EEE2;
+  --dim:#C9D2C8;
+  --muted:#9FB0A2;
+  --faint:#6F8074;
+
+  /* marca */
+  --gold:#E0C48C;
+  --gold-deep:#B8934A;
+  /* fundo de realce dourado — atrás de citação de regra, chip ativo */
+  --gold-wash:rgba(224,196,140,.07);
+  --gold-edge:rgba(224,196,140,.30);
+
+  /* estados. Sempre acompanhados de rótulo escrito. */
+  --risk:#E8906C;
+  --ok:#7BD389;
+
+  /* traços */
+  --line:rgba(243,238,226,.10);
+  --line-2:rgba(243,238,226,.18);
+
+  /* papel — usado pela camada pública quando precisa citar a interna */
+  --paper:#EFE9DB;
+  --paper-card:#FBF8F1;
+  --paper-ink:#0E1B14;
+
+  /* trilho do slider: só ele precisa de um verde intermediário próprio */
+  --track:#243B2E;
+
+  --r-sm:12px; --r-md:16px; --r-lg:20px; --r-xl:24px; --r-2xl:32px; --r-pill:999px;
+
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --serif:'Instrument Serif',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+
+/* A camada interna reusa os mesmos nomes com valores de papel. O dourado
+   escurece: #E0C48C sobre branco não passa em contraste nenhum. */
+body.paper{
+  --bg:#EFE9DB;
+  --bg-deep:#E4DCC9;
+  --surface:#FBF8F1;
+  --raised:#FFFFFF;
+
+  --ink:#0E1B14;
+  --dim:#2E4237;
+  --muted:#5C6F62;
+  --faint:#87988B;
+
+  --gold:#8A6A2B;
+  --gold-deep:#6E5320;
+  --gold-wash:rgba(138,106,43,.08);
+  --gold-edge:rgba(138,106,43,.32);
+
+  --risk:#A24A2C;
+  --ok:#2F7A55;
+
+  --line:rgba(14,27,20,.12);
+  --line-2:rgba(14,27,20,.22);
+
+  --track:#D8CFBB;
+}
+
+/* --------------------------------------------------------------- base */
+*{box-sizing:border-box}
+/* Um `display` declarado numa classe vence o `hidden` do navegador, e o
+   elemento reaparece. Já aconteceu com o status de CNPJ: o atributo estava
+   lá e a bolinha continuava na tela. */
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{
+  margin:0;
+  font-family:var(--serif);
+  font-weight:400;
+  line-height:1.05;
+  letter-spacing:-.01em;
+  text-wrap:balance;
+}
+p{margin:0 0 16px;text-wrap:pretty}
+a{color:var(--gold);text-decoration:none}
+a:hover{color:var(--ink)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* ---------------------------------------------------------- primitivas */
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.serif{font-family:var(--serif);font-weight:400}
+/* Números alinham em coluna. Toda tabela de valor usa. */
+.tnum{font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.logo{font-family:var(--serif);font-size:26px;letter-spacing:.04em;color:var(--ink)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:44px;padding:0 20px;border-radius:var(--r-xl);border:none;
+  background:var(--gold);color:var(--bg);
+  font:500 15px/1 var(--sans);cursor:pointer;transition:filter .2s;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+.btn.lg{height:60px;padding:0 30px;font-size:17px;border-radius:var(--r-md)}
+/* No papel o dourado é escuro, então o texto do botão inverte. */
+body.paper .btn{color:var(--surface)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:28px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);padding:28px}
+
+.chip{
+  height:36px;padding:0 14px;border-radius:var(--r-pill);
+  border:1px solid var(--line-2);background:transparent;color:var(--dim);
+  font:400 13px/1 var(--sans);cursor:pointer;white-space:nowrap;
+}
+.chip[aria-pressed="true"]{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+body.paper .chip[aria-pressed="true"]{color:var(--surface)}
+
+/* Citação de regra ou de norma: barra dourada à esquerda. */
+.rule{
+  border-left:3px solid var(--gold);background:var(--gold-wash);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;padding:16px 20px;
+  font-size:15px;color:var(--dim);
+}
+.rule p{margin:0}
+.fine{font-size:12.5px;color:var(--faint);line-height:1.5}
+
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ------------------------------------------------- casca da plataforma */
+/* Três telas do SaaS compartilham esta barra. Fica aqui, e não repetida em
+   cada uma, porque foi exatamente assim que os tokens divergiram antes. */
+.appbar{
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  padding:14px 28px;border-bottom:1px solid var(--line);background:var(--surface);
+}
+.appbar .sp{flex:1}
+.appbar .marca{display:flex;align-items:center;gap:11px}
+.appbar .caduceu{
+  width:32px;height:32px;border:1px solid var(--gold-edge);border-radius:10px;
+  display:grid;place-items:center;color:var(--gold);font-family:var(--serif);font-size:16px;
+}
+.appbar .nome{font-family:var(--serif);font-size:19px;line-height:1.1;display:block}
+.appbar .sob{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.appbar .rede{
+  display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:var(--r-pill);
+  border:1px solid var(--line-2);font-size:13px;color:var(--dim);background:transparent;cursor:pointer;
+}
+.appbar .rede:hover{border-color:var(--gold-edge);color:var(--ink)}
+.appbar .quem{font-size:13px;color:var(--muted);text-align:right;line-height:1.3}
+.appbar .quem b{display:block;color:var(--ink);font-weight:500;font-family:var(--sans);font-size:13px}
+.appbar .sair{background:none;border:0;color:var(--muted);font:400 13px/1 var(--sans);cursor:pointer;padding:0}
+.appbar .sair:hover{color:var(--risk)}
+
+.app-main{padding:28px;max-width:1240px;margin:0 auto}
+
+/* Abas da plataforma — moram aqui pela mesma razão que a .appbar. */
+/* No celular as abas rolam na horizontal em vez de quebrar em duas linhas:
+   o app de campo é usado de pé, e cada linha a mais empurra o conteúdo. */
+.appbar .abas{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+              scrollbar-width:none;max-width:100%}
+.appbar .abas::-webkit-scrollbar{display:none}
+.appbar .abas a{white-space:nowrap}
+.appbar .abas a{padding:7px 14px;border-radius:var(--r-pill);font-size:13.5px;
+                color:var(--muted);text-decoration:none}
+.appbar .abas a:hover{color:var(--ink);background:var(--bg-deep)}
+.appbar .abas a.on{background:var(--ink);color:var(--surface);font-weight:500}
+
+/* Estado da rede no app de campo. A cor não decide sozinha: a frase diz. */
+.faixa-rede{padding:10px 18px;font-size:13.5px;text-align:center;font-weight:500}
+.faixa-rede.off{background:var(--risk);color:#fff}
+.faixa-rede.esperando{background:var(--gold);color:var(--bg)}
+.faixa-rede.ok{background:var(--ok);color:#fff}
+
+@media(max-width:640px){
+  .appbar{padding:10px 14px;gap:10px}
+  .appbar .marca .sob{display:none}
+  .appbar .quem{display:none}
+  .appbar .abas{order:3;flex-basis:100%}
+}
+
+/* ------------------------------------------------- campo de senha */
+/* O olho fica dentro do campo. `type=button` é obrigatório: dentro de um
+   form, um button sem type envia o formulário ao ser clicado. */
+.senha-campo{position:relative;display:block}
+.senha-campo input{padding-right:52px;width:100%}
+.senha-campo .olho{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  width:40px;height:40px;display:grid;place-items:center;
+  background:none;border:0;border-radius:50%;cursor:pointer;color:var(--muted);
+}
+.senha-campo .olho:hover{color:var(--gold)}
+.senha-campo .olho svg{width:20px;height:20px;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+.appbar .abas .sep{width:1px;height:18px;background:var(--line-2);margin:0 8px;align-self:center;flex:0 0 auto}

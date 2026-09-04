@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Diagnóstico gratuito · VOW</title>
 <meta name="description" content="Simulador AS IS → TO BE: quanto da sua verba com a indústria passa a ser tributada e quanto do seu gasto com serviços volta como crédito.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+
 <link rel="stylesheet" href="/tokens.css">
 <style>
   /* Camada pública: escala escura, a mesma da landing e do totem. */
@@ -17,31 +16,31 @@
   nav .sp{flex:1}
   .passos{display:flex;gap:6px;align-items:center}
   .pino{height:8px;width:14px;border-radius:4px;background:rgba(243,238,226,.18);transition:width .3s,background .3s}
-  .pino.on{width:34px;background:var(--gold)}
-  .recomecar{background:none;border:1px solid var(--line-2);color:var(--dim);border-radius:var(--r-pill);
-             padding:8px 16px;font:400 13px/1 var(--sans);cursor:pointer}
-  .recomecar:hover{color:var(--ink);border-color:var(--gold-edge)}
+  .pino.on{width:34px;background:var(--acento)}
+  .recomecar{background:none;border:1px solid var(--line-2);color:var(--dim);border-radius:var(--r-sm);
+             padding:8px 16px;font:400 13px/1 var(--fonte);cursor:pointer}
+  .recomecar:hover{color:var(--ink);border-color:var(--acento-borda)}
 
   main{max-width:1120px;margin:0 auto;padding:44px 24px 80px}
   .tela{display:none;animation:up .4s ease both}
   .tela.on{display:block}
   h1{font-size:clamp(34px,5.2vw,64px);margin-bottom:16px}
-  h1 em{font-style:italic;color:var(--gold)}
+  h1 em{font-style:italic;color:var(--acento)}
   .lead{font-size:clamp(16px,1.9vw,20px);color:var(--dim);max-width:64ch;margin-bottom:34px}
   h2.sec{font-size:clamp(24px,3.2vw,38px);margin-bottom:8px}
   .legenda{color:var(--muted);font-size:15px;margin-bottom:22px;max-width:70ch}
 
   /* 1 · escolha */
   .escolha{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-  .prod{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-2xl);padding:32px;
+  .prod{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px;
         text-align:left;cursor:pointer;color:var(--ink);transition:border-color .2s,transform .2s}
-  .prod:hover{border-color:var(--gold-edge);transform:translateY(-3px)}
+  .prod:hover{border-color:var(--acento-borda);transform:translateY(-3px)}
   .prod h3{font-size:38px;margin:10px 0 12px}
   .prod p{color:var(--dim);font-size:15px;margin:0 0 22px;line-height:1.6}
   .prod .ir{display:flex;align-items:center;justify-content:space-between;gap:14px;
             border-top:1px solid var(--line);padding-top:18px}
-  .prod .ir b{color:var(--gold);font-weight:500;font-size:14px}
-  .prod .seta{width:44px;height:44px;border-radius:50%;background:var(--gold);color:var(--bg);
+  .prod .ir b{color:var(--acento);font-weight:500;font-size:14px}
+  .prod .seta{width:44px;height:44px;border-radius:50%;background:var(--acento);color:var(--bg);
               display:grid;place-items:center;font-size:19px}
   .prod .feito{color:var(--ok);font-size:13px;font-weight:500}
 
@@ -49,49 +48,49 @@
   .simul{display:grid;grid-template-columns:1fr;gap:16px;max-width:760px}
   .campo .top{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}
   .campo label{font-size:15px;color:var(--muted)}
-  .campo .val{font-family:var(--serif);font-size:44px;line-height:1;color:var(--gold)}
+  .campo .val{font-family:var(--fonte-titulo);font-size:44px;line-height:1;color:var(--acento)}
   input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:10px;border-radius:5px;
-                    background:var(--track);outline:none;margin:0}
+                    background:var(--concrete);outline:none;margin:0}
   input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:34px;height:34px;border-radius:50%;
-    background:var(--gold);border:6px solid var(--bg);box-shadow:0 0 0 2px var(--gold);cursor:pointer}
-  input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--gold);
+    background:var(--acento);border:6px solid var(--bg);box-shadow:0 0 0 2px var(--acento);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--acento);
     border:5px solid var(--bg);cursor:pointer}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
   .resumo{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;
           padding:20px 0 0;border-top:1px solid var(--line);margin-top:6px}
   .resumo .r{font-size:14px;color:var(--muted)}
-  .resumo .v{font-family:var(--serif);font-size:34px;color:var(--ink)}
+  .resumo .v{font-family:var(--fonte-titulo);font-size:34px;color:var(--ink)}
 
   /* 3 · resultado */
   .heroi{margin-bottom:38px}
   .heroi .rot{font-size:15px;color:var(--dim);margin-bottom:8px}
-  .heroi .num{font-family:var(--serif);font-size:clamp(56px,10vw,124px);line-height:.95;letter-spacing:-.02em}
-  .heroi .num.perda{color:var(--risk)}
+  .heroi .num{font-family:var(--fonte-titulo);font-size:clamp(56px,10vw,124px);line-height:.95;letter-spacing:-.02em}
+  .heroi .num.perda{color:var(--risco)}
   .heroi .num.ganho{color:var(--ok)}
   .heroi .sub{font-size:16px;color:var(--dim);margin-top:12px;max-width:60ch}
 
   .cenarios{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
-  .cen{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);padding:24px;
+  .cen{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:24px;
        position:relative;overflow:hidden}
   .cen::before{content:'';position:absolute;inset:0 0 auto;height:5px}
-  .cen.c1{background:#122019}.cen.c1::before{background:var(--faint)}
-  .cen.c2::before{background:var(--risk)}
-  .cen.c3::before{background:var(--gold)}
+  .cen.c1{background:var(--bg-deep)}.cen.c1::before{background:var(--faint)}
+  .cen.c2::before{background:var(--risco)}
+  .cen.c3::before{background:var(--acento)}
   .cen .t{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
   .cen .ln{display:flex;justify-content:space-between;gap:12px;padding:9px 0;font-size:14px;
            color:var(--dim);border-bottom:1px solid var(--line)}
   .cen .ln b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
   .cen .fim{margin-top:16px}
   .cen .fim .l{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-  .cen .fim .v{font-family:var(--serif);font-size:38px;line-height:1;margin-top:6px}
+  .cen .fim .v{font-family:var(--fonte-titulo);font-size:38px;line-height:1;margin-top:6px}
   .cen .fim .n{font-size:12.5px;color:var(--faint);margin-top:6px;line-height:1.45}
 
   /* caixa */
   .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
   .tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:20px}
-  .tile.ouro{background:var(--raised);border-color:var(--gold-edge)}
+  .tile.ouro{background:var(--raised);border-color:var(--acento-borda)}
   .tile .l{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-  .tile .v{font-family:var(--serif);font-size:34px;line-height:1;margin-top:8px}
+  .tile .v{font-family:var(--fonte-titulo);font-size:34px;line-height:1;margin-top:8px}
   .tile .n{font-size:12.5px;color:var(--faint);margin-top:6px;line-height:1.45}
 
   /* linha a linha */
@@ -103,18 +102,18 @@
   .fam .cab{display:flex;align-items:flex-start;gap:14px}
   .cx{width:26px;height:26px;border-radius:8px;border:2px solid var(--line-2);flex:0 0 auto;
       display:grid;place-items:center;font-size:14px;color:var(--bg);margin-top:2px}
-  .fam:not(.off) .cx{background:var(--gold);border-color:var(--gold)}
+  .fam:not(.off) .cx{background:var(--acento);border-color:var(--acento)}
   .fam .id{flex:1;min-width:0}
   .fam .nm{font-size:17px;font-weight:500}
   .fam .tag{font-size:12px;margin-top:5px;display:inline-block}
   .fam .dir{text-align:right;flex:0 0 auto}
-  .fam .vl{font-family:var(--serif);font-size:26px;line-height:1}
+  .fam .vl{font-family:var(--fonte-titulo);font-size:26px;line-height:1}
   .pm{display:flex;gap:6px;justify-content:flex-end;margin-top:8px;align-items:center}
   .pm button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line-2);background:transparent;
-             color:var(--ink);font:400 17px/1 var(--sans);cursor:pointer}
-  .pm button:hover{border-color:var(--gold);color:var(--gold)}
+             color:var(--ink);font:400 17px/1 var(--fonte);cursor:pointer}
+  .pm button:hover{border-color:var(--acento);color:var(--acento)}
   .pm span{font-size:12px;color:var(--faint);min-width:104px;text-align:right}
-  .barra{height:10px;border-radius:5px;background:#2A3D33;margin-top:14px;overflow:hidden}
+  .barra{height:10px;border-radius:5px;background:var(--concrete);margin-top:14px;overflow:hidden}
   .barra i{display:block;height:100%;border-radius:5px}
   .fam .mud{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5}
   .fam .mud b{color:var(--dim);font-weight:500}
@@ -122,7 +121,7 @@
   /* etapas */
   .etapas{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
   .et{border-top:1px solid var(--line-2);padding-top:16px}
-  .et .n{font-family:var(--serif);font-size:34px;color:var(--gold);line-height:1}
+  .et .n{font-family:var(--fonte-titulo);font-size:34px;color:var(--acento);line-height:1}
   .et .t{font-size:17px;font-weight:500;margin:8px 0 6px}
   .et .d{font-size:13.5px;color:var(--muted);line-height:1.55}
 
@@ -131,18 +130,18 @@
   .ff{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0 14px}
   .ff .full{grid-column:1/-1}
   .ff input{height:52px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--bg);
-            color:var(--ink);padding:0 16px;font:400 16px/1 var(--sans);width:100%}
-  .ff input:focus{border-color:var(--gold);outline:none}
+            color:var(--ink);padding:0 16px;font:400 16px/1 var(--fonte);width:100%}
+  .ff input:focus{border-color:var(--acento);outline:none}
   .ff input::placeholder{color:var(--faint)}
-  .ff input.ok{border-color:var(--ok)} .ff input.ruim{border-color:var(--risk)}
+  .ff input.ok{border-color:var(--ok)} .ff input.ruim{border-color:var(--risco)}
   .cnpjst{font-size:13px;color:var(--muted);margin:-6px 0 12px;display:flex;gap:8px;align-items:center}
   .cnpjst i{width:8px;height:8px;border-radius:50%;background:var(--faint);display:inline-block}
   .toggle{width:100%;text-align:left;padding:16px 18px;border-radius:var(--r-md);border:1px solid var(--line-2);
-          background:transparent;color:var(--dim);font:400 14.5px/1.4 var(--sans);cursor:pointer;margin-top:12px}
+          background:transparent;color:var(--dim);font:400 14.5px/1.4 var(--fonte);cursor:pointer;margin-top:12px}
   .toggle[aria-pressed="true"]{border-color:var(--ok);color:var(--ok);background:rgba(123,211,137,.12)}
   .qrw{text-align:center}
   .qrw img{width:180px;height:180px;background:#fff;border-radius:var(--r-sm);padding:10px}
-  .msg{font-size:14px;margin-top:12px;min-height:20px;color:var(--risk)}
+  .msg{font-size:14px;margin-top:12px;min-height:20px;color:var(--risco)}
 
   .bloco{margin-top:52px}
   .acoes{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px;align-items:center}
@@ -302,7 +301,7 @@
     <p class="lead" id="fim-sub"></p>
     <div class="panel" id="fim-metade" hidden style="max-width:640px">
       <div class="eyebrow">Falta a outra metade</div>
-      <h3 style="font-family:var(--serif);font-size:32px;font-weight:400;margin:10px 0 10px" id="m-nome"></h3>
+      <h3 style="font-family:var(--fonte-titulo);font-size:32px;font-weight:400;margin:10px 0 10px" id="m-nome"></h3>
       <p style="color:var(--dim);font-size:15px;margin-bottom:18px" id="m-txt"></p>
       <button class="btn" id="m-btn"></button>
     </div>
@@ -542,8 +541,8 @@ function pintarFamilias(r) {
     const peso = est.pesos[f.nome] ?? f.peso
     const frac = rev ? f.trib : f.cred
     const tag = rev
-      ? (f.trib === 1 ? ['Tributa', 'var(--risk)'] : f.trib === 0 ? ['Não tributa', 'var(--ok)'] : ['Depende do documento', 'var(--gold)'])
-      : (f.cred === 1 ? ['Crédito integral', 'var(--ok)'] : f.cred >= 0.8 ? ['Crédito alto', 'var(--ok)'] : ['Depende do regime', 'var(--gold)'])
+      ? (f.trib === 1 ? ['Tributa', 'var(--risco)'] : f.trib === 0 ? ['Não tributa', 'var(--ok)'] : ['Depende do documento', 'var(--acento)'])
+      : (f.cred === 1 ? ['Crédito integral', 'var(--ok)'] : f.cred >= 0.8 ? ['Crédito alto', 'var(--ok)'] : ['Depende do regime', 'var(--acento)'])
     return `
     <div class="fam ${on ? '' : 'off'}" data-n="${esc(f.nome)}">
       <div class="cab">
@@ -560,7 +559,7 @@ function pintarFamilias(r) {
             <span>${peso}% · ${fmtBRLc(d ? d.valor : 0)}</span></div>` : ''}
         </div>
       </div>
-      ${on ? `<div class="barra"><i style="width:${Math.max(2, (d.valor / maior) * 100)}%;background:linear-gradient(90deg,${tag[1]} ${frac * 100}%,#3A4F42 ${frac * 100}%)"></i></div>
+      ${on ? `<div class="barra"><i style="width:${Math.max(2, (d.valor / maior) * 100)}%;background:linear-gradient(90deg,${tag[1]} ${frac * 100}%,var(--concrete) ${frac * 100}%)"></i></div>
       <div class="mud"><b>Hoje:</b> ${esc(f.hoje)} <b>·  Muda:</b> ${esc(f.muda)}</div>` : ''}
     </div>`
   }).join('')
@@ -603,7 +602,7 @@ $('f-cnpj').addEventListener('input', async (e) => {
   const st = $('cnpjst')
   if (d.length !== 14) { st.hidden = true; e.target.classList.remove('ok', 'ruim'); est.empresa = null; return }
   st.hidden = false; st.querySelector('span').textContent = 'Buscando dados da empresa…'
-  st.querySelector('i').style.background = 'var(--gold)'
+  st.querySelector('i').style.background = 'var(--acento)'
   try {
     const emp = await buscarCNPJ(d)
     est.empresa = emp
@@ -613,7 +612,7 @@ $('f-cnpj').addEventListener('input', async (e) => {
   } catch {
     est.empresa = null
     e.target.classList.add('ruim'); e.target.classList.remove('ok')
-    st.querySelector('i').style.background = 'var(--risk)'
+    st.querySelector('i').style.background = 'var(--risco)'
     st.querySelector('span').textContent = 'CNPJ não encontrado. Pode seguir sem ele.'
   }
 })

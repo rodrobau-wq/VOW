@@ -2,8 +2,6 @@
  * VOW · ABRAS — API do totem e da plataforma de leads.
  *
  *   GET  /                 landing pública com os diagnósticos gratuitos
- *   GET  /totem            totem da feira — protótipo de design (public/abras)
- *   GET  /totem-v1         totem codado, com gravação de lead no servidor
  *   GET  /diagnostico      simulador AS IS -> TO BE (diagnóstico gratuito da landing)
  *   GET  /app/*            plataforma SaaS (ver server/app.js)
  *   GET  /leads            plataforma de leads (protegida por Basic Auth)
@@ -277,13 +275,10 @@ app.get('/', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'landing.html
 // estande). O site completo — seções de produto, como funciona, rodapé —
 // continua inteiro aqui, e é para onde a navegação aponta.
 app.get('/site', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'site.html')))
-// /totem é o protótipo de design vindo do Claude Design (public/abras/).
-// Ele traz o próprio runtime e o próprio motor, e é a tela que o cliente
-// aprovou — por isso é o destino do botão de diagnóstico.
-// O totem codado, que grava lead no servidor, fica em /totem-v1 até a
-// portabilidade do protótipo para o motor da casa.
-app.get('/totem', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'abras', 'totem.dc.html')))
-app.get('/totem-v1', (_req, res) => res.sendFile(path.join(RAIZ, 'public', 'index.html')))
+// O totem saiu do escopo: o lead entra só pela landing. Os protótipos do
+// Claude Design continuam no repositório como referência de design, em
+// docs/handoff-abras/prototipos/, fora do que é servido — eles usam a
+// paleta antiga e não podem aparecer como se fossem o produto.
 
 // O diagnóstico gratuito da landing. Mesma tela do protótipo do totem, mas
 // adaptada à web (responsiva, não 1080x1920) e ligada ao backend de verdade:

@@ -4,30 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Entrar · Plataforma VOW</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+
 <link rel="stylesheet" href="/tokens.css">
 <style>
   /* O login é a última tela escura: a porta entre a vitrine e a ferramenta. */
   body{min-height:100dvh;display:grid;place-items:center;padding:24px}
   .caixa{width:100%;max-width:420px}
   .topo{display:flex;align-items:center;gap:12px;margin-bottom:34px}
-  .caduceu{width:38px;height:38px;border:1px solid var(--gold-edge);border-radius:var(--r-sm);
-           display:grid;place-items:center;color:var(--gold);font-family:var(--serif);font-size:19px}
   h1{font-size:38px;margin-bottom:8px}
-  h1 em{font-style:italic;color:var(--gold)}
+  h1 em{font-style:italic;color:var(--acento)}
   .sub{color:var(--muted);font-size:15px;margin-bottom:28px}
   label{display:block;font-size:13px;color:var(--muted);margin:0 0 8px}
   input{height:52px;width:100%;border-radius:var(--r-sm);border:1px solid var(--line-2);
-        background:var(--surface);color:var(--ink);padding:0 16px;font:400 16px/1 var(--sans);margin-bottom:18px}
-  input:focus{border-color:var(--gold);outline:none}
+        background:var(--surface);color:var(--ink);padding:0 16px;font:400 16px/1 var(--fonte);margin-bottom:18px}
+  input:focus{border-color:var(--acento);outline:none}
   input::placeholder{color:var(--faint)}
   .btn{width:100%}
   .alt{margin-top:22px;padding-top:22px;border-top:1px solid var(--line);text-align:center}
-  .alt button{background:none;border:0;color:var(--gold);font:400 14px/1 var(--sans);cursor:pointer}
+  .alt button{background:none;border:0;color:var(--acento);font:400 14px/1 var(--fonte);cursor:pointer}
   .alt button:hover{color:var(--ink)}
-  .msg{font-size:14px;margin:14px 0 0;min-height:20px;color:var(--risk)}
+  .msg{font-size:14px;margin:14px 0 0;min-height:20px;color:var(--risco)}
   .msg.ok{color:var(--ok)}
   .msg a{display:block;margin-top:8px;word-break:break-all;font-size:12.5px}
   .volta{margin-top:26px;text-align:center;font-size:13px}
@@ -37,7 +34,7 @@
 <body>
   <div class="caixa">
     <div class="topo">
-      <div class="caduceu">V</div>
+      <img class="marca-caduceu" src="/marca/caduceu.jpg" alt="Grupo VOW">
       <div><span class="logo" style="font-size:21px">VOW</span>
         <div class="eyebrow" style="font-size:10px">Plataforma</div></div>
     </div>

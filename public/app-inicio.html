@@ -4,19 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Começar · Plataforma VOW</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+
 <link rel="stylesheet" href="/tokens.css">
 <style>
   h1{font-size:42px;margin-bottom:8px}
-  h1 em{font-style:italic;color:var(--gold)}
+  h1 em{font-style:italic;color:var(--acento)}
   .sub{color:var(--muted);max-width:64ch;margin-bottom:34px}
   .passos{display:grid;gap:14px;max-width:860px}
   .passo{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
          padding:26px;display:grid;grid-template-columns:44px 1fr auto;gap:20px;align-items:start}
-  .passo .n{width:44px;height:44px;border-radius:50%;border:1px solid var(--gold-edge);
-            display:grid;place-items:center;font-family:var(--serif);font-size:20px;color:var(--gold)}
+  .passo .n{width:44px;height:44px;border-radius:50%;border:1px solid var(--acento-borda);
+            display:grid;place-items:center;font-family:var(--fonte-titulo);font-size:20px;color:var(--acento)}
   .passo h2{font-size:23px;margin-bottom:6px}
   .passo p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.6}
   .passo .acao{align-self:center}
@@ -25,15 +24,15 @@
   .poronde{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
   .sist{border:1px solid var(--line-2);border-radius:var(--r-md);padding:18px;text-align:left;
         background:transparent;cursor:pointer;color:var(--ink)}
-  .sist:hover{border-color:var(--gold-edge)}
-  .sist b{display:block;font-family:var(--serif);font-size:19px;font-weight:400;margin-bottom:5px}
+  .sist:hover{border-color:var(--acento-borda)}
+  .sist b{display:block;font-family:var(--fonte-titulo);font-size:19px;font-weight:400;margin-bottom:5px}
   .sist span{font-size:13px;color:var(--muted);line-height:1.5}
   .rule{margin-top:30px;max-width:860px}
 </style>
 </head>
-<body class="paper">
+<body>
   <div class="appbar">
-    <div class="marca"><div class="caduceu">V</div>
+    <div class="marca"><img class="marca-caduceu" src="/marca/caduceu.jpg" alt="Grupo VOW">
       <div><span class="nome">VOW</span><span class="sob">Plataforma</span></div></div>
     <button class="rede" id="rede"></button>
     <div class="sp"></div>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Escolher rede · Plataforma VOW</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  h1{font-size:40px;margin-bottom:6px}
+  h1 em{font-style:italic;color:var(--gold)}
+  .sub{color:var(--muted);margin-bottom:28px}
+  .lista{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+  .rede-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+             padding:26px;text-align:left;cursor:pointer;transition:border-color .2s,transform .2s;color:var(--ink)}
+  .rede-card:hover{border-color:var(--gold-edge);transform:translateY(-2px)}
+  .rede-card h2{font-size:26px;margin-bottom:6px}
+  .rede-card .cnpj{font-size:13px;color:var(--faint);font-variant-numeric:tabular-nums}
+  .rede-card .meta{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .pill{padding:4px 11px;border-radius:var(--r-pill);background:var(--bg-deep);
+        color:var(--muted);font-size:11.5px}
+  .pill.casa{background:var(--gold-wash);color:var(--gold-deep);border:1px solid var(--gold-edge)}
+  .msg{color:var(--risk);margin-top:16px;min-height:20px}
+  .nova{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+        padding:24px;margin-top:16px;max-width:620px}
+  .nova h2{font-size:23px;margin:0 0 6px}
+  .nova .leg{font-size:14px;color:var(--muted);margin:0 0 18px;line-height:1.55}
+  .ff{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+  .ff .full{grid-column:1/-1}
+  .ff input{height:50px;border-radius:var(--r-sm);border:1px solid var(--line-2);
+            background:var(--raised);color:var(--ink);padding:0 15px;font:400 15px/1 var(--sans);width:100%}
+  .ff input:focus{border-color:var(--gold);outline:none}
+  @media(max-width:560px){.ff{grid-template-columns:1fr}}
+  .saida{margin-top:22px;font-size:14px;color:var(--muted)}
+  .saida a{color:var(--gold)}
+</style>
+</head>
+<body class="paper">
+  <div class="appbar">
+    <div class="marca"><div class="caduceu">V</div>
+      <div><span class="nome">VOW</span><span class="sob">Plataforma</span></div></div>
+    <div class="sp"></div>
+    <div class="quem" id="quem"></div>
+    <button class="sair" id="sair">Sair</button>
+  </div>
+
+  <main class="app-main">
+    <div id="cabecalho"></div>
+    <div class="lista" id="lista"></div>
+
+    <section class="nova" id="nova" hidden>
+      <h2>Cadastrar uma rede</h2>
+      <p class="leg">A rede é o cliente. Fornecedores, contratos e itens ficam dentro dela, e
+      os dados de uma nunca aparecem na outra.</p>
+      <div class="ff">
+        <input class="full" id="razao" placeholder="Nome da rede" autocomplete="off">
+        <input id="cnpj" placeholder="CNPJ (opcional)" inputmode="numeric">
+        <input id="porte" placeholder="Porte (opcional)" autocomplete="off">
+      </div>
+      <button class="btn" id="criar">Cadastrar e abrir</button>
+    </section>
+
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+  </main>
+
+<script type="module">
+const $ = (id) => document.getElementById(id)
+
+const ctx = await (await fetch('/api/app/contexto')).json()
+$('quem').innerHTML = `<b>${ctx.usuario.nome}</b>${ctx.usuario.papel}`
+
+const nenhuma = ctx.redes.length === 0
+
+$('cabecalho').innerHTML = nenhuma
+  ? `<h1>Nenhuma rede <em>ainda</em></h1>
+     <p class="sub">A carteira de leads já funciona sem isso — ela é da VOW, não de um
+     cliente. A rede só é necessária para os três sistemas.</p>`
+  : `<h1>Qual <em>rede</em></h1>
+     <p class="sub">Você atende mais de uma. Os dados de cada uma são isolados.</p>`
+
+$('nova').hidden = false
+if (nenhuma) {
+  // Sem saída, esta tela seria um beco: logado e sem lugar nenhum para ir.
+  $('nova').insertAdjacentHTML('afterend',
+    `<p class="saida">Ou vá direto para <a href="/app/pipeline">o funil de leads</a> —
+     ele não depende de rede.</p>`)
+}
+
+$('criar').addEventListener('click', async () => {
+  const razao = $('razao').value.trim()
+  if (!razao) { $('msg').textContent = 'Informe o nome da rede.'; return }
+  $('criar').disabled = true
+  try {
+    const r = await fetch('/api/app/redes', {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ razao, cnpj: $('cnpj').value.trim(), porte: $('porte').value.trim() }),
+    })
+    const j = await r.json()
+    if (!r.ok) throw new Error(j.erro || 'não foi possível cadastrar')
+    location.href = j.destino
+  } catch (e) {
+    $('msg').textContent = e.message
+    $('criar').disabled = false
+  }
+})
+
+$('lista').innerHTML = ctx.redes.map((r) => `
+  <button class="rede-card" data-id="${r.id}">
+    <h2>${esc(r.razao)}</h2>
+    <div class="cnpj">${esc(r.cnpj || '')}</div>
+    <div class="meta"><span class="pill">${r.porte}</span><span class="pill">plano ${r.plano}</span></div>
+  </button>`).join('')
+
+$('lista').addEventListener('click', async (e) => {
+  const alvo = e.target.closest('.rede-card')
+  if (!alvo) return
+  const r = await fetch('/api/app/rede', {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ redeId: alvo.dataset.id }),
+  })
+  const j = await r.json()
+  if (!r.ok) return ($('msg').textContent = j.erro)
+  location.href = j.destino
+})
+
+$('sair').addEventListener('click', async () => {
+  await fetch('/api/app/sair', { method: 'POST' })
+  location.href = '/app/entrar'
+})
+</script>
+</body>
+</html>

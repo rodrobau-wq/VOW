@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VOW · Reforma tributária no varejo — site completo</title>
 <meta name="description" content="Dois diagnósticos gratuitos: quanto da sua verba com a indústria passa a ser tributada e quanto do seu gasto com serviços volta como crédito.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+
 <link rel="stylesheet" href="/tokens.css">
 <style>
   /* cores, tipografia e primitivas vem de /tokens.css */
@@ -23,7 +22,7 @@
   /* hero */
   header.hero{padding:76px 0 64px;border-bottom:1px solid var(--line)}
   header.hero h1{font-size:clamp(38px,6.4vw,76px);margin:22px 0 26px}
-  header.hero h1 em{font-style:italic;color:var(--gold)}
+  header.hero h1 em{font-style:italic;color:var(--acento)}
   header.hero p.lead{font-size:clamp(17px,2.1vw,22px);color:var(--dim);max-width:62ch;margin-bottom:32px}
   .hero-cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
   .hero-note{font-size:14px;color:var(--faint)}
@@ -42,34 +41,34 @@
   /* diagnóstico */
   #diag{scroll-margin-top:70px}
   .tabs{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--line-2);border-radius:30px;margin:28px 0 24px}
-  .tab{height:46px;padding:0 22px;border-radius:24px;border:none;background:transparent;color:var(--dim);font:500 15px/1 'IBM Plex Sans',sans-serif;cursor:pointer}
-  .tab[aria-selected="true"]{background:var(--gold);color:var(--bg)}
+  .tab{height:46px;padding:0 22px;border-radius:24px;border:none;background:transparent;color:var(--dim);font:500 15px/1 var(--fonte);cursor:pointer}
+  .tab[aria-selected="true"]{background:var(--acento);color:var(--bg)}
   .dgrid{display:grid;grid-template-columns:1fr;gap:20px}
   @media(min-width:940px){.dgrid{grid-template-columns:420px 1fr;align-items:start}}
   .fld{margin-bottom:26px}
   .fld:last-child{margin-bottom:0}
   .fld .top{display:flex;justify-content:space-between;align-items:baseline;gap:14px;margin-bottom:12px}
   .fld label{font-size:14px;color:var(--muted)}
-  .fld .val{font-family:'Instrument Serif',serif;font-size:40px;line-height:1;color:var(--gold)}
-  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:4px;background:#243B2E;outline:none;margin:0}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--gold);border:4px solid var(--bg);box-shadow:0 0 0 1.5px var(--gold);cursor:pointer}
-  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--gold);border:4px solid var(--bg);cursor:pointer}
+  .fld .val{font-family:var(--fonte-titulo);font-size:40px;line-height:1;color:var(--acento)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:8px;border-radius:4px;background:var(--concrete);outline:none;margin:0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:var(--acento);border:4px solid var(--bg);box-shadow:0 0 0 1.5px var(--acento);cursor:pointer}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--acento);border:4px solid var(--bg);cursor:pointer}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 
   .out{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:32px;animation:up .3s ease both}
-  .hero-num{font-family:'Instrument Serif',serif;font-size:clamp(48px,8vw,84px);line-height:.95;letter-spacing:-.02em}
+  .hero-num{font-family:var(--fonte-titulo);font-size:clamp(48px,8vw,84px);line-height:.95;letter-spacing:-.02em}
   .hero-lbl{font-size:15px;color:var(--dim);margin-bottom:8px}
   .hero-sub{font-size:16px;color:var(--dim);margin:16px 0 0;max-width:56ch}
   .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:28px 0 0}
   .tile{background:var(--raised);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
   .tile .l{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;line-height:1.3}
-  .tile .v{font-family:'Instrument Serif',serif;font-size:28px;line-height:1}
+  .tile .v{font-family:var(--fonte-titulo);font-size:28px;line-height:1}
   .tile .n{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
   .rows{margin-top:26px;border-top:1px solid var(--line)}
   .row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:baseline;padding:13px 0;border-bottom:1px solid var(--line)}
   .row .nm{font-size:15px;font-weight:500}
   .row .nt{font-size:13px;color:var(--muted);line-height:1.35;margin-top:3px;max-width:60ch}
-  .row .vv{font-family:'Instrument Serif',serif;font-size:22px;color:var(--ok);white-space:nowrap}
+  .row .vv{font-family:var(--fonte-titulo);font-size:22px;color:var(--ok);white-space:nowrap}
   .rule{margin-top:26px}
   .fine{margin:22px 0 0}
 
@@ -79,7 +78,7 @@
   .capture p.s{color:var(--dim);font-size:15px}
   .ff{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0 16px}
   @media(max-width:640px){.ff{grid-template-columns:1fr}}
-  .ff input{height:52px;border-radius:12px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);padding:0 16px;font:400 16px/1 'IBM Plex Sans',sans-serif;width:100%}
+  .ff input{height:52px;border-radius:12px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);padding:0 16px;font:400 16px/1 var(--fonte);width:100%}
   .ff input::placeholder{color:var(--faint)}
   .ff .full{grid-column:1/-1}
   .msg{font-size:14px;margin-top:12px;min-height:20px}
@@ -88,18 +87,18 @@
 
   /* produtos */
   .pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:36px}
-  .prod{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:20px;padding:28px;display:flex;flex-direction:column}
-  .prod .n{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+  .prod{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--acento);border-radius:20px;padding:28px;display:flex;flex-direction:column}
+  .prod .n{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--acento);margin-bottom:12px}
   .prod h3{font-size:25px;margin-bottom:10px}
   .prod .q{color:var(--dim);font-size:15px;margin-bottom:16px}
   .prod ul{margin:0 0 18px;padding-left:18px;color:var(--muted);font-size:14px}
   .prod li{margin:6px 0}
-  .prod li::marker{color:var(--gold)}
+  .prod li::marker{color:var(--acento)}
   .prod .foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 
   .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-top:36px}
   .step{background:var(--surface);padding:26px 24px}
-  .step .k{font-family:'Instrument Serif',serif;font-size:30px;color:var(--gold);line-height:1;margin-bottom:12px}
+  .step .k{font-family:var(--fonte-titulo);font-size:30px;color:var(--acento);line-height:1;margin-bottom:12px}
   .step h4{font-size:16px;margin:0 0 6px;font-weight:600}
   .step p{font-size:14px;color:var(--muted);margin:0}
 
@@ -117,8 +116,8 @@
   .dcard h3{font-size:clamp(26px,3.4vw,34px);margin:0 0 12px}
   .dcard p{color:var(--dim);font-size:16px;margin:0;max-width:44ch}
   .dcard .go{display:flex;align-items:center;justify-content:space-between;gap:16px;
-             font-size:16px;font-weight:500;color:var(--gold)}
-  .dcard .go i{width:52px;height:52px;border-radius:50%;background:var(--gold);color:var(--bg);
+             font-size:16px;font-weight:500;color:var(--acento)}
+  .dcard .go i{width:52px;height:52px;border-radius:50%;background:var(--acento);color:var(--bg);
                display:grid;place-items:center;font-style:normal;font-size:22px;flex:none}
 
   /* entrada dedicada da feira — marca a origem do lead */
@@ -127,13 +126,13 @@
          background:linear-gradient(90deg,rgba(224,196,140,.10),transparent 70%);
          color:var(--ink);text-decoration:none;transition:background .2s,transform .2s}
   .abras:hover{background:linear-gradient(90deg,rgba(224,196,140,.18),transparent 70%);transform:translateY(-1px);color:var(--ink)}
-  .abras .sel{flex:none;width:76px;height:76px;border-radius:50%;border:1px solid var(--gold);
-              color:var(--gold);display:grid;place-items:center;font-family:var(--serif,'Instrument Serif',serif);
+  .abras .sel{flex:none;width:76px;height:76px;border-radius:50%;border:1px solid var(--acento);
+              color:var(--acento);display:grid;place-items:center;font-family:var(--serif,var(--fonte-titulo));
               font-size:19px;letter-spacing:.06em}
   .abras .txt{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0}
   .abras .txt strong{font-size:19px;font-weight:500}
   .abras .txt span{font-size:15px;color:var(--dim);line-height:1.45}
-  .abras i{flex:none;font-style:normal;font-size:26px;color:var(--gold)}
+  .abras i{flex:none;font-style:normal;font-size:26px;color:var(--acento)}
   @media(max-width:640px){.abras{flex-direction:column;align-items:flex-start;gap:16px}.abras i{display:none}}
   @media(max-width:900px){.abras-nav{display:none}}
 </style>
@@ -272,5 +271,10 @@
   </div>
 </footer>
 
+<footer style="border-top:1px solid var(--line);padding:44px 24px;text-align:center">
+  <img class="marca-logo" src="/marca/logo-horizontal.jpg"
+       alt="Grupo VOW — a inteligência tributária que alimenta o Brasil"
+       style="margin:0 auto">
+</footer>
 </body>
 </html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VOW · Reforma tributária no varejo</title>
+<meta name="description" content="Dois diagnósticos gratuitos: quanto da sua verba com a indústria passa a ser tributada e quanto do seu gasto com serviços volta como crédito.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/tokens.css">
+<style>
+  /* Tela única, sem rolagem: é o que fica no painel do estande e no monitor
+     da recepção. O site completo (produto, como funciona, rodapé) vive em
+     /site — esta aqui só precisa fazer uma pergunta e abrir o diagnóstico. */
+  html,body{height:100%}
+  body{overflow:hidden}
+  #tela{height:100dvh;display:flex;flex-direction:column}
+
+  header{display:flex;align-items:center;gap:20px;flex:0 0 auto;
+         padding:20px 40px;border-bottom:1px solid var(--line)}
+  header .sp{flex:1}
+  .marca{display:flex;align-items:baseline;gap:14px}
+  .marca .sub{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+
+  /* Seletor de orientação — canto superior esquerdo, ao lado da marca. */
+  .orient{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--line-2);border-radius:var(--r-pill)}
+  .orient button{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;
+                 border:0;border-radius:var(--r-pill);background:transparent;color:var(--muted);
+                 font:400 12.5px/1 var(--sans);cursor:pointer}
+  .orient button[aria-pressed="true"]{background:var(--gold);color:var(--bg)}
+  .orient i{display:block;border:1.5px solid currentColor;border-radius:2px}
+  .orient .iv{width:11px;height:17px}
+  .orient .ih{width:17px;height:11px}
+  .orient .rot{display:none}
+
+  main{flex:1 1 auto;display:grid;align-content:center;padding:40px 40px 48px;min-height:0}
+  .eyebrow{margin-bottom:22px}
+  h1{font-size:clamp(40px,6.6vw,84px);margin-bottom:26px}
+  h1 em{font-style:italic;color:var(--gold)}
+  .lead{font-size:clamp(17px,2vw,23px);color:var(--dim);max-width:60ch;margin-bottom:34px;line-height:1.5}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .nota{font-size:13.5px;color:var(--faint);margin:22px 0 0}
+
+  /* ---------------------------------------------------------- vertical */
+  /* Retrato: coluna única, tipografia maior, conteúdo centrado na altura. */
+  body[data-orient="vertical"] main{max-width:920px;margin:0 auto;width:100%}
+  body[data-orient="vertical"] h1{font-size:clamp(44px,7.4vw,92px)}
+
+  /* -------------------------------------------------------- horizontal */
+  /* Paisagem: texto à esquerda, ações à direita, para o olho não varrer a
+     tela inteira num monitor largo. */
+  body[data-orient="horizontal"] main{
+    grid-template-columns:1.15fr .85fr;gap:56px;align-items:center;
+    max-width:1360px;margin:0 auto;width:100%}
+  body[data-orient="horizontal"] .col-b{border-left:1px solid var(--line);padding-left:56px}
+  body[data-orient="horizontal"] .lead{margin-bottom:0}
+  body[data-orient="horizontal"] .cta{flex-direction:column;align-items:stretch}
+  body[data-orient="horizontal"] .cta .btn{width:100%}
+  body[data-orient="horizontal"] .orient .rot{display:inline}
+
+  /* Numa tela estreita a escolha some: só cabe o retrato. */
+  @media(max-width:900px){
+    .orient{display:none}
+    body[data-orient="horizontal"] main{grid-template-columns:1fr;gap:0}
+    body[data-orient="horizontal"] .col-b{border-left:0;padding-left:0;margin-top:30px}
+    body[data-orient="horizontal"] .cta{flex-direction:row}
+    header{padding:16px 22px} main{padding:24px 22px 32px}
+  }
+</style>
+</head>
+<body data-orient="vertical">
+<div id="tela">
+  <header>
+    <div class="marca">
+      <span class="logo">VOW</span>
+      <span class="sub">Reforma tributária no varejo</span>
+    </div>
+    <div class="orient" role="group" aria-label="Orientação da tela">
+      <button data-o="vertical" aria-pressed="true"><i class="iv"></i><span class="rot">Vertical</span></button>
+      <button data-o="horizontal" aria-pressed="false"><i class="ih"></i><span class="rot">Horizontal</span></button>
+    </div>
+    <div class="sp"></div>
+    <a class="lnk" href="/site" style="font-size:14px;color:var(--dim)">O que é a VOW</a>
+    <a class="lnk" href="/app/pipeline" style="font-size:14px;color:var(--dim)">CRM</a>
+  </header>
+
+  <main>
+    <div class="col-a">
+      <div class="eyebrow">JBP 2027 · IBS/CBS · LC 214/2025</div>
+      <h1>Já fez o seu JBP? <em>Planejou com as novas regras tributárias?</em></h1>
+      <p class="lead">A reforma já está no seu contrato com a indústria e nos seus contratos de
+      serviço. Em três minutos você vê o que muda, quanto custa e o que levar para a mesa.</p>
+    </div>
+    <div class="col-b">
+      <div class="cta">
+        <a class="btn lg" href="/diagnostico">Fazer o diagnóstico gratuito</a>
+      </div>
+      <p class="nota">Três minutos, sem compromisso. O diagnóstico chega no seu e-mail ao final.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+  const CHAVE = 'vow_abras_orientacao'
+  const botoes = document.querySelectorAll('.orient button')
+
+  function aplicar(o, guardar) {
+    document.body.dataset.orient = o
+    for (const b of botoes) b.setAttribute('aria-pressed', String(b.dataset.o === o))
+    if (guardar) { try { localStorage.setItem(CHAVE, o) } catch {} }
+  }
+
+  // Preferência do operador vence. Sem preferência, a própria tela decide:
+  // no estande o painel é retrato, num monitor de recepção é paisagem.
+  let inicial = null
+  try { inicial = localStorage.getItem(CHAVE) } catch {}
+  aplicar(inicial || (innerWidth > innerHeight ? 'horizontal' : 'vertical'), false)
+
+  for (const b of botoes) b.addEventListener('click', () => aplicar(b.dataset.o, true))
+</script>
+</body>
+</html>

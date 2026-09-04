@@ -4,15 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Painel · Plataforma VOW</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+
 <link rel="stylesheet" href="/tokens.css">
 <style>
   .cab{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
        flex-wrap:wrap;margin-bottom:24px}
   h1{font-size:38px;margin-bottom:4px}
-  h1 em{font-style:italic;color:var(--gold)}
+  h1 em{font-style:italic;color:var(--acento)}
   .cab .sub{color:var(--muted);font-size:15px;margin:0}
   .movimento{font-size:13.5px;color:var(--muted);text-align:right;line-height:1.6}
   .movimento b{color:var(--ink);font-weight:500}
@@ -21,9 +20,9 @@
   .num{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;
        display:flex;flex-direction:column}
   .num .rot{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-  .num .v{font-family:var(--serif);font-size:44px;line-height:1;margin:12px 0 0;
+  .num .v{font-family:var(--fonte-titulo);font-size:44px;line-height:1;margin:12px 0 0;
           font-variant-numeric:tabular-nums}
-  .num .v.risco{color:var(--risk)}
+  .num .v.risco{color:var(--risco)}
   .num .v.bom{color:var(--ok)}
   .num .pe{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5;flex:1}
   /* "Ainda não sabemos isto" é informação, não defeito: aparece no card. */
@@ -44,8 +43,8 @@
   .exc .cca{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.55}
   .exc .cca b{color:var(--dim);font-weight:500}
   .exc .pe{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap;font-size:12px}
-  .tag{padding:3px 10px;border-radius:var(--r-pill);background:var(--bg-deep);color:var(--muted)}
-  .tag.venceu{background:rgba(162,74,44,.10);color:var(--risk)}
+  .tag{padding:3px 10px;border-radius:var(--r-sm);background:var(--bg-deep);color:var(--muted)}
+  .tag.venceu{background:rgba(162,74,44,.10);color:var(--risco)}
 
   .comp{padding:20px 24px}
   .comp .linha{display:flex;justify-content:space-between;gap:14px;padding:11px 0;
@@ -55,9 +54,9 @@
   .carregando{padding:60px;text-align:center;color:var(--faint)}
 </style>
 </head>
-<body class="paper">
+<body>
   <div class="appbar">
-    <div class="marca"><div class="caduceu">V</div>
+    <div class="marca"><img class="marca-caduceu" src="/marca/caduceu.jpg" alt="Grupo VOW">
       <div><span class="nome">VOW</span><span class="sob">Plataforma</span></div></div>
     <button class="rede" id="rede"></button>
     <div class="sp"></div>
@@ -141,7 +140,7 @@ $('tudo').innerHTML = `
     <div class="movimento">
       Desde ontem: <b>${d.excecoesNovas}</b> ${d.excecoesNovas === 1 ? 'exceção nova' : 'exceções novas'},
       <b>${d.excecoesFechadas}</b> ${d.excecoesFechadas === 1 ? 'fechada' : 'fechadas'}.<br>
-      ${p.vencidas > 0 ? `<b style="color:var(--risk)">${p.vencidas} fora do prazo.</b>` : 'Nenhuma fora do prazo.'}
+      ${p.vencidas > 0 ? `<b style="color:var(--risco)">${p.vencidas} fora do prazo.</b>` : 'Nenhuma fora do prazo.'}
     </div>
   </div>
 

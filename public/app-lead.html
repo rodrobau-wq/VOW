@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Oportunidade · Plataforma VOW</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+
 <link rel="stylesheet" href="/tokens.css">
 <style>
   main{padding:24px 28px 60px;max-width:1180px;margin:0 auto}
@@ -15,7 +14,7 @@
   .cab{margin:14px 0 22px}
   h1{font-size:38px;margin:0 0 6px}
   .sub{color:var(--muted);font-size:15px;margin:0}
-  .sub a{color:var(--gold)}
+  .sub a{color:var(--acento)}
 
   /* Faixa da jornada: onde o lead entrou, onde está e onde travou. */
   .jornada{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
@@ -25,18 +24,18 @@
   .passo::before{content:"";position:absolute;top:9px;left:0;right:0;height:2px;background:var(--line-2)}
   .passo:first-child::before{left:50%}
   .passo:last-child::before{right:50%}
-  .passo.feito::before{background:var(--gold)}
+  .passo.feito::before{background:var(--acento)}
   .passo .bola{position:absolute;top:2px;left:50%;transform:translateX(-50%);
                width:16px;height:16px;border-radius:50%;background:var(--bg-deep);
                border:2px solid var(--line-2)}
-  .passo.feito .bola{background:var(--gold);border-color:var(--gold)}
-  .passo.aqui .bola{background:var(--surface);border-color:var(--gold);box-shadow:0 0 0 4px var(--gold-wash)}
+  .passo.feito .bola{background:var(--acento);border-color:var(--acento)}
+  .passo.aqui .bola{background:var(--surface);border-color:var(--acento);box-shadow:0 0 0 4px var(--acento-suave)}
   .passo .nm{font-size:12.5px;color:var(--muted);line-height:1.3}
   .passo.feito .nm{color:var(--ink);font-weight:500}
-  .passo.aqui .nm{color:var(--gold-deep);font-weight:600}
+  .passo.aqui .nm{color:var(--ink);font-weight:600}
   .passo .qdo{font-size:11px;color:var(--faint);margin-top:3px}
   .passo .dur{font-size:11px;color:var(--faint);margin-top:1px}
-  .passo.trava .dur{color:var(--risk);font-weight:500}
+  .passo.trava .dur{color:var(--risco);font-weight:500}
   .jornada .resumo{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;padding-top:14px;
                    border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
   .jornada .resumo b{color:var(--ink);font-weight:500}
@@ -50,28 +49,28 @@
 
   .valores{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
   .val{border:1px solid var(--line);border-radius:var(--r-md);padding:16px;background:var(--bg-deep)}
-  .val .v{font-family:var(--serif);font-size:30px;line-height:1;margin-top:7px;font-variant-numeric:tabular-nums}
-  .val.jogo .v{color:var(--risk)} .val.hon .v{color:var(--ok)}
+  .val .v{font-family:var(--fonte-titulo);font-size:30px;line-height:1;margin-top:7px;font-variant-numeric:tabular-nums}
+  .val.jogo .v{color:var(--risco)} .val.hon .v{color:var(--ok)}
   .val .p{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.45}
 
   .fases{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
   .fase{padding:8px 14px;border-radius:999px;border:1px solid var(--line-2);background:transparent;
-        color:var(--muted);font:400 13px/1 var(--sans);cursor:pointer}
-  .fase.on{background:var(--gold);color:var(--surface);border-color:var(--gold);font-weight:500}
+        color:var(--muted);font:400 13px/1 var(--fonte);cursor:pointer}
+  .fase.on{background:var(--acento);color:var(--surface);border-color:var(--acento);font-weight:500}
   .fase.ganho.on{background:var(--ok);border-color:var(--ok)}
-  .fase.perda.on{background:var(--risk);border-color:var(--risk)}
+  .fase.perda.on{background:var(--risco);border-color:var(--risco)}
   .saida{font-size:12.5px;color:var(--faint);margin:10px 0 0;line-height:1.5}
 
   label{display:block;font-size:12.5px;color:var(--muted);margin:14px 0 6px}
   input,select,textarea{width:100%;padding:11px 13px;border:1px solid var(--line-2);
     border-radius:var(--r-sm);background:var(--raised);color:var(--ink);
-    font:400 14.5px/1.4 var(--sans);outline:none}
-  input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+    font:400 14.5px/1.4 var(--fonte);outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--acento)}
   textarea{resize:vertical;min-height:76px}
   .dupla{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .btn.pequeno{height:40px;padding:0 18px;font-size:14px;border-radius:var(--r-pill)}
+  .btn.pequeno{height:40px;padding:0 18px;font-size:14px;border-radius:var(--r-sm)}
   .acoes{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
-  .msg{font-size:13.5px;min-height:19px;color:var(--risk)}
+  .msg{font-size:13.5px;min-height:19px;color:var(--risco)}
   .msg.ok{color:var(--ok)}
 
   .linha{display:flex;justify-content:space-between;gap:14px;padding:11px 0;
@@ -83,16 +82,16 @@
   .tempo li{padding:14px 0 14px 20px;border-left:2px solid var(--line);position:relative;margin-left:4px}
   .tempo li::before{content:"";position:absolute;left:-5px;top:20px;width:8px;height:8px;
                     border-radius:50%;background:var(--line-2)}
-  .tempo li.sistema::before{background:var(--gold)}
+  .tempo li.sistema::before{background:var(--acento)}
   .tempo .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
-  .tempo .tipo{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .tempo .tipo{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--acento)}
   .tempo .qdo{font-size:12px;color:var(--faint)}
   .tempo .txt{font-size:14px;color:var(--dim);line-height:1.55}
   .tempo .aut{font-size:12px;color:var(--faint);margin-top:3px}
   .aviso{font-size:12.5px;color:var(--faint);margin-top:12px;line-height:1.5}
 </style>
 </head>
-<body class="paper">
+<body>
 <main>
   <a class="volta" href="/app/pipeline">← Funil</a>
   <div id="tudo" style="padding:60px 0;color:var(--faint)">Carregando…</div>
@@ -164,7 +163,7 @@ function pintar() {
             data-e="${e.id}">${esc(e.nome)}</button>`).join('')}
         </div>
         <p class="saida">${est.saida ? '<b>Para avançar:</b> ' + esc(est.saida) : 'Fase final.'}
-          ${l.foraDoSla ? '<br><b style="color:var(--risk)">Fora do prazo de primeiro contato.</b>' : ''}
+          ${l.foraDoSla ? '<br><b style="color:var(--risco)">Fora do prazo de primeiro contato.</b>' : ''}
           Nesta fase ${parado(l.diasParado)}.</p>
 
         <div id="perda-campos" ${l.estagio === 'perdido' ? '' : 'hidden'}>

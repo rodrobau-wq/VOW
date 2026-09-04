@@ -18,7 +18,7 @@ const VERSAO = 'vow-campo-v1'
 const CASCA = [
   '/app/hoje', '/app/pipeline', '/app/leads',
   '/tokens.css', '/app-nav.js', '/motor.js',
-  '/icone.svg', '/manifest.webmanifest',
+  '/marca/caduceu.jpg', '/manifest.webmanifest',
 ]
 
 self.addEventListener('install', (e) => {

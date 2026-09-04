@@ -4,21 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Resultado · Plataforma VOW</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+
 <link rel="stylesheet" href="/tokens.css">
 <style>
   main{padding:24px 28px 60px;max-width:1180px;margin:0 auto}
   .cab{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:22px}
-  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--gold)}
+  h1{font-size:38px;margin:0 0 4px} h1 em{font-style:italic;color:var(--acento)}
   .cab p{color:var(--muted);font-size:15px;margin:0}
   .periodo{display:flex;gap:6px}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:13px;margin-bottom:20px}
   .k{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:19px}
   .k .r{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
-  .k .v{font-family:var(--serif);font-size:34px;line-height:1;margin-top:8px;font-variant-numeric:tabular-nums}
-  .k.bom .v{color:var(--ok)} .k.ruim .v{color:var(--risk)}
+  .k .v{font-family:var(--fonte-titulo);font-size:34px;line-height:1;margin-top:8px;font-variant-numeric:tabular-nums}
+  .k.bom .v{color:var(--ok)} .k.ruim .v{color:var(--risco)}
   .k .p{font-size:12.5px;color:var(--faint);margin-top:6px;line-height:1.45}
   .duas{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;align-items:start}
   @media(max-width:920px){.duas{grid-template-columns:1fr}}
@@ -29,9 +28,9 @@
   .mot:last-child{border-bottom:0}
   .mot .l1{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
   .mot .nm{font-size:14.5px;font-weight:500}
-  .mot .qt{font-family:var(--serif);font-size:21px;font-variant-numeric:tabular-nums}
+  .mot .qt{font-family:var(--fonte-titulo);font-size:21px;font-variant-numeric:tabular-nums}
   .mot .barra{height:6px;border-radius:3px;background:var(--bg-deep);margin:8px 0 7px;overflow:hidden}
-  .mot .barra i{display:block;height:100%;background:var(--risk);border-radius:3px}
+  .mot .barra i{display:block;height:100%;background:var(--risco);border-radius:3px}
   .mot .ac{font-size:12.5px;color:var(--faint);line-height:1.5}
   .linha{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--dim)}
   .linha:last-child{border-bottom:0}
@@ -39,7 +38,7 @@
   .nota{font-size:12.5px;color:var(--faint);margin-top:16px;line-height:1.55}
 </style>
 </head>
-<body class="paper">
+<body>
 <main>
   <div class="cab">
     <div><h1>O que <em>fechou</em> e o que caiu</h1><p>A tela da reunião de pipeline.</p></div>

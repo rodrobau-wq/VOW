@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base href="/abras/">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; padding:0; background:#0E1B14; }
+  body { font-family:'IBM Plex Sans', system-ui, sans-serif; color:#F3EEE2; -webkit-font-smoothing:antialiased; }
+  a { color:#E0C48C; text-decoration:none; } a:hover { color:#F3EEE2; }
+  * { box-sizing:border-box; }
+</style>
+</helmet>
+<div data-screen-label="Diagnóstico no celular" style="max-width:520px;margin:0 auto;min-height:100vh;background:#0E1B14;color:#F3EEE2;padding:24px 20px 48px;font-size:16px;line-height:1.4">
+  <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:36px">
+    <span style="font-family:'Instrument Serif',serif;font-size:26px;letter-spacing:0.04em">VOW</span>
+    <span style="font-size:11px;color:#9FB0A2;letter-spacing:0.14em;text-transform:uppercase">Diagnóstico · ABRAS 2026</span>
+  </div>
+
+  <sc-if value="{{ semDados }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:24px;border:1px dashed rgba(243,238,226,0.2);border-radius:16px;color:#C9D2C8">Este link não contém um diagnóstico. Faça o seu no estande da VOW ou fale com a gente em <a href="mailto:contato@vow.com.br">contato@vow.com.br</a>.</div>
+  </sc-if>
+
+  <sc-if value="{{ temDados }}" hint-placeholder-val="{{ true }}">
+    <div style="font-size:12px;color:#E0C48C;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px">{{ produtoNome }} · {{ quem }}</div>
+    <div style="font-size:16px;color:#C9D2C8;margin-bottom:6px">{{ heroLabel }}</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:64px;line-height:0.95;letter-spacing:-0.02em;color:{{ heroCor }};margin-bottom:14px">{{ heroValor }}</div>
+    <p style="font-size:16px;color:#C9D2C8;margin:0 0 12px;text-wrap:pretty">{{ heroSub }}</p>
+    <div style="font-size:13px;color:#9FB0A2;margin-bottom:28px">Premissas: faturamento {{ fatFmt }} · {{ pctFmt }} {{ pctLabel }} · {{ ativasResumo }}</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:32px">
+      <div style="background:#15261C;border:1px solid rgba(243,238,226,0.10);border-radius:16px;padding:16px">
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#9FB0A2;margin-bottom:12px">Hoje</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ hojeRows }}" as="r" hint-placeholder-count="4">
+            <div><div style="font-size:12px;color:#9FB0A2">{{ r.l }}</div><div style="font-size:15px;font-weight:500;line-height:1.3">{{ r.v }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:#1C3225;border:1px solid rgba(224,196,140,0.35);border-radius:16px;padding:16px">
+        <div style="font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:#E0C48C;margin-bottom:12px">Depois</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ depoisRows }}" as="r" hint-placeholder-count="4">
+            <div><div style="font-size:12px;color:#9FB0A2">{{ r.l }}</div><div style="font-size:15px;font-weight:500;line-height:1.3;color:{{ r.cor }}">{{ r.v }}</div></div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:28px;margin:0 0 4px">Linha a linha</h3>
+    <div style="font-size:12px;color:#9FB0A2;margin-bottom:12px">{{ colunaValorLabel }}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:32px">
+      <sc-for list="{{ familias }}" as="f" hint-placeholder-count="7">
+        <div style="background:#15261C;border-radius:14px;padding:14px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+            <span style="font-size:16px;font-weight:500">{{ f.nome }} <span style="font-size:11px;font-weight:400;color:{{ f.tagCor }};padding-left:6px">{{ f.tag }}</span></span>
+            <span style="font-family:'Instrument Serif',serif;font-size:20px;color:{{ f.valorCor }}">{{ f.valorFmt }}</span>
+          </div>
+          <div style="font-size:13px;color:#C9D2C8;line-height:1.4;margin-top:4px"><span style="color:#9FB0A2">{{ f.hoje }}</span> <span style="color:#E0C48C">→</span> {{ f.muda }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <h3 style="font-family:'Instrument Serif',serif;font-weight:400;font-size:28px;margin:0 0 4px">Como ficar em conformidade</h3>
+    <div style="font-size:13px;color:#9FB0A2;margin-bottom:12px">{{ ordemFrase }}</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:32px">
+      <sc-for list="{{ etapas }}" as="e" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:36px 1fr;gap:10px;background:#15261C;border-radius:14px;padding:14px 16px">
+          <span style="font-family:'Instrument Serif',serif;font-size:22px;line-height:1;color:#E0C48C">{{ e.n }}</span>
+          <div><div style="font-size:15px;font-weight:500">{{ e.t }}</div><div style="font-size:13px;color:#C9D2C8;line-height:1.4">{{ e.d }}</div></div>
+        </div>
+      </sc-for>
+    </div>
+
+    <a href="{{ linkContato }}" style="display:flex;align-items:center;justify-content:center;height:56px;border-radius:14px;background:#E0C48C;color:#0E1B14;font-size:16px;font-weight:500;margin-bottom:24px">Conversar com a VOW sobre este diagnóstico</a>
+    <p style="font-size:12px;color:#6F8074;line-height:1.45;margin:0;text-wrap:pretty">Estimativa com as premissas do estudo VOW × ABRAS: alíquota de referência 26,5%, mix padrão do varejo por família e margem líquida de 2%. Os valores da sua rede dependem do inventário. Aritmética a validar com o time fiscal da VOW.</p>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932},&quot;demo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Demonstração&quot;},&quot;linkContato&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contato&quot;}}">
+class Component extends DCLogic {
+  state = { M: null, d: null };
+  componentDidMount() {
+    import('./motor.js').then(M => { this.setState({ M, d: M.decodificarDiagnostico(location.hash) }); window.addEventListener('hashchange', () => this.setState({ d: M.decodificarDiagnostico(location.hash) })); });
+  }
+  renderVals() {
+    const { M, d } = this.state;
+    if (!M) return { temDados: true, semDados: false };
+    const demo = this.props.demo ?? true;
+    const dd = d || (demo ? { p: 'revenda', f: 3e8, pc: 3, a: null, n: 'Mariana Costa', e: 'Supermercados Bom Dia' } : null);
+    if (!dd) return { temDados: false, semDados: true };
+    const P = M.PRODUTOS[dd.p] || M.PRODUTOS.revenda;
+    const r = M.simular(P.id, +dd.f, +dd.pc, dd.a, dd.w);
+    const isRev = P.id === 'revenda'; const fx = M.fmtBRLc;
+    const hero = isRev
+      ? { heroLabel: 'Perda anual se a verba não for recomposta', heroValor: fx(r.perda), heroCor: '#E8906C', heroSub: `${M.fmtPct(r.pctLucro, 0)} do lucro anual estimado. ${M.fmtPct(r.pctTributavel)} da verba passa a ser tributada, e a recomposição não custa nada à indústria: ela credita o imposto que paga.` }
+      : { heroLabel: 'Crédito que passa a voltar por ano', heroValor: fx(r.ganho), heroCor: '#7BD389', heroSub: `${M.fmtPct(r.pctGanho)} do que você paga em indiretos, hoje tratado como custo puro. Equivale a ${M.fmtPct(r.pctLucro, 0)} do lucro anual estimado, e depende do regime de cada prestador.` };
+    const hojeRows = isRev ? [{ l: 'Verba recebida no ano', v: fx(r.base) }, { l: 'Como circula', v: 'Abatimento em fatura' }, { l: 'Tributo sobre a verba', v: 'R$ 0' }, { l: 'Documento fiscal do varejo', v: 'Raro' }] : [{ l: 'Gasto com indiretos', v: fx(r.base) }, { l: 'Crédito recuperado', v: fx(r.creditoHoje) }, { l: 'Custo líquido', v: fx(r.custoHoje) }, { l: 'Critério de compra', v: 'Preço' }];
+    const depoisRows = isRev ? [{ l: 'Passa a ser tributado', v: fx(r.tributavel), cor: '#F3EEE2' }, { l: 'IBS/CBS embutido', v: fx(r.perda), cor: '#E8906C' }, { l: 'Recomposição a negociar', v: fx(r.recomposicao), cor: '#7BD389' }, { l: 'Documento fiscal', v: 'Obrigatório, com CNAE', cor: '#F3EEE2' }] : [{ l: 'IBS/CBS embutido', v: fx(r.base * M.POR_DENTRO), cor: '#F3EEE2' }, { l: 'Crédito potencial', v: fx(r.creditoDepois), cor: '#7BD389' }, { l: 'Custo líquido', v: fx(r.custoDepois), cor: '#7BD389' }, { l: 'Critério de compra', v: 'Custo líquido de crédito', cor: '#F3EEE2' }];
+    const familias = r.familias.map(f => { const tagCor = isRev ? (f.trib === 1 ? '#E8906C' : f.trib === 0 ? '#7BD389' : '#E0C48C') : (f.cred === 1 ? '#7BD389' : '#E0C48C'); return { nome: f.nome, hoje: f.hoje, muda: f.muda, tagCor, tag: isRev ? (f.trib === 1 ? 'Tributa' : f.trib === 0 ? 'Não tributa' : 'Depende do documento') : (f.cred === 1 ? 'Crédito integral' : f.cred >= 0.8 ? 'Crédito alto' : 'Depende do regime'), valorFmt: fx(isRev ? f.tributavel : f.creditoDepois), valorCor: isRev ? (f.trib === 0 ? '#9FB0A2' : '#F3EEE2') : '#7BD389' }; });
+    return {
+      temDados: true, semDados: false, produtoNome: P.nome, quem: dd.e || dd.n || '', ...hero, hojeRows, depoisRows, familias,
+      fatFmt: fx(+dd.f), pctFmt: (+dd.pc).toLocaleString('pt-BR') + '%', pctLabel: isRev ? 'de verba' : 'em indiretos',
+      ativasResumo: r.ativas.length === P.familias.length ? 'todas as famílias' : `${r.ativas.length} de ${P.familias.length} famílias`,
+      colunaValorLabel: isRev ? 'valor que passa a tributar, por família' : 'crédito potencial por ano, por família',
+      ordemFrase: isRev ? 'Classificar antes de renegociar.' : 'Classificar antes de sentar.',
+      etapas: P.etapas.map((e, i) => ({ n: '0' + (i + 1), t: e.t, d: e.d })),
+      linkContato: this.props.linkContato || 'mailto:contato@vow.com.br?subject=' + encodeURIComponent('Diagnóstico VOW · ' + P.nome),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>VOW · Reforma tributária no varejo</title>
 <meta name="description" content="Dois diagnósticos gratuitos: quanto da sua verba com a indústria passa a ser tributada e quanto do seu gasto com serviços volta como crédito.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+
 <link rel="stylesheet" href="/tokens.css">
 <style>
   /* Tela única, sem rolagem: é o que fica no painel do estande e no monitor
@@ -20,24 +19,28 @@
   header{display:flex;align-items:center;gap:20px;flex:0 0 auto;
          padding:20px 40px;border-bottom:1px solid var(--line)}
   header .sp{flex:1}
-  .marca{display:flex;align-items:baseline;gap:14px}
-  .marca .sub{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+  .marca{display:flex;align-items:center;gap:12px}
+  .assinatura b{display:block;font-size:17px;font-weight:600;letter-spacing:.06em;line-height:1.1}
+  .assinatura span{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 
   /* Seletor de orientação — canto superior esquerdo, ao lado da marca. */
-  .orient{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--line-2);border-radius:var(--r-pill)}
+  .orient{display:inline-flex;gap:3px;padding:3px;border:1px solid var(--line-2);border-radius:var(--r-sm)}
   .orient button{display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;
-                 border:0;border-radius:var(--r-pill);background:transparent;color:var(--muted);
-                 font:400 12.5px/1 var(--sans);cursor:pointer}
-  .orient button[aria-pressed="true"]{background:var(--gold);color:var(--bg)}
+                 border:0;border-radius:var(--r-sm);background:transparent;color:var(--muted);
+                 font:400 12.5px/1 var(--fonte);cursor:pointer}
+  .orient button[aria-pressed="true"]{background:var(--acento);color:var(--bg)}
   .orient i{display:block;border:1.5px solid currentColor;border-radius:2px}
   .orient .iv{width:11px;height:17px}
   .orient .ih{width:17px;height:11px}
   .orient .rot{display:none}
 
-  main{flex:1 1 auto;display:grid;align-content:center;padding:40px 40px 48px;min-height:0}
+  /* `safe center` centraliza quando cabe e ancora no topo quando não cabe.
+     Sem o `safe`, conteúdo mais alto que a tela perde o começo no corte. */
+  main{flex:1 1 auto;display:grid;align-content:safe center;padding:36px 40px 44px;
+       min-height:0;overflow-y:auto}
   .eyebrow{margin-bottom:22px}
-  h1{font-size:clamp(40px,6.6vw,84px);margin-bottom:26px}
-  h1 em{font-style:italic;color:var(--gold)}
+  h1{font-size:var(--t-h1);margin-bottom:24px}
+  h1 em{font-style:italic;color:var(--acento)}
   .lead{font-size:clamp(17px,2vw,23px);color:var(--dim);max-width:60ch;margin-bottom:34px;line-height:1.5}
   .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
   .nota{font-size:13.5px;color:var(--faint);margin:22px 0 0}
@@ -45,7 +48,7 @@
   /* ---------------------------------------------------------- vertical */
   /* Retrato: coluna única, tipografia maior, conteúdo centrado na altura. */
   body[data-orient="vertical"] main{max-width:920px;margin:0 auto;width:100%}
-  body[data-orient="vertical"] h1{font-size:clamp(44px,7.4vw,92px)}
+  body[data-orient="vertical"] h1{font-size:var(--t-h1)}
 
   /* -------------------------------------------------------- horizontal */
   /* Paisagem: texto à esquerda, ações à direita, para o olho não varrer a
@@ -73,8 +76,11 @@
 <div id="tela">
   <header>
     <div class="marca">
-      <span class="logo">VOW</span>
-      <span class="sub">Reforma tributária no varejo</span>
+      <img class="marca-caduceu" src="/marca/caduceu.jpg" alt="">
+      <span class="assinatura">
+        <b>GRUPO VOW</b>
+        <span>A inteligência tributária que alimenta o Brasil</span>
+      </span>
     </div>
     <div class="orient" role="group" aria-label="Orientação da tela">
       <button data-o="vertical" aria-pressed="true"><i class="iv"></i><span class="rot">Vertical</span></button>

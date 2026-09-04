@@ -1,101 +1,116 @@
 /**
- * Tokens VOW — fonte única da linguagem visual.
+ * Identidade visual — Grupo VOW
  *
- * Antes disto, cada tela repetia o :root inline e as três já tinham divergido
- * (a landing em verde escuro, o totem num preto/dourado próprio, os leads em
- * papel). Qualquer tela nova importa este arquivo e não redeclara cor nenhuma.
+ * FONTE ÚNICA: Marca/[Grupo Vow] Brandguide 2026.pdf.
+ * Nada aqui é escolha de design. Cada valor abaixo tem página no manual, e a
+ * página está citada. Se algo não estiver no manual, não entra sem aprovação
+ * dos gestores da marca — é o que a página 28 determina, com essas palavras:
  *
- * DUAS ESCALAS, mesmos nomes semânticos:
+ *   "As aplicações da marca em outras cores são desaconselhadas e não devem
+ *    ser realizadas sem aprovação dos gestores da marca."
  *
- *   :root       camada pública — landing, diagnósticos, totem.
- *               Escura e cinematográfica. É vitrine, dura minutos.
- *
- *   body.paper  camada interna — plataforma de leads e o SaaS.
- *               Clara, sobre papel. É ferramenta de oito horas por dia.
- *
- * Um componente escrito com --surface/--ink/--line funciona nas duas sem
- * saber em qual está. Só troque a escala no <body>, nunca dentro da tela.
- *
- * ACESSIBILIDADE: cor nunca decide sozinha. Vermelho de tributado contra
- * verde de não tributado dá ΔE 7,6 em deuteranopia — indistinguíveis. Todo
- * elemento que usa --risk ou --ok carrega o rótulo escrito junto.
+ * A versão anterior usava um verde e um dourado que não existem no manual:
+ * vieram do handoff de design, que os marcava como "a confirmar". Saíram.
  */
 
 :root{
-  /* fundos, do mais fundo ao mais alto */
-  --bg:#0E1B14;
-  --bg-deep:#07110C;
-  --surface:#15261C;
-  --raised:#1C3225;
+  /* ---------------- paleta oficial · pág. 28 · 4 cinzas e o preto -------- */
+  --preto:    #000000;   /* K100                  */
+  --piano:    #3d3d3d;   /* cinza 90%  ·  PIANO    */
+  --storm:    #707070;   /* cinza 70%  ·  STORM    */
+  --concrete: #bfbfbf;   /* cinza 30%  ·  CONCRETE */
+  --silver:   #e8e8e8;   /* cinza 10%  ·  SILVER   */
+  --branco:   #ffffff;
 
-  /* texto, do mais forte ao mais apagado */
-  --ink:#F3EEE2;
-  --dim:#C9D2C8;
-  --muted:#9FB0A2;
-  --faint:#6F8074;
+  /* ------------- papéis na interface, a partir da paleta ---------------- */
+  /* Combinação 04 da pág. 29: marca em STORM sobre fundo SILVER. */
+  --bg:      var(--silver);
+  --bg-deep: var(--concrete);
+  --surface: var(--branco);
+  --raised:  var(--branco);
 
-  /* marca */
-  --gold:#E0C48C;
-  --gold-deep:#B8934A;
-  /* fundo de realce dourado — atrás de citação de regra, chip ativo */
-  --gold-wash:rgba(224,196,140,.07);
-  --gold-edge:rgba(224,196,140,.30);
+  --ink:   var(--preto);
+  --dim:   var(--piano);
+  --muted: var(--storm);
+  --faint: var(--concrete);
 
-  /* estados. Sempre acompanhados de rótulo escrito. */
-  --risk:#E8906C;
-  --ok:#7BD389;
+  /* Sem cor de acento na marca. O destaque é feito com preto sobre claro —
+     é assim que o manual resolve contraste, e não com uma cor de sinalização. */
+  --acento:      var(--preto);
+  --acento-tinta:var(--branco);
+  --acento-suave:rgba(0,0,0,.06);
+  --acento-borda:rgba(0,0,0,.22);
 
-  /* traços */
-  --line:rgba(243,238,226,.10);
-  --line-2:rgba(243,238,226,.18);
+  --line:   rgba(0,0,0,.14);
+  --line-2: rgba(0,0,0,.26);
 
-  /* papel — usado pela camada pública quando precisa citar a interna */
-  --paper:#EFE9DB;
-  --paper-card:#FBF8F1;
-  --paper-ink:#0E1B14;
+  /**
+   * ⚠️ FORA DA PALETA — pendente de aprovação dos gestores da marca.
+   *
+   * Um CRM precisa distinguir atrasado de em dia. O manual não prevê cor de
+   * estado, e inventar uma seria contrariar a página 28 — então ficam aqui,
+   * isoladas e assinaladas, nos tons mais contidos que resolvem a função.
+   *
+   * A interface NUNCA depende só delas: todo item colorido carrega o rótulo
+   * escrito, o que também é o que resolve daltonismo.
+   */
+  --risco: #8a3123;
+  --ok:    #2f6b45;
 
-  /* trilho do slider: só ele precisa de um verde intermediário próprio */
-  --track:#243B2E;
+  /* ------------------ tipografia · págs. 31 e 32 ------------------------ */
+  /**
+   * A tipografia da marca é a Obviously, do Adobe Fonts (pág. 31).
+   * É licenciada: sem o kit da conta Adobe do Grupo VOW ela não carrega, e
+   * nenhuma fonte gratuita é a Obviously. Por isso a pilha cai num sans
+   * neutro do sistema em vez de substituir a marca por outra fonte.
+   *
+   * PARA ATIVAR A FONTE REAL: inclua o kit do Adobe Fonts no <head> das
+   * telas e nada mais precisa mudar — ela já é a primeira da pilha.
+   *   <link rel="stylesheet" href="https://use.typekit.net/SEU-KIT.css">
+   */
+  --fonte: 'Obviously', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --fonte-titulo: var(--fonte);
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --r-sm:12px; --r-md:16px; --r-lg:20px; --r-xl:24px; --r-2xl:32px; --r-pill:999px;
+  /* Escala tipográfica da pág. 32, em proporção ao corpo de 16px.
+     H1 Semibold 80/100 · H2 Medium 48/60 · H3 Regular 28/48 */
+  --t-h1: clamp(38px, 6vw, 80px);
+  --t-h2: clamp(30px, 4vw, 48px);
+  --t-h3: 28px;
 
-  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
-  --serif:'Instrument Serif',Georgia,serif;
-  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --r-sm:4px; --r-md:6px; --r-lg:8px; --r-xl:10px; --r-2xl:12px; --r-pill:999px;
 }
 
-/* A camada interna reusa os mesmos nomes com valores de papel. O dourado
-   escurece: #E0C48C sobre branco não passa em contraste nenhum. */
-body.paper{
-  --bg:#EFE9DB;
-  --bg-deep:#E4DCC9;
-  --surface:#FBF8F1;
-  --raised:#FFFFFF;
+/**
+ * Camada de fundo escuro — combinação 03 da pág. 29: marca em SILVER sobre
+ * fundo PIANO. Usada onde o manual permite peça escura.
+ */
+.escuro{
+  --bg:      var(--piano);
+  --bg-deep: var(--preto);
+  --surface: var(--piano);
+  --raised:  var(--storm);
 
-  --ink:#0E1B14;
-  --dim:#2E4237;
-  --muted:#5C6F62;
-  --faint:#87988B;
+  --ink:   var(--silver);
+  --dim:   var(--concrete);
+  --muted: var(--concrete);
+  --faint: var(--storm);
 
-  --gold:#8A6A2B;
-  --gold-deep:#6E5320;
-  --gold-wash:rgba(138,106,43,.08);
-  --gold-edge:rgba(138,106,43,.32);
+  --acento:      var(--silver);
+  --acento-tinta:var(--piano);
+  --acento-suave:rgba(232,232,232,.10);
+  --acento-borda:rgba(232,232,232,.30);
 
-  --risk:#A24A2C;
-  --ok:#2F7A55;
+  --line:   rgba(232,232,232,.16);
+  --line-2: rgba(232,232,232,.30);
 
-  --line:rgba(14,27,20,.12);
-  --line-2:rgba(14,27,20,.22);
-
-  --track:#D8CFBB;
+  --risco: #e0a196;
+  --ok:    #9dc9ae;
 }
 
 /* --------------------------------------------------------------- base */
 *{box-sizing:border-box}
-/* Um `display` declarado numa classe vence o `hidden` do navegador, e o
-   elemento reaparece. Já aconteceu com o status de CNPJ: o atributo estava
-   lá e a bolinha continuava na tela. */
+/* Um `display` declarado numa classe vence o `hidden` do navegador. */
 [hidden]{display:none!important}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){
@@ -106,131 +121,137 @@ body{
   margin:0;
   background:var(--bg);
   color:var(--ink);
-  font-family:var(--sans);
+  font-family:var(--fonte);
   font-size:16px;
   line-height:1.5;
   -webkit-font-smoothing:antialiased;
 }
+
+/* Caixa alta é permitida em títulos — pág. 32. */
 h1,h2,h3{
   margin:0;
-  font-family:var(--serif);
-  font-weight:400;
-  line-height:1.05;
-  letter-spacing:-.01em;
+  font-family:var(--fonte-titulo);
+  line-height:1.25;
+  letter-spacing:0;      /* AV: 0 no manual */
   text-wrap:balance;
 }
+h1{font-size:var(--t-h1);font-weight:600}   /* Semibold */
+h2{font-size:var(--t-h2);font-weight:500}   /* Medium   */
+h3{font-size:var(--t-h3);font-weight:400}   /* Regular  */
 p{margin:0 0 16px;text-wrap:pretty}
-a{color:var(--gold);text-decoration:none}
-a:hover{color:var(--ink)}
-:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+a:hover{color:var(--muted)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* -------------------------------------------------------- a marca */
+/**
+ * Os arquivos da marca são JPG com fundo branco. `multiply` faz o branco
+ * desaparecer sobre fundo claro sem recortar a imagem — nenhum pixel do
+ * logotipo é alterado, que é o que a pág. 29 exige ao proibir efeitos que
+ * descaracterizem a marca.
+ *
+ * REDUÇÃO MÍNIMA (pág. 22): o logotipo completo nunca abaixo de 115px de
+ * altura. Em barra de aplicativo isso é impossível, então ali entra o
+ * caduceu sozinho — que é elemento gráfico próprio, não o logotipo reduzido.
+ */
+.marca-logo{display:block;height:115px;width:auto;mix-blend-mode:multiply}
+.marca-caduceu{display:block;height:32px;width:auto;mix-blend-mode:multiply}
+/**
+ * Sobre fundo escuro o logotipo NÃO funciona com os arquivos de hoje: são
+ * JPG com fundo branco, e nenhuma mesclagem devolve transparência. Aplicar
+ * `invert` deixaria a marca cinza-escura sobre cinza-escuro, ilegível — e
+ * alterar a marca é o que a pág. 29 proíbe.
+ *
+ * Para usar a marca em peça escura é preciso o arquivo vetorial (SVG ou EPS)
+ * ou um PNG com fundo transparente, na versão SILVER da combinação 03.
+ * Enquanto não houver, todas as telas usam fundo claro — que é a expressão
+ * natural da marca e o que as próprias artes oficiais fazem.
+ */
+.escuro .marca-logo,.escuro .marca-caduceu{display:none}
 
 /* ---------------------------------------------------------- primitivas */
 .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-.serif{font-family:var(--serif);font-weight:400}
-/* Números alinham em coluna. Toda tabela de valor usa. */
 .tnum{font-variant-numeric:tabular-nums}
-.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
-.logo{font-family:var(--serif);font-size:26px;letter-spacing:.04em;color:var(--ink)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:500}
 
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  height:44px;padding:0 20px;border-radius:var(--r-xl);border:none;
-  background:var(--gold);color:var(--bg);
-  font:500 15px/1 var(--sans);cursor:pointer;transition:filter .2s;
+  height:46px;padding:0 22px;border:1px solid var(--acento);border-radius:var(--r-sm);
+  background:var(--acento);color:var(--acento-tinta);
+  font:500 15px/1 var(--fonte);cursor:pointer;text-decoration:none;
+  transition:opacity .15s;
 }
-.btn:hover{filter:brightness(1.08)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
-.btn.lg{height:60px;padding:0 30px;font-size:17px;border-radius:var(--r-md)}
-/* No papel o dourado é escuro, então o texto do botão inverte. */
-body.paper .btn{color:var(--surface)}
+.btn:hover{opacity:.85;color:var(--acento-tinta)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-2)}
+.btn.ghost:hover{border-color:var(--ink);color:var(--ink)}
+.btn.lg{height:58px;padding:0 30px;font-size:17px}
 
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:28px}
-.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);padding:28px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:26px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:26px}
 
 .chip{
-  height:36px;padding:0 14px;border-radius:var(--r-pill);
-  border:1px solid var(--line-2);background:transparent;color:var(--dim);
-  font:400 13px/1 var(--sans);cursor:pointer;white-space:nowrap;
+  height:34px;padding:0 14px;border-radius:var(--r-sm);
+  border:1px solid var(--line-2);background:transparent;color:var(--muted);
+  font:400 13px/1 var(--fonte);cursor:pointer;white-space:nowrap;
 }
-.chip[aria-pressed="true"]{background:var(--gold);color:var(--bg);border-color:var(--gold)}
-body.paper .chip[aria-pressed="true"]{color:var(--surface)}
+.chip[aria-pressed="true"]{background:var(--acento);color:var(--acento-tinta);border-color:var(--acento)}
 
-/* Citação de regra ou de norma: barra dourada à esquerda. */
-.rule{
-  border-left:3px solid var(--gold);background:var(--gold-wash);
-  border-radius:0 var(--r-sm) var(--r-sm) 0;padding:16px 20px;
-  font-size:15px;color:var(--dim);
-}
+.rule{border-left:2px solid var(--ink);background:var(--acento-suave);
+      padding:16px 20px;font-size:15px;color:var(--dim)}
 .rule p{margin:0}
-.fine{font-size:12.5px;color:var(--faint);line-height:1.5}
+.fine{font-size:12.5px;color:var(--muted);line-height:1.5}
 
-@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 /* ------------------------------------------------- casca da plataforma */
-/* Três telas do SaaS compartilham esta barra. Fica aqui, e não repetida em
-   cada uma, porque foi exatamente assim que os tokens divergiram antes. */
 .appbar{
   display:flex;align-items:center;gap:18px;flex-wrap:wrap;
-  padding:14px 28px;border-bottom:1px solid var(--line);background:var(--surface);
+  padding:12px 26px;border-bottom:1px solid var(--line);background:var(--surface);
 }
 .appbar .sp{flex:1}
-.appbar .marca{display:flex;align-items:center;gap:11px}
-.appbar .caduceu{
-  width:32px;height:32px;border:1px solid var(--gold-edge);border-radius:10px;
-  display:grid;place-items:center;color:var(--gold);font-family:var(--serif);font-size:16px;
-}
-.appbar .nome{font-family:var(--serif);font-size:19px;line-height:1.1;display:block}
-.appbar .sob{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
-.appbar .rede{
-  display:flex;align-items:center;gap:8px;padding:7px 14px;border-radius:var(--r-pill);
-  border:1px solid var(--line-2);font-size:13px;color:var(--dim);background:transparent;cursor:pointer;
-}
-.appbar .rede:hover{border-color:var(--gold-edge);color:var(--ink)}
-.appbar .quem{font-size:13px;color:var(--muted);text-align:right;line-height:1.3}
-.appbar .quem b{display:block;color:var(--ink);font-weight:500;font-family:var(--sans);font-size:13px}
-.appbar .sair{background:none;border:0;color:var(--muted);font:400 13px/1 var(--sans);cursor:pointer;padding:0}
-.appbar .sair:hover{color:var(--risk)}
-
-.app-main{padding:28px;max-width:1240px;margin:0 auto}
-
-/* Abas da plataforma — moram aqui pela mesma razão que a .appbar. */
-/* No celular as abas rolam na horizontal em vez de quebrar em duas linhas:
-   o app de campo é usado de pé, e cada linha a mais empurra o conteúdo. */
+.appbar .marca{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.appbar .nome{font-size:17px;font-weight:600;letter-spacing:.04em;line-height:1.1;display:block}
+.appbar .sob{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .appbar .abas{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;
               scrollbar-width:none;max-width:100%}
 .appbar .abas::-webkit-scrollbar{display:none}
-.appbar .abas a{white-space:nowrap}
-.appbar .abas a{padding:7px 14px;border-radius:var(--r-pill);font-size:13.5px;
-                color:var(--muted);text-decoration:none}
-.appbar .abas a:hover{color:var(--ink);background:var(--bg-deep)}
-.appbar .abas a.on{background:var(--ink);color:var(--surface);font-weight:500}
+.appbar .abas a{padding:7px 13px;border-radius:var(--r-sm);font-size:13.5px;
+                color:var(--muted);text-decoration:none;white-space:nowrap}
+.appbar .abas a:hover{color:var(--ink);background:var(--bg)}
+.appbar .abas a.on{background:var(--acento);color:var(--acento-tinta);font-weight:500}
+.appbar .abas .sep{width:1px;height:18px;background:var(--line-2);margin:0 8px;align-self:center;flex:0 0 auto}
+.appbar .rede{display:flex;align-items:center;gap:8px;padding:7px 13px;border-radius:var(--r-sm);
+              border:1px solid var(--line-2);font-size:13px;color:var(--dim);background:transparent;cursor:pointer}
+.appbar .rede:hover{border-color:var(--ink);color:var(--ink)}
+.appbar .quem{font-size:13px;color:var(--muted);text-align:right;line-height:1.3}
+.appbar .quem b{display:block;color:var(--ink);font-weight:500;font-size:13px}
+.appbar .sair{background:none;border:0;color:var(--muted);font:400 13px/1 var(--fonte);cursor:pointer;padding:0}
+.appbar .sair:hover{color:var(--ink);text-decoration:underline}
 
-/* Estado da rede no app de campo. A cor não decide sozinha: a frase diz. */
-.faixa-rede{padding:10px 18px;font-size:13.5px;text-align:center;font-weight:500}
-.faixa-rede.off{background:var(--risk);color:#fff}
-.faixa-rede.esperando{background:var(--gold);color:var(--bg)}
-.faixa-rede.ok{background:var(--ok);color:#fff}
+.app-main{padding:26px;max-width:1240px;margin:0 auto}
 
 @media(max-width:640px){
   .appbar{padding:10px 14px;gap:10px}
-  .appbar .marca .sob{display:none}
+  .appbar .sob{display:none}
   .appbar .quem{display:none}
   .appbar .abas{order:3;flex-basis:100%}
 }
 
-/* ------------------------------------------------- campo de senha */
-/* O olho fica dentro do campo. `type=button` é obrigatório: dentro de um
-   form, um button sem type envia o formulário ao ser clicado. */
+/* --------------------------------------------- campo de senha (olhinho) */
 .senha-campo{position:relative;display:block}
 .senha-campo input{padding-right:52px;width:100%}
 .senha-campo .olho{
   position:absolute;right:6px;top:50%;transform:translateY(-50%);
   width:40px;height:40px;display:grid;place-items:center;
-  background:none;border:0;border-radius:50%;cursor:pointer;color:var(--muted);
+  background:none;border:0;border-radius:var(--r-sm);cursor:pointer;color:var(--muted);
 }
-.senha-campo .olho:hover{color:var(--gold)}
+.senha-campo .olho:hover{color:var(--ink)}
 .senha-campo .olho svg{width:20px;height:20px;fill:none;stroke:currentColor;
   stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
-.appbar .abas .sep{width:1px;height:18px;background:var(--line-2);margin:0 8px;align-self:center;flex:0 0 auto}
+/* Estado da rede. A cor não decide sozinha: a frase diz o que houve. */
+.faixa-rede{padding:10px 18px;font-size:13.5px;text-align:center;font-weight:500}
+.faixa-rede.off{background:var(--risco);color:var(--branco)}
+.faixa-rede.esperando{background:var(--concrete);color:var(--preto)}
+.faixa-rede.ok{background:var(--ok);color:var(--branco)}
