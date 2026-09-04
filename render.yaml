@@ -65,3 +65,9 @@ services:
         sync: false
       - key: ADMIN_SENHA
         sync: false
+      # Dono da plataforma (papel `deus`): a conta não pode ser rebaixada nem
+      # desativada pela tela de equipe. Diferente das de cima, esta é lida a
+      # cada boot — só promove uma conta que já existe, nunca define senha.
+      # Em branco, cai no ADMIN_EMAIL.
+      - key: SUPERADMIN_EMAIL
+        sync: false
